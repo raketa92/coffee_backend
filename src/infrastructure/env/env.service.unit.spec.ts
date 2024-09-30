@@ -1,8 +1,8 @@
-import { ConfigService } from '@nestjs/config';
-import { EnvService } from './env.service';
-import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from "@nestjs/config";
+import { EnvService } from "./env.service";
+import { Test, TestingModule } from "@nestjs/testing";
 
-describe('EnvService', () => {
+describe("EnvService", () => {
   let service: EnvService;
   let configService: ConfigService;
 
@@ -22,16 +22,16 @@ describe('EnvService', () => {
     service = module.get<EnvService>(EnvService);
     configService = module.get<ConfigService>(ConfigService);
   });
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  describe('return env value', () => {
-    it('should return port value', () => {
+  describe("return env value", () => {
+    it("should return port value", () => {
       const PORT = 4000;
-      jest.spyOn(configService, 'get').mockReturnValue(PORT);
-      expect(service.get('PORT')).toEqual(PORT);
-      expect(configService.get).toHaveBeenCalledWith('PORT', { infer: true });
+      jest.spyOn(configService, "get").mockReturnValue(PORT);
+      expect(service.get("PORT")).toEqual(PORT);
+      expect(configService.get).toHaveBeenCalledWith("PORT", { infer: true });
     });
   });
 });

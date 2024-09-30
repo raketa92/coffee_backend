@@ -1,8 +1,7 @@
-import logger from 'src/infrastructure/common/logger';
-import { Entity } from './Entity';
-import { DomainEvents } from './events/DomainEvents';
-import { IDomainEvent } from './events/IDomainEvent';
-import { UniqueEntityID } from './UniqueEntityID';
+import { Entity } from "./Entity";
+import { DomainEvents } from "./events/DomainEvents";
+import { IDomainEvent } from "./events/IDomainEvent";
+import { UniqueEntityID } from "./UniqueEntityID";
 
 export abstract class AggregateRoot<TInitProps> extends Entity<TInitProps> {
   private readonly _domainEvents: IDomainEvent[] = [];
@@ -29,19 +28,19 @@ export abstract class AggregateRoot<TInitProps> extends Entity<TInitProps> {
     const thisClass = Reflect.getPrototypeOf(this);
     const domainEventClass = Reflect.getPrototypeOf(domainEvent);
     if (!thisClass || !domainEventClass) {
-      logger.info(
-        '[Domain Event Created]: ',
+      console.log(
+        "[Domain Event Created]: ",
         thisClass,
-        '==>',
-        domainEventClass,
+        "==>",
+        domainEventClass
       );
       return;
     }
-    logger.info(
+    console.log(
       `[Domain Event Created]:`,
       thisClass.constructor.name,
-      '==>',
-      domainEventClass.constructor.name,
+      "==>",
+      domainEventClass.constructor.name
     );
   }
 }

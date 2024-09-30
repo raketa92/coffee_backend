@@ -1,0 +1,87 @@
+import { Test, TestingModule } from "@nestjs/testing";
+import { BankService } from "./bankService";
+import { PaymentDto } from "./dto/paymentDto";
+import { IPaymentReponse } from "../../../application/coffee_shop/ports/IBankService";
+import axios from "axios";
+import { EnvService } from "../../../infrastructure/env";
+
+jest.mock("axios");
+
+describe("Bank service", () => {
+  let service: BankService;
+
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        BankService,
+        {
+          provide: EnvService,
+          useValue: {
+            get: jest.fn((key: string) => {
+              switch (key) {
+                case "HALKBANK_PAYMENT_GATEWAY":
+                  return "https://fake-payment-gateway.com";
+                case "HALKBANK_PAYMENT_PAY_PATH":
+                  return "payment";
+                default:
+                  return null;
+              }
+            }),
+          },
+        },
+      ],
+    }).compile();
+
+    service = module.get<BankService>(BankService);
+  });
+
+  it("should be defined", () => {
+    expect(service).toBeDefined();
+  });
+
+  it("should make a successful payment", async () => {
+    const paymentDto: PaymentDto = {
+      currency: 934,
+      language: "ru",
+      orderNumber: "12345",
+      userName: "testUser",
+      password: "testPassword",
+      amount: 10000,
+      returnUrl: "https://test-return-url.com",
+    };
+
+    const mockResponse: IPaymentReponse = {
+      data: {
+        bankOrderId: "bank111",
+      },
+    };
+
+    (axios.get as jest.Mock).mockResolvedValueOnce(mockResponse);
+
+    const result = await service.makePayment(paymentDto);
+
+    expect(result).toEqual(mockResponse);
+    expect(axios.get).toHaveBeenCalledWith(
+      "https://fake-payment-gateway.com/payment",
+      { params: paymentDto }
+    );
+  });
+
+  it("should handle payment errors", async () => {
+    const paymentDto: PaymentDto = {
+      currency: 934,
+      language: "ru",
+      orderNumber: "12345",
+      userName: "testUser",
+      password: "testPassword",
+      amount: 10000,
+      returnUrl: "https://test-return-url.com",
+    };
+
+    (axios.get as jest.Mock).mockRejectedValueOnce(new Error("Payment failed"));
+
+    await expect(service.makePayment(paymentDto)).rejects.toThrow(
+      "Payment failed"
+    );
+  });
+});
