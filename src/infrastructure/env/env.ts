@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const evnSchema = z.object({
+  NODE_ENV: z.coerce.string(),
   HOST_API: z.coerce.string().optional().default("localhost"),
   PORT: z.coerce.number().optional().default(3000),
   REDIS_HOST: z.coerce.string().optional().default("localhost"),

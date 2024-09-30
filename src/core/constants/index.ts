@@ -21,3 +21,9 @@ export enum CardProvider {
   dasaryYkdysadyBank = "dasaryYkdysadyBank",
   senagatBank = "senagatBank",
 }
+
+export enum Stages {
+  test = "test",
+  dev = "dev",
+  prod = "prod",
+}
