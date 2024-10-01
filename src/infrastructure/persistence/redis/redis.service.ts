@@ -30,4 +30,12 @@ export class RedisService {
     const year = String(date.getFullYear()).slice(-2);
     return `${day}${month}${year}`;
   }
+
+  async get(key: string): Promise<string | null> {
+    return this.redisClient.get(key);
+  }
+
+  async set(key: string, value: string, ttl: number): Promise<void> {
+    await this.redisClient.set(key, value, "EX", ttl);
+  }
 }
