@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { BankService } from "./bankService";
+import { BankService } from "./bank.service";
 import { PaymentDto } from "./dto/paymentDto";
 import { IPaymentReponse } from "../../../application/coffee_shop/ports/IBankService";
 import axios from "axios";

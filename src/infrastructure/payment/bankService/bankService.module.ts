@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { EnvModule } from "src/infrastructure/env";
-import { BankService } from "./bankService";
+import { BankService } from "./bank.service";
 
 @Module({
   imports: [EnvModule],

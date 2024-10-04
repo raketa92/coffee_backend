@@ -2,19 +2,19 @@ import { UniqueEntityID } from "src/core/UniqueEntityID";
 import { Product } from "./product";
 import { Entity } from "../../core/Entity";
 
-export interface IOrderProductProps {
-  orderId?: UniqueEntityID;
+export interface IOrderItemProps {
+  orderGuid?: UniqueEntityID;
   quantity: number;
   product: Product;
 }
 
-export class OrderProduct extends Entity<IOrderProductProps> {
-  private readonly _orderId?: UniqueEntityID;
+export class OrderItem extends Entity<IOrderItemProps> {
+  private readonly _orderGuid?: UniqueEntityID;
   private readonly _quantity: number;
   private readonly _product: Product;
-  constructor(props: IOrderProductProps, guid?: UniqueEntityID) {
+  constructor(props: IOrderItemProps, guid?: UniqueEntityID) {
     super(guid);
-    this._orderId = props.orderId;
+    this._orderGuid = props.orderGuid;
     this._quantity = props.quantity;
     this._product = props.product;
   }
@@ -23,8 +23,8 @@ export class OrderProduct extends Entity<IOrderProductProps> {
     return this._guid;
   }
 
-  get orderId(): UniqueEntityID | null {
-    return this._orderId || null;
+  get orderGuid(): UniqueEntityID | null {
+    return this._orderGuid || null;
   }
 
   get quantity(): number {

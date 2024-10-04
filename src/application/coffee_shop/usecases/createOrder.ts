@@ -16,7 +16,7 @@ import { Payment } from "../../../domain/payment/payment";
 import { PaymentRepository } from "../ports/IPaymentRepository";
 import { RedisService } from "../../../infrastructure/persistence/redis/redis.service";
 import { Order } from "../../../domain/order/order";
-import { OrderProduct } from "../../../domain/order/orderProduct";
+import { OrderItem } from "../../../domain/order/orderItem";
 import { EnvService } from "../../../infrastructure/env";
 
 @Injectable()
@@ -37,20 +37,20 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
 
     const newOrder = this.createOrderEntity(request, orderNumber);
 
-    const savedOrder = await this.orderRepository.save(newOrder);
+    await this.orderRepository.save(newOrder);
 
     if (request.paymentMethod === PaymentMethods.card) {
       await this.processPayment(newOrder);
     }
 
-    return savedOrder;
+    return newOrder;
   }
 
   private async processPayment(newOrder: Order) {
     const hostApi = this.configService.get("HOST_API");
     const returnUrl = `${hostApi}/payment-service/orderStatus?orderNumber=${newOrder.orderNumber}&lang=${"ru"}`;
-    const USERNAME = "test";
-    const PASSWORD = "test";
+    const USERNAME = this.configService.get("HALK_BANK_LOGIN");
+    const PASSWORD = this.configService.get("HALK_BANK_PASSWORD");
     const paymentData: PaymentDto = {
       currency: 934,
       language: "ru",
@@ -94,7 +94,7 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
         rating: product.rating,
         ingredients: product.ingredients,
       });
-      return new OrderProduct({
+      return new OrderItem({
         quantity: item.quantity,
         product: newProduct,
       });
@@ -123,7 +123,7 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
       status,
       paymentMethod: request.paymentMethod,
       card: orderCard,
-      orderProducts,
+      orderItems: orderProducts,
     });
     return newOrder;
   }

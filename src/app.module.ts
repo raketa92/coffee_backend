@@ -4,6 +4,7 @@ import { RedisModule } from "./infrastructure/persistence/redis/redis.module";
 import { RedisService } from "./infrastructure/persistence/redis/redis.service";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { RedisCacheInterceptor } from "./infrastructure/persistence/redis/redisCache.interceptor";
+import { OrderController } from "./infrastructure/http/order.controller";
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { RedisCacheInterceptor } from "./infrastructure/persistence/redis/redisC
     }),
     RedisModule,
   ],
-  controllers: [],
+  controllers: [OrderController],
   providers: [
     RedisService,
     {

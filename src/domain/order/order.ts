@@ -1,7 +1,7 @@
 import { OrderStatus, PaymentMethods } from "../../core/constants";
 import { UniqueEntityID } from "../../core/UniqueEntityID";
 import { AggregateRoot } from "../../core/AggregateRoot";
-import { OrderProduct } from "./orderProduct";
+import { OrderItem } from "./orderItem";
 import { Card } from "./card";
 
 export interface IOrderProps {
@@ -15,7 +15,7 @@ export interface IOrderProps {
   paymentId?: UniqueEntityID | null;
   paymentMethod: PaymentMethods;
   card?: Card | null;
-  orderProducts: OrderProduct[];
+  orderItems: OrderItem[];
 }
 
 export class Order extends AggregateRoot<IOrderProps> {
@@ -29,7 +29,7 @@ export class Order extends AggregateRoot<IOrderProps> {
   private readonly _paymentId?: UniqueEntityID | null;
   private readonly _paymentMethod: PaymentMethods;
   private readonly _card?: Card | null;
-  private readonly _orderProducts: OrderProduct[];
+  private readonly _orderItems: OrderItem[];
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
 
@@ -45,7 +45,7 @@ export class Order extends AggregateRoot<IOrderProps> {
     this._paymentId = props.paymentId;
     this._paymentMethod = props.paymentMethod;
     this._card = props.card || null;
-    this._orderProducts = props.orderProducts;
+    this._orderItems = props.orderItems;
     this._createdAt = new Date();
     this._updatedAt = new Date();
   }
@@ -64,6 +64,14 @@ export class Order extends AggregateRoot<IOrderProps> {
 
   get shopId(): UniqueEntityID {
     return this._shopId;
+  }
+
+  get phone(): string {
+    return this._phone;
+  }
+
+  get address(): string {
+    return this._address;
   }
 
   get totalPrice(): number {
@@ -86,8 +94,8 @@ export class Order extends AggregateRoot<IOrderProps> {
     return this._card || null;
   }
 
-  get orderProducts(): OrderProduct[] {
-    return this._orderProducts;
+  get orderItems(): OrderItem[] {
+    return this._orderItems;
   }
 
   get createdAt(): Date {

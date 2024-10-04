@@ -13,7 +13,7 @@ import {
 import { Order } from "../../../domain/order/order";
 import { Product } from "../../../domain/order/product";
 import { UniqueEntityID } from "../../../core/UniqueEntityID";
-import { OrderProduct } from "../../../domain/order/orderProduct";
+import { OrderItem } from "../../../domain/order/orderItem";
 import { Card } from "../../../domain/order/card";
 import { Payment } from "../../../domain/payment/payment";
 import { CreateOrderUseCase } from "./createOrder";
@@ -124,7 +124,7 @@ describe("Create order use case", () => {
         rating: product.rating,
         ingredients: product.ingredients,
       });
-      return new OrderProduct({
+      return new OrderItem({
         quantity: item.quantity,
         product: newProduct,
       });
@@ -140,7 +140,7 @@ describe("Create order use case", () => {
       status: OrderStatus.waitingClientApproval,
       paymentMethod: createOrderDto.paymentMethod,
       card: new Card(createOrderDto.card!),
-      orderProducts,
+      orderItems: orderProducts,
     });
     const paymentResponse = { data: { bankOrderId: "bank123" } };
     const hostApi = configService.get("HOST_API");
@@ -215,7 +215,7 @@ describe("Create order use case", () => {
         rating: product.rating,
         ingredients: product.ingredients,
       });
-      return new OrderProduct({
+      return new OrderItem({
         quantity: item.quantity,
         product: newProduct,
       });
@@ -230,7 +230,7 @@ describe("Create order use case", () => {
       totalPrice: createOrderDto.totalPrice,
       status: OrderStatus.pending,
       paymentMethod: createOrderDto.paymentMethod,
-      orderProducts,
+      orderItems: orderProducts,
     });
 
     (redisService.generateOrderNumber as jest.Mock).mockResolvedValue(
