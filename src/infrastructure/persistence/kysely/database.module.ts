@@ -1,10 +1,15 @@
 import { Module } from "@nestjs/common";
 import { Kysely, PostgresDialect } from "kysely";
 import { Pool } from "pg";
-import { EnvService } from "src/infrastructure/env";
+import { EnvModule, EnvService } from "src/infrastructure/env";
 import { DatabaseScema } from "./database.schema";
+import { OrderRepository } from "src/application/coffee_shop/ports/order.repository";
+import { OrderRepositoryImpl } from "./repository/orderRepositoryImpl";
+import { PaymentRepositoryImpl } from "./repository/paymentRepositoryImpl";
+import { PaymentRepository } from "src/application/coffee_shop/ports/IPaymentRepository";
 
 @Module({
+  imports: [EnvModule],
   providers: [
     {
       provide: "DB_CONNECTION",
@@ -24,7 +29,15 @@ import { DatabaseScema } from "./database.schema";
       },
       inject: [EnvService],
     },
+    {
+      provide: OrderRepository,
+      useClass: OrderRepositoryImpl,
+    },
+    {
+      provide: PaymentRepository,
+      useClass: PaymentRepositoryImpl,
+    },
   ],
-  exports: ["DB_CONNECTION"],
+  exports: ["DB_CONNECTION", OrderRepository, PaymentRepository],
 })
 export class DatabaseModule {}

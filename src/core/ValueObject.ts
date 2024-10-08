@@ -1,4 +1,4 @@
-import { shallowEqual } from 'shallow-equal-object';
+import { shallowEqual } from "shallow-equal-object";
 
 type IValueObjectProps = Record<string, any>;
 

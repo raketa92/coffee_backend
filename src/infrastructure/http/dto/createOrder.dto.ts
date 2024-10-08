@@ -8,6 +8,28 @@ import {
 } from "class-validator";
 import { CardProvider, PaymentMethods } from "src/core/constants";
 
+class Card {
+  readonly cardNumber: string;
+  readonly month: number;
+  readonly year: number;
+  readonly name: string;
+  readonly cvv: number;
+  readonly cardProvider: CardProvider;
+}
+
+class OrderItem {
+  readonly quantity: number;
+  readonly product: Product;
+}
+
+class Product {
+  readonly name: string;
+  readonly price: number;
+  readonly categoryId: string;
+  readonly rating: number;
+  readonly ingredients: string[];
+}
+
 export class CreateOrderDto {
   @IsString()
   @Optional()
@@ -29,26 +51,4 @@ export class CreateOrderDto {
   @Type(() => OrderItem)
   @ValidateNested()
   orderItems: OrderItem[];
-}
-
-class Card {
-  readonly cardNumber: string;
-  readonly month: number;
-  readonly year: number;
-  readonly name: string;
-  readonly cvv: number;
-  readonly cardProvider: CardProvider;
-}
-
-class OrderItem {
-  readonly quantity: number;
-  readonly product: Product;
-}
-
-class Product {
-  readonly name: string;
-  readonly price: number;
-  readonly categoryId: string;
-  readonly rating: number;
-  readonly ingredients: string[];
 }

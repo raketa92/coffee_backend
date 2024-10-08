@@ -1,5 +1,5 @@
 import { Generated, Selectable, Insertable, Updateable } from "kysely";
-import { OrderStatus, PaymentMethods } from "src/core/constants";
+import { CardProvider, OrderStatus, PaymentMethods } from "src/core/constants";
 import { UniqueEntityID } from "src/core/UniqueEntityID";
 
 export interface OrderTable {
@@ -13,6 +13,7 @@ export interface OrderTable {
   status: OrderStatus;
   paymentId?: UniqueEntityID | null;
   paymentMethod: PaymentMethods;
+  card?: CardModel | null;
   createdAt: Generated<Date>;
   updatedAt: Generated<Date>;
 }
@@ -20,3 +21,12 @@ export interface OrderTable {
 export type OrderModel = Selectable<OrderTable>;
 export type OrderCreateModel = Insertable<OrderTable>;
 export type OrderUpdateModel = Updateable<OrderTable>;
+
+type CardModel = {
+  cardNumber: string;
+  month: number;
+  year: number;
+  name: string;
+  cvv: number;
+  cardProvider: CardProvider;
+};

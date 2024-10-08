@@ -1,7 +1,6 @@
 import { Order } from "src/domain/order/order";
 import { OrderTable } from "../models/order";
 import { Card } from "src/domain/order/card";
-import { CardTable } from "../models/card";
 import { OrderItemTable } from "../models/orderItem";
 import { OrderItem } from "src/domain/order/orderItem";
 import { ProductTable } from "../models/product";
@@ -10,18 +9,20 @@ import { Product } from "src/domain/order/product";
 export class OrderMapper {
   static toDomain(
     orderModel: OrderTable,
-    cardModel: CardTable,
     orderItemModel: OrderItemTable[],
     productModel: ProductTable[]
   ): Order | null {
-    const card = new Card({
-      cardNumber: cardModel.cardNumber,
-      month: cardModel.month,
-      year: cardModel.year,
-      name: cardModel.name,
-      cvv: cardModel.cvv,
-      cardProvider: cardModel.cardProvider,
-    });
+    let card = null;
+    if (orderModel.card) {
+      card = new Card({
+        cardNumber: orderModel.card.cardNumber,
+        month: orderModel.card.month,
+        year: orderModel.card.year,
+        name: orderModel.card.name,
+        cvv: orderModel.card.cvv,
+        cardProvider: orderModel.card.cardProvider,
+      });
+    }
 
     const orderItems = orderItemModel
       .map((item) => {

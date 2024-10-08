@@ -1,10 +1,11 @@
 import { Module } from "@nestjs/common";
 import { OrderController } from "./order.controller";
-import { CreateOrderUseCase } from "src/application/coffee_shop/usecases/createOrder";
+import { RedisService } from "../persistence/redis/redis.service";
+import { CoffeeShopModule } from "src/application/coffee_shop/coffeeShop.module";
 
 @Module({
-  imports: [],
+  imports: [CoffeeShopModule],
   controllers: [OrderController],
-  providers: [CreateOrderUseCase],
+  providers: [RedisService],
 })
 export class HttpModule {}

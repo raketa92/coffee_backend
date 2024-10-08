@@ -4,7 +4,6 @@ import { OrderRepository } from "src/application/coffee_shop/ports/order.reposit
 import { Order } from "src/domain/order/order";
 import { DatabaseScema } from "../database.schema";
 import { OrderCreateModel } from "../models/order";
-import { CardCreateModel } from "../models/card";
 import { OrderItemCreateModel } from "../models/orderItem";
 
 @Injectable()
@@ -26,6 +25,7 @@ export class OrderRepositoryImpl implements OrderRepository {
         status: data.status,
         paymentId: data.paymentId,
         paymentMethod: data.paymentMethod,
+        card: data.card,
       };
       const newOrder = await trx
         .insertInto("order")
@@ -33,19 +33,6 @@ export class OrderRepositoryImpl implements OrderRepository {
         .returningAll()
         .executeTakeFirstOrThrow();
 
-      if (data.card) {
-        const cardModelData: CardCreateModel = {
-          guid: data.card.guid,
-          orderGuid: newOrder.guid,
-          cardNumber: data.card.cardNumber,
-          month: data.card.month,
-          year: data.card.year,
-          name: data.card.name,
-          cvv: data.card.cvv,
-          cardProvider: data.card.cardProvider,
-        };
-        await trx.insertInto("card").values(cardModelData).execute();
-      }
       const orderItemPromises = [];
       for (const item of data.orderItems) {
         const orderItemModelData: OrderItemCreateModel = {

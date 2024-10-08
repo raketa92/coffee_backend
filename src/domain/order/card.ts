@@ -1,6 +1,5 @@
-import { UniqueEntityID } from "../../core/UniqueEntityID";
-import { Entity } from "../../core/Entity";
 import { CardProvider } from "../../core/constants";
+import { ValueObject } from "src/core/ValueObject";
 
 export interface ICardProps {
   readonly cardNumber: string;
@@ -11,25 +10,21 @@ export interface ICardProps {
   readonly cardProvider: CardProvider;
 }
 
-export class Card extends Entity<ICardProps> {
+export class Card extends ValueObject<ICardProps> {
   private readonly _cardNumber: string;
   private readonly _month: number;
   private readonly _year: number;
   private readonly _name: string;
   private readonly _cvv: number;
   private readonly _cardProvider: CardProvider;
-  constructor(props: ICardProps, guid?: UniqueEntityID) {
-    super(guid);
+  constructor(props: ICardProps) {
+    super(props);
     this._cardNumber = props.cardNumber;
     this._month = props.month;
     this._year = props.year;
     this._name = props.name;
     this._cvv = props.cvv;
     this._cardProvider = props.cardProvider;
-  }
-
-  get guid(): UniqueEntityID {
-    return this._guid;
   }
 
   get cardNumber(): string {
