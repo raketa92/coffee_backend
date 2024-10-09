@@ -6,7 +6,7 @@ export interface IPaymentProps {
   paymentFor: PaytmentFor;
   cardProvider: CardProvider;
   status: string;
-  orderNumber: string;
+  orderGuid: UniqueEntityID;
   bankOrderId: string;
   amount: number;
   currency: number;
@@ -17,7 +17,7 @@ export class Payment extends AggregateRoot<IPaymentProps> {
   private readonly _paymentFor: PaytmentFor;
   private readonly _cardProvider: CardProvider;
   private readonly _status: string;
-  private readonly _orderNumber: string;
+  private readonly _orderGuid: UniqueEntityID;
   private readonly _bankOrderId: string;
   private readonly _amount: number;
   private readonly _currency: number;
@@ -29,7 +29,7 @@ export class Payment extends AggregateRoot<IPaymentProps> {
     this._paymentFor = props.paymentFor;
     this._cardProvider = props.cardProvider;
     this._status = props.status;
-    this._orderNumber = props.orderNumber;
+    this._orderGuid = props.orderGuid;
     this._bankOrderId = props.bankOrderId;
     this._amount = props.amount;
     this._currency = props.currency;
@@ -54,8 +54,8 @@ export class Payment extends AggregateRoot<IPaymentProps> {
     return this._status;
   }
 
-  get orderNumber(): string {
-    return this._orderNumber;
+  get orderGuid(): UniqueEntityID {
+    return this._orderGuid;
   }
 
   get bankOrderId(): string {

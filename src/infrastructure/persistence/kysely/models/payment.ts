@@ -4,10 +4,10 @@ import { UniqueEntityID } from "src/core/UniqueEntityID";
 
 export interface PaymentTable {
   guid: UniqueEntityID;
+  orderGuid: UniqueEntityID;
   paymentFor: PaytmentFor;
   cardProvider: CardProvider;
   status: string;
-  orderNumber: string;
   bankOrderId: string;
   amount: number;
   currency: number;

@@ -36,8 +36,8 @@ export class OrderMapper {
         const product = new Product({
           name: currentProduct.name,
           price: currentProduct.price,
-          categoryId: currentProduct.categoryId,
-          shopId: currentProduct.shopId,
+          categoryGuid: currentProduct.categoryGuid,
+          shopGuid: currentProduct.shopGuid,
           rating: currentProduct.rating,
           ingredients: currentProduct.ingredients,
         });
@@ -56,13 +56,13 @@ export class OrderMapper {
 
     const order = new Order({
       orderNumber: orderModel.orderNumber,
-      userId: orderModel.userId,
-      shopId: orderModel.shopId,
+      userGuid: orderModel.userGuid,
+      shopGuid: orderModel.shopGuid,
       phone: orderModel.phone,
       address: orderModel.address,
       totalPrice: orderModel.totalPrice,
       status: orderModel.status,
-      paymentId: orderModel.paymentId,
+      paymentGuid: orderModel.paymentGuid,
       paymentMethod: orderModel.paymentMethod,
       card,
       orderItems,

@@ -8,6 +8,7 @@ import {
 import { UniqueEntityID } from "src/core/UniqueEntityID";
 
 export interface BankResponseTable {
+  guid: UniqueEntityID;
   paymentId: UniqueEntityID;
   errorCode: string | null;
   errorMessage: string | null;

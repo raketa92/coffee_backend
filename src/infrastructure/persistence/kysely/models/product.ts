@@ -5,10 +5,10 @@ export interface ProductTable {
   guid: UniqueEntityID;
   name: string;
   price: number;
-  categoryId: UniqueEntityID;
-  shopId: UniqueEntityID;
+  categoryGuid: UniqueEntityID;
+  shopGuid: UniqueEntityID;
   rating: number;
-  ingredients: string[];
+  ingredients: string[] | null;
   createdAt: Generated<Date>;
   updatedAt: Generated<Date>;
 }

@@ -17,7 +17,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       paymentFor: data.paymentFor,
       cardProvider: data.cardProvider,
       status: data.status,
-      orderNumber: data.orderNumber,
+      orderGuid: data.orderGuid,
       bankOrderId: data.bankOrderId,
       amount: data.amount,
       currency: data.currency,

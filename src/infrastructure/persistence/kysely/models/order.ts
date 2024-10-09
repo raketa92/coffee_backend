@@ -5,13 +5,13 @@ import { UniqueEntityID } from "src/core/UniqueEntityID";
 export interface OrderTable {
   guid: UniqueEntityID;
   orderNumber: string;
-  userId?: UniqueEntityID | null;
-  shopId: UniqueEntityID;
+  userGuid?: UniqueEntityID | null;
+  shopGuid: UniqueEntityID;
   phone: string;
   address: string;
   totalPrice: number;
   status: OrderStatus;
-  paymentId?: UniqueEntityID | null;
+  paymentGuid?: UniqueEntityID | null;
   paymentMethod: PaymentMethods;
   card?: CardModel | null;
   createdAt: Generated<Date>;

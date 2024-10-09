@@ -119,8 +119,8 @@ describe("Create order use case", () => {
       const newProduct = new Product({
         name: product.name,
         price: product.price,
-        categoryId: new UniqueEntityID(product.categoryId),
-        shopId: new UniqueEntityID(createOrderDto.shopId),
+        categoryGuid: new UniqueEntityID(product.categoryId),
+        shopGuid: new UniqueEntityID(createOrderDto.shopId),
         rating: product.rating,
         ingredients: product.ingredients,
       });
@@ -132,8 +132,8 @@ describe("Create order use case", () => {
 
     const newOrder = new Order({
       orderNumber,
-      userId: new UniqueEntityID(createOrderDto.userId),
-      shopId: new UniqueEntityID(createOrderDto.shopId),
+      userGuid: new UniqueEntityID(createOrderDto.userId),
+      shopGuid: new UniqueEntityID(createOrderDto.shopId),
       phone: createOrderDto.phone,
       address: createOrderDto.address,
       totalPrice: createOrderDto.totalPrice,
@@ -159,7 +159,7 @@ describe("Create order use case", () => {
       paymentFor: PaytmentFor.product,
       cardProvider: newOrder.card!.cardProvider,
       status: OrderStatus.waitingClientApproval,
-      orderNumber: newOrder.orderNumber,
+      orderGuid: newOrder.guid,
       bankOrderId: paymentResponse.data.bankOrderId,
       amount: paymentData.amount,
       currency: paymentData.currency,
@@ -210,8 +210,8 @@ describe("Create order use case", () => {
       const newProduct = new Product({
         name: product.name,
         price: product.price,
-        categoryId: new UniqueEntityID(product.categoryId),
-        shopId: new UniqueEntityID(createOrderDto.shopId),
+        categoryGuid: new UniqueEntityID(product.categoryId),
+        shopGuid: new UniqueEntityID(createOrderDto.shopId),
         rating: product.rating,
         ingredients: product.ingredients,
       });
@@ -223,8 +223,8 @@ describe("Create order use case", () => {
 
     const newOrder = new Order({
       orderNumber,
-      userId: new UniqueEntityID(createOrderDto.userId),
-      shopId: new UniqueEntityID(createOrderDto.shopId),
+      userGuid: new UniqueEntityID(createOrderDto.userId),
+      shopGuid: new UniqueEntityID(createOrderDto.shopId),
       phone: createOrderDto.phone,
       address: createOrderDto.address,
       totalPrice: createOrderDto.totalPrice,

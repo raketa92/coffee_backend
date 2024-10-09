@@ -6,13 +6,13 @@ import { Card } from "./card";
 
 export interface IOrderProps {
   orderNumber: string;
-  userId?: UniqueEntityID | null;
-  shopId: UniqueEntityID;
+  userGuid?: UniqueEntityID | null;
+  shopGuid: UniqueEntityID;
   phone: string;
   address: string;
   totalPrice: number;
   status: OrderStatus;
-  paymentId?: UniqueEntityID | null;
+  paymentGuid?: UniqueEntityID | null;
   paymentMethod: PaymentMethods;
   card?: Card | null;
   orderItems: OrderItem[];
@@ -20,13 +20,13 @@ export interface IOrderProps {
 
 export class Order extends AggregateRoot<IOrderProps> {
   private readonly _orderNumber: string;
-  private readonly _userId?: UniqueEntityID | null;
-  private readonly _shopId: UniqueEntityID;
+  private readonly _userGuid?: UniqueEntityID | null;
+  private readonly _shopGuid: UniqueEntityID;
   private readonly _phone: string;
   private readonly _address: string;
   private readonly _totalPrice: number;
   private readonly _status: OrderStatus;
-  private readonly _paymentId?: UniqueEntityID | null;
+  private readonly _paymentGuid?: UniqueEntityID | null;
   private readonly _paymentMethod: PaymentMethods;
   private readonly _card?: Card | null;
   private readonly _orderItems: OrderItem[];
@@ -36,13 +36,13 @@ export class Order extends AggregateRoot<IOrderProps> {
   constructor(props: IOrderProps, guid?: UniqueEntityID) {
     super(guid);
     this._orderNumber = props.orderNumber;
-    this._userId = props.userId;
-    this._shopId = props.shopId;
+    this._userGuid = props.userGuid;
+    this._shopGuid = props.shopGuid;
     this._phone = props.phone;
     this._address = props.address;
     this._totalPrice = props.totalPrice;
     this._status = props.status;
-    this._paymentId = props.paymentId;
+    this._paymentGuid = props.paymentGuid;
     this._paymentMethod = props.paymentMethod;
     this._card = props.card || null;
     this._orderItems = props.orderItems;
@@ -58,12 +58,12 @@ export class Order extends AggregateRoot<IOrderProps> {
     return this._orderNumber;
   }
 
-  get userId(): UniqueEntityID | null {
-    return this._userId || null;
+  get userGuid(): UniqueEntityID | null {
+    return this._userGuid || null;
   }
 
-  get shopId(): UniqueEntityID {
-    return this._shopId;
+  get shopGuid(): UniqueEntityID {
+    return this._shopGuid;
   }
 
   get phone(): string {
@@ -82,8 +82,8 @@ export class Order extends AggregateRoot<IOrderProps> {
     return this._status;
   }
 
-  get paymentId(): UniqueEntityID | null {
-    return this._paymentId || null;
+  get paymentGuid(): UniqueEntityID | null {
+    return this._paymentGuid || null;
   }
 
   get paymentMethod(): PaymentMethods {

@@ -66,7 +66,7 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
       paymentFor: PaytmentFor.product,
       cardProvider: newOrder.card!.cardProvider,
       status: OrderStatus.waitingClientApproval,
-      orderNumber: newOrder.orderNumber,
+      orderGuid: newOrder.guid,
       bankOrderId: paymentResponse.data.bankOrderId,
       amount: paymentData.amount,
       currency: paymentData.currency,
@@ -89,8 +89,8 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
       const newProduct = new Product({
         name: product.name,
         price: product.price,
-        categoryId: new UniqueEntityID(product.categoryId),
-        shopId: new UniqueEntityID(request.shopId),
+        categoryGuid: new UniqueEntityID(product.categoryId),
+        shopGuid: new UniqueEntityID(request.shopId),
         rating: product.rating,
         ingredients: product.ingredients,
       });
@@ -115,8 +115,8 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
 
     const newOrder = new Order({
       orderNumber,
-      userId,
-      shopId,
+      userGuid: userId,
+      shopGuid: shopId,
       phone: request.phone,
       address: request.address,
       totalPrice: request.totalPrice,

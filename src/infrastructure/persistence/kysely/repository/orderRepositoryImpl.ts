@@ -17,13 +17,13 @@ export class OrderRepositoryImpl implements OrderRepository {
       const orderModelData: OrderCreateModel = {
         guid: data.guid,
         orderNumber: data.orderNumber,
-        shopId: data.shopId,
-        userId: data.userId,
+        shopGuid: data.shopGuid,
+        userGuid: data.userGuid,
         phone: data.phone,
         address: data.address,
         totalPrice: data.totalPrice,
         status: data.status,
-        paymentId: data.paymentId,
+        paymentGuid: data.paymentGuid,
         paymentMethod: data.paymentMethod,
         card: data.card,
       };
