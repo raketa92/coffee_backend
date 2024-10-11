@@ -1,17 +1,16 @@
 import { Generated, Selectable, Insertable, Updateable } from "kysely";
 import { CardProvider, OrderStatus, PaymentMethods } from "src/core/constants";
-import { UniqueEntityID } from "src/core/UniqueEntityID";
 
 export interface OrderTable {
-  guid: UniqueEntityID;
+  guid: string;
   orderNumber: string;
-  userGuid?: UniqueEntityID | null;
-  shopGuid: UniqueEntityID;
+  userGuid?: string | null;
+  shopGuid: string;
   phone: string;
   address: string;
   totalPrice: number;
   status: OrderStatus;
-  paymentGuid?: UniqueEntityID | null;
+  paymentGuid?: string | null;
   paymentMethod: PaymentMethods;
   card?: CardModel | null;
   createdAt: Generated<Date>;

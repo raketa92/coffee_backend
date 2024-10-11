@@ -17,10 +17,16 @@ export class BankService implements IBankService {
         "HALKBANK_PAYMENT_PAY_PATH"
       );
       const paymentUrl = `${paymentGateway}/${paymentPayPath}`;
-      const payment = await axios.get(paymentUrl, {
-        params: payload,
-      });
-      return payment;
+      const paymentResponse: IPaymentReponse = {
+        data: {
+          bankOrderId: "someId",
+        },
+      };
+      return paymentResponse;
+      // const payment = await axios.get(paymentUrl, {
+      //   params: payload,
+      // });
+      // return payment;
     } catch (error) {
       throw error;
     }

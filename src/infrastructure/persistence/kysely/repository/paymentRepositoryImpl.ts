@@ -13,18 +13,18 @@ export class PaymentRepositoryImpl implements PaymentRepository {
   ) {}
   async save(data: Payment): Promise<Payment> {
     const paymentModelData: PaymentCreateModel = {
-      guid: data.guid,
+      guid: data.guid.toValue(),
       paymentFor: data.paymentFor,
       cardProvider: data.cardProvider,
       status: data.status,
-      orderGuid: data.orderGuid,
+      orderGuid: data.orderGuid.toValue(),
       bankOrderId: data.bankOrderId,
       amount: data.amount,
       currency: data.currency,
       description: data.description,
     };
     await this.kysely
-      .insertInto("payment")
+      .insertInto("Payment")
       .values(paymentModelData)
       .returningAll()
       .executeTakeFirstOrThrow();

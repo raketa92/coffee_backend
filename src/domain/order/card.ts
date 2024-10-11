@@ -27,6 +27,17 @@ export class Card extends ValueObject<ICardProps> {
     this._cardProvider = props.cardProvider;
   }
 
+  toJSON() {
+    return {
+      cardNumber: this._cardNumber,
+      month: this._month,
+      year: this._year,
+      name: this._name,
+      cvv: this._cvv,
+      cardProvider: this._cardProvider,
+    };
+  }
+
   get cardNumber(): string {
     return this._cardNumber;
   }

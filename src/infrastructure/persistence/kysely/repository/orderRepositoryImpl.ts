@@ -15,20 +15,20 @@ export class OrderRepositoryImpl implements OrderRepository {
   async save(data: Order): Promise<Order> {
     return await this.kysely.transaction().execute(async (trx) => {
       const orderModelData: OrderCreateModel = {
-        guid: data.guid,
+        guid: data.guid.toValue(),
         orderNumber: data.orderNumber,
-        shopGuid: data.shopGuid,
-        userGuid: data.userGuid,
+        shopGuid: data.shopGuid.toValue(),
+        userGuid: data.userGuid?.toValue(),
         phone: data.phone,
         address: data.address,
         totalPrice: data.totalPrice,
         status: data.status,
-        paymentGuid: data.paymentGuid,
+        paymentGuid: data.paymentGuid?.toValue(),
         paymentMethod: data.paymentMethod,
         card: data.card,
       };
       const newOrder = await trx
-        .insertInto("order")
+        .insertInto("Order")
         .values(orderModelData)
         .returningAll()
         .executeTakeFirstOrThrow();
@@ -36,13 +36,13 @@ export class OrderRepositoryImpl implements OrderRepository {
       const orderItemPromises = [];
       for (const item of data.orderItems) {
         const orderItemModelData: OrderItemCreateModel = {
-          guid: item.guid,
+          guid: item.guid.toValue(),
           orderGuid: newOrder.guid,
           quantity: item.quantity,
-          productGuid: item.product.guid,
+          productGuid: item.productId.toValue(),
         };
         orderItemPromises.push(
-          trx.insertInto("orderItems").values(orderItemModelData).execute()
+          trx.insertInto("OrderItem").values(orderItemModelData).execute()
         );
       }
       await Promise.all(orderItemPromises);

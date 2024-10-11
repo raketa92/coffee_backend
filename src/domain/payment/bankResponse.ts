@@ -21,8 +21,6 @@ export interface IBankResponseProps {
   authRefNum: string | null;
   paymentAmountInfo: object | null;
   bankInfo: object | null;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export class BankResponse extends Entity<IBankResponseProps> {
@@ -45,8 +43,6 @@ export class BankResponse extends Entity<IBankResponseProps> {
   private readonly _authRefNum: string | null;
   private readonly _paymentAmountInfo: object | null;
   private readonly _bankInfo: object | null;
-  private readonly _createdAt: Date;
-  private readonly _updatedAt: Date;
   constructor(props: IBankResponseProps, guid?: UniqueEntityID) {
     super(guid);
     this._paymentId = props.paymentId;
@@ -68,8 +64,6 @@ export class BankResponse extends Entity<IBankResponseProps> {
     this._authRefNum = props.authRefNum;
     this._paymentAmountInfo = props.paymentAmountInfo;
     this._bankInfo = props.bankInfo;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
   }
 
   get guid(): UniqueEntityID {
@@ -132,11 +126,5 @@ export class BankResponse extends Entity<IBankResponseProps> {
   }
   get bankInfo(): object | null {
     return this._bankInfo;
-  }
-  get createdAt(): Date {
-    return this._createdAt;
-  }
-  get updatedAt(): Date {
-    return this._updatedAt;
   }
 }

@@ -5,9 +5,9 @@ import { PaymentTable } from "./models/payment";
 import { ProductTable } from "./models/product";
 
 export interface DatabaseScema {
-  order: OrderTable;
-  orderItems: OrderItemTable;
-  product: ProductTable;
-  payment: PaymentTable;
-  bankResponse: BankResponseTable;
+  Order: OrderTable;
+  OrderItem: OrderItemTable;
+  Product: ProductTable;
+  Payment: PaymentTable;
+  BankResponse: BankResponseTable;
 }

@@ -8,7 +8,6 @@ import {
   PaymentMethods,
   PaytmentFor,
 } from "../../../core/constants";
-import { Product } from "../../../domain/order/product";
 import { Card } from "../../../domain/order/card";
 import { BankService } from "../../../application/coffee_shop/ports/IBankService";
 import { PaymentDto } from "../../../infrastructure/payment/bankService/dto/paymentDto";
@@ -29,21 +28,26 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
     private redisService: RedisService
   ) {}
   public async execute(request?: CreateOrderDto): Promise<Order> {
-    if (!request) {
-      throw new Error("CreateOrderDto is required.");
+    try {
+      if (!request) {
+        throw new Error("CreateOrderDto is required.");
+      }
+
+      const orderNumber = await this.redisService.generateOrderNumber();
+
+      const newOrder = this.createOrderEntity(request, orderNumber);
+
+      await this.orderRepository.save(newOrder);
+
+      if (request.paymentMethod === PaymentMethods.card) {
+        await this.processPayment(newOrder);
+      }
+
+      return newOrder;
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
-
-    const orderNumber = await this.redisService.generateOrderNumber();
-
-    const newOrder = this.createOrderEntity(request, orderNumber);
-
-    await this.orderRepository.save(newOrder);
-
-    if (request.paymentMethod === PaymentMethods.card) {
-      await this.processPayment(newOrder);
-    }
-
-    return newOrder;
   }
 
   private async processPayment(newOrder: Order) {
@@ -85,18 +89,9 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
         : OrderStatus.waitingClientApproval;
 
     const orderProducts = request.orderItems.map((item) => {
-      const { product } = item;
-      const newProduct = new Product({
-        name: product.name,
-        price: product.price,
-        categoryGuid: new UniqueEntityID(product.categoryId),
-        shopGuid: new UniqueEntityID(request.shopId),
-        rating: product.rating,
-        ingredients: product.ingredients,
-      });
       return new OrderItem({
         quantity: item.quantity,
-        product: newProduct,
+        productId: new UniqueEntityID(item.productId),
       });
     });
 

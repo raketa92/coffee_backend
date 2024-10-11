@@ -4,7 +4,7 @@ import { Card } from "src/domain/order/card";
 import { OrderItemTable } from "../models/orderItem";
 import { OrderItem } from "src/domain/order/orderItem";
 import { ProductTable } from "../models/product";
-import { Product } from "src/domain/order/product";
+import { UniqueEntityID } from "src/core/UniqueEntityID";
 
 export class OrderMapper {
   static toDomain(
@@ -33,19 +33,9 @@ export class OrderMapper {
           return undefined;
         }
 
-        const product = new Product({
-          name: currentProduct.name,
-          price: currentProduct.price,
-          categoryGuid: currentProduct.categoryGuid,
-          shopGuid: currentProduct.shopGuid,
-          rating: currentProduct.rating,
-          ingredients: currentProduct.ingredients,
-        });
-
         return new OrderItem({
-          orderGuid: item.orderGuid,
           quantity: item.quantity,
-          product,
+          productId: new UniqueEntityID(item.productGuid),
         });
       })
       .filter((el): el is OrderItem => el !== undefined);
@@ -56,13 +46,17 @@ export class OrderMapper {
 
     const order = new Order({
       orderNumber: orderModel.orderNumber,
-      userGuid: orderModel.userGuid,
-      shopGuid: orderModel.shopGuid,
+      userGuid: orderModel.userGuid
+        ? new UniqueEntityID(orderModel.userGuid)
+        : null,
+      shopGuid: new UniqueEntityID(orderModel.shopGuid),
       phone: orderModel.phone,
       address: orderModel.address,
       totalPrice: orderModel.totalPrice,
       status: orderModel.status,
-      paymentGuid: orderModel.paymentGuid,
+      paymentGuid: orderModel.paymentGuid
+        ? new UniqueEntityID(orderModel.paymentGuid)
+        : null,
       paymentMethod: orderModel.paymentMethod,
       card,
       orderItems,

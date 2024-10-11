@@ -11,7 +11,6 @@ import {
   PaytmentFor,
 } from "../../../core/constants";
 import { Order } from "../../../domain/order/order";
-import { Product } from "../../../domain/order/product";
 import { UniqueEntityID } from "../../../core/UniqueEntityID";
 import { OrderItem } from "../../../domain/order/orderItem";
 import { Card } from "../../../domain/order/card";
@@ -90,13 +89,7 @@ describe("Create order use case", () => {
       shopId: "2",
       orderItems: [
         {
-          product: {
-            name: "Product 1",
-            price: 100,
-            categoryId: "1",
-            rating: 5,
-            ingredients: [],
-          },
+          productId: "c1f0012a-d013-4969-b440-5864e53c8778",
           quantity: 1,
         },
       ],
@@ -115,18 +108,9 @@ describe("Create order use case", () => {
     };
 
     const orderProducts = createOrderDto.orderItems.map((item) => {
-      const { product } = item;
-      const newProduct = new Product({
-        name: product.name,
-        price: product.price,
-        categoryGuid: new UniqueEntityID(product.categoryId),
-        shopGuid: new UniqueEntityID(createOrderDto.shopId),
-        rating: product.rating,
-        ingredients: product.ingredients,
-      });
       return new OrderItem({
         quantity: item.quantity,
-        product: newProduct,
+        productId: new UniqueEntityID(item.productId),
       });
     });
 
@@ -189,13 +173,7 @@ describe("Create order use case", () => {
       shopId: "2",
       orderItems: [
         {
-          product: {
-            name: "Product 1",
-            price: 100,
-            categoryId: "1",
-            rating: 5,
-            ingredients: [],
-          },
+          productId: "c1f0012a-d013-4969-b440-5864e53c8778",
           quantity: 1,
         },
       ],
@@ -206,18 +184,9 @@ describe("Create order use case", () => {
     };
 
     const orderProducts = createOrderDto.orderItems.map((item) => {
-      const { product } = item;
-      const newProduct = new Product({
-        name: product.name,
-        price: product.price,
-        categoryGuid: new UniqueEntityID(product.categoryId),
-        shopGuid: new UniqueEntityID(createOrderDto.shopId),
-        rating: product.rating,
-        ingredients: product.ingredients,
-      });
       return new OrderItem({
         quantity: item.quantity,
-        product: newProduct,
+        productId: new UniqueEntityID(item.productId),
       });
     });
 

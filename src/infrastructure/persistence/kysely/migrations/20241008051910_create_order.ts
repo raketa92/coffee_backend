@@ -14,6 +14,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("address", "text", (col) => col.notNull())
     .addColumn("totalPrice", "decimal", (col) => col.notNull())
     .addColumn("status", "varchar(50)", (col) => col.notNull())
+    .addColumn("paymentGuid", "uuid")
     .addColumn("paymentMethod", "varchar(50)")
     .addColumn("card", "json")
     .$call(withTimestamps)

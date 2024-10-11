@@ -18,16 +18,10 @@ class Card {
 }
 
 class OrderItem {
+  @IsNumber()
   readonly quantity: number;
-  readonly product: Product;
-}
-
-class Product {
-  readonly name: string;
-  readonly price: number;
-  readonly categoryId: string;
-  readonly rating: number;
-  readonly ingredients: string[];
+  @IsString()
+  readonly productId: string;
 }
 
 export class CreateOrderDto {

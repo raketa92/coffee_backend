@@ -25,13 +25,11 @@ export class Order extends AggregateRoot<IOrderProps> {
   private readonly _phone: string;
   private readonly _address: string;
   private readonly _totalPrice: number;
-  private readonly _status: OrderStatus;
-  private readonly _paymentGuid?: UniqueEntityID | null;
+  private _status: OrderStatus;
+  private _paymentGuid?: UniqueEntityID | null;
   private readonly _paymentMethod: PaymentMethods;
   private readonly _card?: Card | null;
   private readonly _orderItems: OrderItem[];
-  private readonly _createdAt: Date;
-  private readonly _updatedAt: Date;
 
   constructor(props: IOrderProps, guid?: UniqueEntityID) {
     super(guid);
@@ -46,8 +44,44 @@ export class Order extends AggregateRoot<IOrderProps> {
     this._paymentMethod = props.paymentMethod;
     this._card = props.card || null;
     this._orderItems = props.orderItems;
-    this._createdAt = new Date();
-    this._updatedAt = new Date();
+
+    if (this._paymentMethod === PaymentMethods.card && !props.card) {
+      throw new Error("Card payment details are required for card payments");
+    }
+    this._card = props.card || null;
+  }
+
+  changeStatus(newStatus: OrderStatus) {
+    if (this._status === OrderStatus.completed) {
+      throw new Error("Order can't be changed after it's completed");
+    }
+    this._status = newStatus;
+  }
+
+  setPaymentGuid(paymentGuid: UniqueEntityID) {
+    if (this._paymentMethod !== PaymentMethods.card) {
+      throw new Error("Payment method must be card to set paymentGuid ");
+    }
+    if (this.card) {
+      this._paymentGuid = paymentGuid;
+    }
+  }
+
+  toJSON() {
+    return {
+      guid: this._guid.toValue(),
+      orderNumber: this._orderNumber,
+      userGuid: this._userGuid?.toValue(),
+      shopGuid: this._shopGuid.toValue(),
+      phone: this._phone,
+      address: this._address,
+      totalPrice: this._totalPrice,
+      status: this._status,
+      paymentGuid: this._paymentGuid?.toValue(),
+      paymentMethod: this._paymentMethod,
+      card: this._card,
+      orderItems: this._orderItems,
+    };
   }
 
   get guid(): UniqueEntityID {
@@ -96,13 +130,5 @@ export class Order extends AggregateRoot<IOrderProps> {
 
   get orderItems(): OrderItem[] {
     return this._orderItems;
-  }
-
-  get createdAt(): Date {
-    return this._createdAt;
-  }
-
-  get updatedAt(): Date {
-    return this._updatedAt;
   }
 }

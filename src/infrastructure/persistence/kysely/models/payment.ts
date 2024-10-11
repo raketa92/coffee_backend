@@ -1,10 +1,9 @@
 import { Generated, Selectable, Insertable, Updateable } from "kysely";
 import { CardProvider, PaytmentFor } from "src/core/constants";
-import { UniqueEntityID } from "src/core/UniqueEntityID";
 
 export interface PaymentTable {
-  guid: UniqueEntityID;
-  orderGuid: UniqueEntityID;
+  guid: string;
+  orderGuid: string;
   paymentFor: PaytmentFor;
   cardProvider: CardProvider;
   status: string;

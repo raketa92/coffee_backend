@@ -1,37 +1,40 @@
 import { UniqueEntityID } from "src/core/UniqueEntityID";
-import { Product } from "./product";
 import { Entity } from "../../core/Entity";
 
 export interface IOrderItemProps {
-  orderGuid?: UniqueEntityID;
   quantity: number;
-  product: Product;
+  productId: UniqueEntityID;
 }
 
 export class OrderItem extends Entity<IOrderItemProps> {
-  private readonly _orderGuid?: UniqueEntityID;
   private readonly _quantity: number;
-  private readonly _product: Product;
+  private readonly _productId: UniqueEntityID;
   constructor(props: IOrderItemProps, guid?: UniqueEntityID) {
     super(guid);
-    this._orderGuid = props.orderGuid;
+    if (props.quantity <= 0) {
+      throw new Error("Quantity must be greater than zero");
+    }
     this._quantity = props.quantity;
-    this._product = props.product;
+    this._productId = props.productId;
+  }
+
+  toJSON() {
+    return {
+      guid: this._guid.toValue(),
+      quanity: this.quantity,
+      productId: this.productId.toValue(),
+    };
   }
 
   get guid(): UniqueEntityID {
     return this._guid;
   }
 
-  get orderGuid(): UniqueEntityID | null {
-    return this._orderGuid || null;
-  }
-
   get quantity(): number {
     return this._quantity;
   }
 
-  get product(): Product {
-    return this._product;
+  get productId(): UniqueEntityID {
+    return this._productId;
   }
 }

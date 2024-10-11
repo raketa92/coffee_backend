@@ -34,8 +34,6 @@ export class Payment extends AggregateRoot<IPaymentProps> {
     this._amount = props.amount;
     this._currency = props.currency;
     this._description = props.description;
-    this._createdAt = new Date();
-    this._updatedAt = new Date();
   }
 
   get guid(): UniqueEntityID {
@@ -72,13 +70,5 @@ export class Payment extends AggregateRoot<IPaymentProps> {
 
   get description(): string | undefined {
     return this._description;
-  }
-
-  get createdAt(): Date {
-    return this._createdAt;
-  }
-
-  get updatedAt(): Date {
-    return this._updatedAt;
   }
 }

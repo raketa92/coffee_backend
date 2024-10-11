@@ -1,11 +1,10 @@
 import { Selectable, Insertable, Updateable } from "kysely";
-import { UniqueEntityID } from "src/core/UniqueEntityID";
 
 export interface OrderItemTable {
-  guid: UniqueEntityID;
-  orderGuid: UniqueEntityID;
+  guid: string;
+  orderGuid: string;
   quantity: number;
-  productGuid: UniqueEntityID;
+  productGuid: string;
 }
 
 export type OrderItemModel = Selectable<OrderItemTable>;
