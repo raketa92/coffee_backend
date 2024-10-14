@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Kysely } from "kysely";
-import { DatabaseScema } from "../database.schema";
+import { Kysely, Transaction } from "kysely";
+import { DatabaseSchema } from "../database.schema";
 import { PaymentRepository } from "src/application/coffee_shop/ports/IPaymentRepository";
 import { Payment } from "src/domain/payment/payment";
 import { PaymentCreateModel } from "../models/payment";
@@ -9,9 +9,12 @@ import { PaymentCreateModel } from "../models/payment";
 export class PaymentRepositoryImpl implements PaymentRepository {
   constructor(
     @Inject("DB_CONNECTION")
-    private readonly kysely: Kysely<DatabaseScema>
+    private readonly kysely: Kysely<DatabaseSchema>
   ) {}
-  async save(data: Payment): Promise<Payment> {
+  async save(
+    data: Payment,
+    transaction?: Transaction<DatabaseSchema>
+  ): Promise<Payment> {
     const paymentModelData: PaymentCreateModel = {
       guid: data.guid.toValue(),
       paymentFor: data.paymentFor,
@@ -23,12 +26,25 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       currency: data.currency,
       description: data.description,
     };
-    await this.kysely
+    if (transaction) {
+      await this.insertPayment(transaction, paymentModelData);
+    } else {
+      await this.kysely.transaction().execute(async (trx) => {
+        await this.insertPayment(trx, paymentModelData);
+      });
+    }
+
+    return data;
+  }
+
+  private async insertPayment(
+    trx: Transaction<DatabaseSchema>,
+    paymentModelData: PaymentCreateModel
+  ): Promise<void> {
+    await trx
       .insertInto("Payment")
       .values(paymentModelData)
       .returningAll()
       .executeTakeFirstOrThrow();
-
-    return data;
   }
 }

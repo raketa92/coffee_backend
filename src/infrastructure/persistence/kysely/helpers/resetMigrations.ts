@@ -1,7 +1,7 @@
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Kysely, PostgresDialect } from "kysely";
 import { Pool } from "pg";
-import { DatabaseScema } from "../database.schema";
+import { DatabaseSchema } from "../database.schema";
 import { execSync } from "child_process";
 
 ConfigModule.forRoot({
@@ -10,7 +10,7 @@ ConfigModule.forRoot({
 
 const resetSqlSchema = async () => {
   const configService = new ConfigService();
-  const db = new Kysely<DatabaseScema>({
+  const db = new Kysely<DatabaseSchema>({
     dialect: new PostgresDialect({
       pool: new Pool({
         host: configService.get("POSTGRES_HOST"),

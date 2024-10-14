@@ -7,7 +7,7 @@ import {
   PostgresDialect,
   FileMigrationProvider,
 } from "kysely";
-import { DatabaseScema } from "./database.schema";
+import { DatabaseSchema } from "./database.schema";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 
 ConfigModule.forRoot({
@@ -16,7 +16,7 @@ ConfigModule.forRoot({
 
 async function migrateToLatest() {
   const configService = new ConfigService();
-  const db = new Kysely<DatabaseScema>({
+  const db = new Kysely<DatabaseSchema>({
     dialect: new PostgresDialect({
       pool: new Pool({
         host: configService.get("POSTGRES_HOST"),

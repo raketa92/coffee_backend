@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { UseCase } from "../../../core/UseCase";
 import { OrderRepository } from "../ports/order.repository";
 import { CreateOrderDto } from "../../../infrastructure/http/dto/createOrder.dto";
@@ -17,6 +17,8 @@ import { RedisService } from "../../../infrastructure/persistence/redis/redis.se
 import { Order } from "../../../domain/order/order";
 import { OrderItem } from "../../../domain/order/orderItem";
 import { EnvService } from "../../../infrastructure/env";
+import { DatabaseSchema } from "src/infrastructure/persistence/kysely/database.schema";
+import { Kysely, Transaction } from "kysely";
 
 @Injectable()
 export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
@@ -25,7 +27,9 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
     private paymentRepository: PaymentRepository,
     private bankService: BankService,
     private configService: EnvService,
-    private redisService: RedisService
+    private redisService: RedisService,
+    @Inject("DB_CONNECTION")
+    private readonly kysely: Kysely<DatabaseSchema>
   ) {}
   public async execute(request?: CreateOrderDto): Promise<Order> {
     try {
@@ -35,22 +39,26 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
 
       const orderNumber = await this.redisService.generateOrderNumber();
 
-      const newOrder = this.createOrderEntity(request, orderNumber);
+      return await this.kysely.transaction().execute(async (trx) => {
+        const newOrder = this.createOrderEntity(request, orderNumber);
 
-      await this.orderRepository.save(newOrder);
+        await this.orderRepository.save(newOrder, trx);
+        if (request.paymentMethod === PaymentMethods.card) {
+          await this.processPayment(newOrder, trx);
+        }
 
-      if (request.paymentMethod === PaymentMethods.card) {
-        await this.processPayment(newOrder);
-      }
-
-      return newOrder;
+        return newOrder;
+      });
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
 
-  private async processPayment(newOrder: Order) {
+  private async processPayment(
+    newOrder: Order,
+    trx?: Transaction<DatabaseSchema>
+  ) {
     const hostApi = this.configService.get("HOST_API");
     const returnUrl = `${hostApi}/payment-service/orderStatus?orderNumber=${newOrder.orderNumber}&lang=${"ru"}`;
     const USERNAME = this.configService.get("HALK_BANK_LOGIN");
@@ -77,7 +85,7 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
       description: paymentData.description,
     });
 
-    await this.paymentRepository.save(newPayment);
+    await this.paymentRepository.save(newPayment, trx);
   }
 
   private createOrderEntity(request: CreateOrderDto, orderNumber: string) {

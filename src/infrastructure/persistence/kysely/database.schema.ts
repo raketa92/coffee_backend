@@ -4,7 +4,7 @@ import { OrderItemTable } from "./models/orderItem";
 import { PaymentTable } from "./models/payment";
 import { ProductTable } from "./models/product";
 
-export interface DatabaseScema {
+export interface DatabaseSchema {
   Order: OrderTable;
   OrderItem: OrderItemTable;
   Product: ProductTable;

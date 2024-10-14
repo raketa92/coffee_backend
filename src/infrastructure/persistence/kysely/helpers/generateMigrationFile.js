@@ -39,4 +39,3 @@ export async function down(db: Kysely<any>): Promise<void> {
 };
 
 generateFile();
-// 20241008155952-add-consumablesArrivingDate-to-patients
