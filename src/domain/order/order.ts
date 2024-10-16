@@ -3,6 +3,7 @@ import { UniqueEntityID } from "../../core/UniqueEntityID";
 import { AggregateRoot } from "../../core/AggregateRoot";
 import { OrderItem } from "./orderItem";
 import { Card } from "./card";
+import { DomainError, DomainErrorCode, DomainErrorMessage } from "../exception";
 
 export interface IOrderProps {
   orderNumber: string;
@@ -46,9 +47,19 @@ export class Order extends AggregateRoot<IOrderProps> {
     this._orderItems = props.orderItems;
 
     if (this._paymentMethod === PaymentMethods.card && !props.card) {
-      throw new Error("Card payment details are required for card payments");
+      throw new DomainError({
+        code: DomainErrorCode.BAD_REQUEST,
+        message: DomainErrorMessage.card_details_required,
+      });
     }
     this._card = props.card || null;
+
+    if (this._totalPrice < 0) {
+      throw new DomainError({
+        code: DomainErrorCode.BAD_REQUEST,
+        message: DomainErrorMessage.total_price_cant_be_negative,
+      });
+    }
   }
 
   changeStatus(newStatus: OrderStatus) {
@@ -60,7 +71,10 @@ export class Order extends AggregateRoot<IOrderProps> {
 
   setPaymentGuid(paymentGuid: UniqueEntityID) {
     if (this._paymentMethod !== PaymentMethods.card) {
-      throw new Error("Payment method must be card to set paymentGuid ");
+      throw new DomainError({
+        code: DomainErrorCode.BAD_REQUEST,
+        message: DomainErrorMessage.payment_method_must_be_card,
+      });
     }
     if (this.card) {
       this._paymentGuid = paymentGuid;
