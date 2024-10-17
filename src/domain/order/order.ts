@@ -69,7 +69,7 @@ export class Order extends AggregateRoot<IOrderProps> {
     this._status = newStatus;
   }
 
-  setPaymentGuid(paymentGuid: UniqueEntityID) {
+  assignPayment(paymentGuid: UniqueEntityID) {
     if (this._paymentMethod !== PaymentMethods.card) {
       throw new DomainError({
         code: DomainErrorCode.BAD_REQUEST,

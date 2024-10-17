@@ -17,7 +17,7 @@ class Card {
   readonly cardProvider: CardProvider;
 }
 
-class OrderItem {
+export class OrderItem {
   @IsNumber()
   readonly quantity: number;
   @IsString()

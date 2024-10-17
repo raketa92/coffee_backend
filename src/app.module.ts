@@ -7,6 +7,7 @@ import { RedisCacheInterceptor } from "./infrastructure/persistence/redis/redisC
 import { OrderController } from "./infrastructure/http/order.controller";
 import { CoffeeShopModule } from "./application/coffee_shop/coffeeShop.module";
 import { EnvModule } from "./infrastructure/env";
+import { LoggerModule } from "./infrastructure/logger/logger.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { EnvModule } from "./infrastructure/env";
     CoffeeShopModule,
     RedisModule,
     EnvModule,
+    LoggerModule,
   ],
   controllers: [OrderController],
   providers: [

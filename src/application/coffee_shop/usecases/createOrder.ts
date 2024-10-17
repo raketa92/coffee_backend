@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { UseCase } from "../../../core/UseCase";
 import { OrderRepository } from "../ports/order.repository";
-import { CreateOrderDto } from "../../../infrastructure/http/dto/createOrder.dto";
+import { CreateOrderDto } from "../../../infrastructure/http/dto/createOrderDto";
 import { UniqueEntityID } from "../../../core/UniqueEntityID";
 import {
   OrderStatus,
@@ -19,9 +19,18 @@ import { OrderItem } from "../../../domain/order/orderItem";
 import { EnvService } from "../../../infrastructure/env";
 import { DatabaseSchema } from "src/infrastructure/persistence/kysely/database.schema";
 import { Kysely, Transaction } from "kysely";
+import { CreateOrderResponseDto } from "src/infrastructure/http/dto/createOrderResponseDto";
+import {
+  UseCaseError,
+  UseCaseErrorCode,
+  UseCaseErrorMessage,
+} from "../exception";
+import { LoggerService } from "src/infrastructure/logger/logger";
 
 @Injectable()
-export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
+export class CreateOrderUseCase
+  implements UseCase<CreateOrderDto, CreateOrderResponseDto>
+{
   constructor(
     private orderRepository: OrderRepository,
     private paymentRepository: PaymentRepository,
@@ -29,29 +38,41 @@ export class CreateOrderUseCase implements UseCase<CreateOrderDto, Order> {
     private configService: EnvService,
     private redisService: RedisService,
     @Inject("DB_CONNECTION")
-    private readonly kysely: Kysely<DatabaseSchema>
+    private readonly kysely: Kysely<DatabaseSchema>,
+    private readonly logger: LoggerService
   ) {}
-  public async execute(request?: CreateOrderDto): Promise<Order> {
+  public async execute(
+    request?: CreateOrderDto
+  ): Promise<CreateOrderResponseDto> {
     try {
       if (!request) {
-        throw new Error("CreateOrderDto is required.");
+        throw new UseCaseError({
+          code: UseCaseErrorCode.BAD_REQUEST,
+          message: UseCaseErrorMessage.payload_required,
+        });
       }
 
       const orderNumber = await this.redisService.generateOrderNumber();
 
-      return await this.kysely.transaction().execute(async (trx) => {
-        const newOrder = this.createOrderEntity(request, orderNumber);
+      const createdOrder = await this.kysely
+        .transaction()
+        .execute(async (trx) => {
+          const newOrder = this.createOrderEntity(request, orderNumber);
+          await this.orderRepository.save(newOrder, trx);
 
-        await this.orderRepository.save(newOrder, trx);
-        if (request.paymentMethod === PaymentMethods.card) {
-          await this.processPayment(newOrder, trx);
-        }
+          if (request.paymentMethod === PaymentMethods.card) {
+            await this.processPayment(newOrder, trx);
+          }
 
-        return newOrder;
-      });
+          return newOrder;
+        });
+
+      return new CreateOrderResponseDto(orderNumber, createdOrder.status);
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw new UseCaseError({
+        code: UseCaseErrorCode.BAD_REQUEST,
+        message: error.message || UseCaseErrorMessage.create_order_error,
+      });
     }
   }
 

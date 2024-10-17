@@ -3,7 +3,7 @@ import { BankService } from "../ports/IBankService";
 import { PaymentRepository } from "../ports/IPaymentRepository";
 import { OrderRepository } from "../ports/order.repository";
 import { Test, TestingModule } from "@nestjs/testing";
-import { CreateOrderDto } from "../../../infrastructure/http/dto/createOrder.dto";
+import { CreateOrderDto } from "../../../infrastructure/http/dto/createOrderDto";
 import {
   CardProvider,
   OrderStatus,

@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { CreateOrderUseCase } from "src/application/coffee_shop/usecases/createOrder";
-import { CreateOrderDto } from "./dto/createOrder.dto";
+import { CreateOrderDto } from "./dto/createOrderDto";
 
 @Controller("/order")
 export class OrderController {

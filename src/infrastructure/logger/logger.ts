@@ -1,8 +1,9 @@
-/* eslint-disable no-console */
-import winston from "winston";
+import * as winston from "winston";
 import { Injectable } from "@nestjs/common";
 import { EnvService } from "../env";
 import { Stages } from "src/core/constants";
+
+const { combine, timestamp, colorize, printf } = winston.format;
 
 /*
   only use 4 level of logging:
@@ -40,10 +41,10 @@ export class LoggerService {
       transports: [
         new winston.transports.Console({
           silent: isTestStage,
-          format: winston.format.combine(
-            winston.format.colorize(),
-            winston.format.timestamp(),
-            winston.format.printf(
+          format: combine(
+            colorize(),
+            timestamp(),
+            printf(
               ({ timestamp, level, message }) =>
                 `${timestamp} ${level}: ${
                   typeof message === "object"
@@ -66,11 +67,27 @@ export class LoggerService {
         console.debug(message, ...rest);
       },
       info(message: any, ...rest: any) {
-        console.info(message, ...rest);
+        console.info(message, rest);
       },
       error(message: any, ...rest: any) {
         console.error(message, ...rest);
       },
     };
+  }
+
+  silly(message: any, ...rest: any) {
+    this.logger.silly(message, ...rest);
+  }
+
+  debug(message: any, ...rest: any) {
+    this.logger.debug(message, ...rest);
+  }
+
+  info(message: any, ...rest: any) {
+    this.logger.info(message, ...rest);
+  }
+
+  error(message: any, ...rest: any) {
+    this.logger.error(message, ...rest);
   }
 }

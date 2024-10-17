@@ -3,6 +3,7 @@ export enum OrderStatus {
   completed = "completed",
   canceled = "canceled",
   waitingClientApproval = "waitingClientApproval",
+  inProgress = "inProgress",
 }
 
 export enum PaymentMethods {
