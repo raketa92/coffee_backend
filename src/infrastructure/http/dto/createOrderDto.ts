@@ -6,7 +6,7 @@ import {
   IsString,
   ValidateNested,
 } from "class-validator";
-import { CardProvider, PaymentMethods } from "src/core/constants";
+import { CardProvider, PaymentMethods } from "@core/constants";
 
 class Card {
   readonly cardNumber: string;

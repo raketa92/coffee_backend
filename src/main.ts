@@ -1,9 +1,9 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { EnvService } from "./infrastructure/env";
-import { ResponseInterceptor } from "./infrastructure/http/interceptor/response.interceptor";
+import { EnvService } from "@infrastructure/env";
+import { ResponseInterceptor } from "@infrastructure/http/interceptor/response.interceptor";
 import { ValidationPipe } from "@nestjs/common";
-import { LoggerService } from "./infrastructure/logger/logger";
+import { LoggerService } from "@infrastructure/logger/logger";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {

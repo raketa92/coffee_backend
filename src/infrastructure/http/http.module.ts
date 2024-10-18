@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { OrderController } from "./order.controller";
-import { RedisService } from "../persistence/redis/redis.service";
-import { CoffeeShopModule } from "src/application/coffee_shop/coffeeShop.module";
+import { RedisService } from "@infrastructure/persistence/redis/redis.service";
+import { CoffeeShopModule } from "@application/coffee_shop/coffeeShop.module";
 
 @Module({
   imports: [CoffeeShopModule],

@@ -1,5 +1,10 @@
-import { Entity } from "../../core/Entity";
-import { UniqueEntityID } from "../../core/UniqueEntityID";
+import { Entity } from "@core/Entity";
+import { UniqueEntityID } from "@core/UniqueEntityID";
+import {
+  DomainError,
+  DomainErrorCode,
+  DomainErrorMessage,
+} from "@domain/exception";
 
 export interface IProductProps {
   name: string;
@@ -24,6 +29,13 @@ export class Product extends Entity<IProductProps> {
     this._shopGuid = props.shopGuid;
     this._rating = props.rating;
     this._ingredients = props.ingredients;
+
+    if (this._rating < 0) {
+      throw new DomainError({
+        code: DomainErrorCode.BAD_REQUEST,
+        message: DomainErrorMessage.rating_be_negative,
+      });
+    }
   }
 
   get guid(): UniqueEntityID {

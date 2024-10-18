@@ -1,9 +1,9 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { BankService } from "./bank.service";
 import { PaymentDto } from "./dto/paymentDto";
-import { IPaymentReponse } from "../../../application/coffee_shop/ports/IBankService";
+import { IPaymentReponse } from "@application/coffee_shop/ports/IBankService";
 import axios from "axios";
-import { EnvService } from "../../../infrastructure/env";
+import { EnvService } from "@infrastructure/env";
 
 jest.mock("axios");
 

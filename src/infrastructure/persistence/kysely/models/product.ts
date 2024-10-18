@@ -1,5 +1,5 @@
 import { Generated, Selectable, Insertable, Updateable } from "kysely";
-import { UniqueEntityID } from "src/core/UniqueEntityID";
+import { UniqueEntityID } from "@core/UniqueEntityID";
 
 export interface ProductTable {
   guid: UniqueEntityID;

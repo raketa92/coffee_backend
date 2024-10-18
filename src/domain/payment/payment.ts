@@ -1,6 +1,6 @@
-import { UniqueEntityID } from "../../core/UniqueEntityID";
-import { CardProvider, PaytmentFor } from "../../core/constants";
-import { AggregateRoot } from "../../core/AggregateRoot";
+import { UniqueEntityID } from "@core/UniqueEntityID";
+import { CardProvider, PaytmentFor } from "@core/constants";
+import { AggregateRoot } from "@core/AggregateRoot";
 
 export interface IPaymentProps {
   paymentFor: PaytmentFor;

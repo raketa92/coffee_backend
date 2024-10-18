@@ -1,5 +1,5 @@
-import { CardProvider } from "../../core/constants";
-import { ValueObject } from "src/core/ValueObject";
+import { CardProvider } from "@core/constants";
+import { ValueObject } from "@core/ValueObject";
 
 export interface ICardProps {
   readonly cardNumber: string;

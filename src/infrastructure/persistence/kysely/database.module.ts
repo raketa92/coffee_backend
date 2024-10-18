@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
 import { Kysely, PostgresDialect } from "kysely";
 import { Pool } from "pg";
-import { EnvModule, EnvService } from "src/infrastructure/env";
+import { EnvModule, EnvService } from "@infrastructure/env";
 import { DatabaseSchema } from "./database.schema";
-import { OrderRepository } from "src/application/coffee_shop/ports/order.repository";
+import { OrderRepository } from "@application/coffee_shop/ports/order.repository";
 import { OrderRepositoryImpl } from "./repository/orderRepositoryImpl";
 import { PaymentRepositoryImpl } from "./repository/paymentRepositoryImpl";
-import { PaymentRepository } from "src/application/coffee_shop/ports/IPaymentRepository";
+import { PaymentRepository } from "@application/coffee_shop/ports/IPaymentRepository";
 
 @Module({
   imports: [EnvModule],

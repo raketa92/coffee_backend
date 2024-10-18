@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Kysely, Transaction } from "kysely";
-import { DatabaseSchema } from "../database.schema";
-import { PaymentRepository } from "src/application/coffee_shop/ports/IPaymentRepository";
-import { Payment } from "src/domain/payment/payment";
-import { PaymentCreateModel } from "../models/payment";
+import { DatabaseSchema } from "@infrastructure/persistence/kysely/database.schema";
+import { PaymentRepository } from "@application/coffee_shop/ports/IPaymentRepository";
+import { Payment } from "@domain/payment/payment";
+import { PaymentCreateModel } from "@infrastructure/persistence/kysely/models/payment";
 
 @Injectable()
 export class PaymentRepositoryImpl implements PaymentRepository {

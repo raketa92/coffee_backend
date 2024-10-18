@@ -1,7 +1,7 @@
-import { Entity } from "./Entity";
-import { DomainEvents } from "./events/DomainEvents";
-import { IDomainEvent } from "./events/IDomainEvent";
-import { UniqueEntityID } from "./UniqueEntityID";
+import { Entity } from "@core/Entity";
+import { DomainEvents } from "@core/events/DomainEvents";
+import { IDomainEvent } from "@core/events/IDomainEvent";
+import { UniqueEntityID } from "@core/UniqueEntityID";
 
 export abstract class AggregateRoot<TInitProps> extends Entity<TInitProps> {
   private readonly _domainEvents: IDomainEvent[] = [];

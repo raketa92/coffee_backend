@@ -1,9 +1,13 @@
-import { OrderStatus, PaymentMethods } from "../../core/constants";
-import { UniqueEntityID } from "../../core/UniqueEntityID";
-import { AggregateRoot } from "../../core/AggregateRoot";
-import { OrderItem } from "./orderItem";
-import { Card } from "./card";
-import { DomainError, DomainErrorCode, DomainErrorMessage } from "../exception";
+import { OrderStatus, PaymentMethods } from "@core/constants";
+import { UniqueEntityID } from "@core/UniqueEntityID";
+import { AggregateRoot } from "@core/AggregateRoot";
+import { OrderItem } from "@domain/order/orderItem";
+import { Card } from "@domain/order/card";
+import {
+  DomainError,
+  DomainErrorCode,
+  DomainErrorMessage,
+} from "@domain/exception";
 
 export interface IOrderProps {
   orderNumber: string;

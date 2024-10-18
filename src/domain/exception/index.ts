@@ -8,6 +8,7 @@ export type DomainErrorCode =
 
 export const DomainErrorMessage = {
   total_price_cant_be_negative: "Total price can't be negative",
+  rating_be_negative: "Rating can't be negative",
   card_details_required: "Card details are required for card payments",
   payment_method_must_be_card: "Payment method must be card to set paymentGuid",
 };

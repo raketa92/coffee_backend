@@ -1,5 +1,5 @@
-import { UniqueEntityID } from "../../core/UniqueEntityID";
-import { Entity } from "../../core/Entity";
+import { UniqueEntityID } from "@core/UniqueEntityID";
+import { Entity } from "@core/Entity";
 
 export interface IBankResponseProps {
   paymentId: UniqueEntityID;

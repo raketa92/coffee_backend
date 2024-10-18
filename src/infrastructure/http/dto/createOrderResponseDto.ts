@@ -1,4 +1,4 @@
-import { OrderStatus } from "src/core/constants";
+import { OrderStatus } from "@core/constants";
 
 export class CreateOrderResponseDto {
   orderNumber: string;

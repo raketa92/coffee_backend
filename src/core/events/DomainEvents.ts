@@ -1,6 +1,6 @@
-import { AggregateRoot } from '../AggregateRoot';
-import { UniqueEntityID } from '../UniqueEntityID';
-import { IDomainEvent } from './IDomainEvent';
+import { AggregateRoot } from "@core/AggregateRoot";
+import { UniqueEntityID } from "@core/UniqueEntityID";
+import { IDomainEvent } from "@core/events/IDomainEvent";
 
 type ClassName = string;
 type EventCallback = (event: IDomainEvent) => void;
@@ -33,14 +33,14 @@ export class DomainEvents {
   }
 
   private static removeAggregateFromMarkedDispatchList(
-    aggregate: AggregateRoot<any>,
+    aggregate: AggregateRoot<any>
   ): void {
     const index = this.markedAggregates.findIndex((e) => e.equals(aggregate));
     this.markedAggregates.splice(index, 1);
   }
 
   public static findMarkedAggregateByID(
-    id: UniqueEntityID,
+    id: UniqueEntityID
   ): AggregateRoot<any> | null {
     let found: AggregateRoot<any> | null = null;
     for (const aggregate of this.markedAggregates) {
@@ -62,7 +62,7 @@ export class DomainEvents {
 
   public static register(
     callback: EventCallback,
-    eventClassName: ClassName,
+    eventClassName: ClassName
   ): void {
     if (!this.handlersMap.hasOwnProperty(eventClassName)) {
       this.handlersMap[eventClassName] = [];

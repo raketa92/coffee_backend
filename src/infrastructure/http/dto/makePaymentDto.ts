@@ -1,5 +1,5 @@
 import { IsNumber, IsString } from "class-validator";
-import { CardProvider, PaytmentFor } from "src/core/constants";
+import { CardProvider, PaytmentFor } from "@core/constants";
 
 export class MakePaymentDto {
   @IsString()

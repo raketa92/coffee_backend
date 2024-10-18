@@ -1,10 +1,10 @@
-import { Order } from "src/domain/order/order";
-import { OrderTable } from "../models/order";
-import { Card } from "src/domain/order/card";
-import { OrderItemTable } from "../models/orderItem";
-import { OrderItem } from "src/domain/order/orderItem";
-import { ProductTable } from "../models/product";
-import { UniqueEntityID } from "src/core/UniqueEntityID";
+import { Order } from "@domain/order/order";
+import { OrderTable } from "@infrastructure/persistence/kysely/models/order";
+import { Card } from "@domain/order/card";
+import { OrderItemTable } from "@infrastructure/persistence/kysely/models/orderItem";
+import { OrderItem } from "@domain/order/orderItem";
+import { ProductTable } from "@infrastructure/persistence/kysely/models/product";
+import { UniqueEntityID } from "@core/UniqueEntityID";
 
 export class OrderMapper {
   static toDomain(

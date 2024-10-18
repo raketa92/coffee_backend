@@ -6,7 +6,7 @@ export class ApplicationError extends Error {
     name: string,
     statusCode: string,
     httpStatusCode: number,
-    message: string,
+    message: string
   ) {
     super(message);
     this.name = name;

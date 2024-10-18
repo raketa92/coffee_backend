@@ -1,7 +1,7 @@
 import * as winston from "winston";
 import { Injectable } from "@nestjs/common";
-import { EnvService } from "../env";
-import { Stages } from "src/core/constants";
+import { EnvService } from "@infrastructure/env";
+import { Stages } from "@core/constants";
 
 const { combine, timestamp, colorize, printf } = winston.format;
 

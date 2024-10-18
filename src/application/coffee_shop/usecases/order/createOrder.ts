@@ -1,22 +1,18 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { UseCase } from "../../../core/UseCase";
-import { OrderRepository } from "../ports/order.repository";
-import { CreateOrderDto } from "../../../infrastructure/http/dto/createOrderDto";
-import { UniqueEntityID } from "../../../core/UniqueEntityID";
-import {
-  OrderStatus,
-  PaymentMethods,
-  PaytmentFor,
-} from "../../../core/constants";
-import { Card } from "../../../domain/order/card";
-import { BankService } from "../../../application/coffee_shop/ports/IBankService";
-import { PaymentDto } from "../../../infrastructure/payment/bankService/dto/paymentDto";
-import { Payment } from "../../../domain/payment/payment";
-import { PaymentRepository } from "../ports/IPaymentRepository";
-import { RedisService } from "../../../infrastructure/persistence/redis/redis.service";
-import { Order } from "../../../domain/order/order";
-import { OrderItem } from "../../../domain/order/orderItem";
-import { EnvService } from "../../../infrastructure/env";
+import { UseCase } from "@core/UseCase";
+import { OrderRepository } from "@application/coffee_shop/ports/order.repository";
+import { CreateOrderDto } from "@infrastructure/http/dto/createOrderDto";
+import { UniqueEntityID } from "@core/UniqueEntityID";
+import { OrderStatus, PaymentMethods, PaytmentFor } from "@core/constants";
+import { Card } from "@domain/order/card";
+import { BankService } from "@application/coffee_shop/ports/IBankService";
+import { PaymentDto } from "@infrastructure/payment/bankService/dto/paymentDto";
+import { Payment } from "@domain/payment/payment";
+import { PaymentRepository } from "../../ports/IPaymentRepository";
+import { RedisService } from "@infrastructure/persistence/redis/redis.service";
+import { Order } from "@domain/order/order";
+import { OrderItem } from "@domain/order/orderItem";
+import { EnvService } from "@infrastructure/env";
 import { DatabaseSchema } from "src/infrastructure/persistence/kysely/database.schema";
 import { Kysely, Transaction } from "kysely";
 import { CreateOrderResponseDto } from "src/infrastructure/http/dto/createOrderResponseDto";
@@ -24,7 +20,7 @@ import {
   UseCaseError,
   UseCaseErrorCode,
   UseCaseErrorMessage,
-} from "../exception";
+} from "../../exception";
 import { LoggerService } from "src/infrastructure/logger/logger";
 
 @Injectable()

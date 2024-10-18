@@ -5,7 +5,7 @@ import {
 } from "src/application/coffee_shop/ports/IBankService";
 import { PaymentDto } from "./dto/paymentDto";
 import axios from "axios";
-import { EnvService } from "../../env";
+import { EnvService } from "@infrastructure/env";
 
 @Injectable()
 export class BankService implements IBankService {

@@ -1,5 +1,5 @@
 import { Generated, Selectable, Insertable, Updateable } from "kysely";
-import { CardProvider, OrderStatus, PaymentMethods } from "src/core/constants";
+import { CardProvider, OrderStatus, PaymentMethods } from "@core/constants";
 
 export interface OrderTable {
   guid: string;

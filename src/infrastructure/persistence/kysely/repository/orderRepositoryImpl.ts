@@ -1,11 +1,14 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Kysely, Transaction } from "kysely";
-import { OrderRepository } from "src/application/coffee_shop/ports/order.repository";
-import { Order } from "src/domain/order/order";
-import { DatabaseSchema } from "../database.schema";
-import { OrderCreateModel, OrderModel } from "../models/order";
-import { OrderItemCreateModel } from "../models/orderItem";
-import { OrderItem } from "src/domain/order/orderItem";
+import { OrderRepository } from "@application/coffee_shop/ports/order.repository";
+import { Order } from "@domain/order/order";
+import { DatabaseSchema } from "@infrastructure/persistence/kysely/database.schema";
+import {
+  OrderCreateModel,
+  OrderModel,
+} from "@infrastructure/persistence/kysely/models/order";
+import { OrderItemCreateModel } from "@infrastructure/persistence/kysely/models/orderItem";
+import { OrderItem } from "@domain/order/orderItem";
 
 @Injectable()
 export class OrderRepositoryImpl implements OrderRepository {

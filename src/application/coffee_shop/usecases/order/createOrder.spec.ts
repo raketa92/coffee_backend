@@ -1,23 +1,23 @@
-import { RedisService } from "../../../infrastructure/persistence/redis/redis.service";
-import { BankService } from "../ports/IBankService";
-import { PaymentRepository } from "../ports/IPaymentRepository";
-import { OrderRepository } from "../ports/order.repository";
+import { RedisService } from "@infrastructure/persistence/redis/redis.service";
+import { BankService } from "@application/coffee_shop/ports/IBankService";
+import { PaymentRepository } from "@application/coffee_shop/ports/IPaymentRepository";
+import { OrderRepository } from "@application/coffee_shop/ports/order.repository";
 import { Test, TestingModule } from "@nestjs/testing";
-import { CreateOrderDto } from "../../../infrastructure/http/dto/createOrderDto";
+import { CreateOrderDto } from "@infrastructure/http/dto/createOrderDto";
 import {
   CardProvider,
   OrderStatus,
   PaymentMethods,
   PaytmentFor,
-} from "../../../core/constants";
-import { Order } from "../../../domain/order/order";
-import { UniqueEntityID } from "../../../core/UniqueEntityID";
-import { OrderItem } from "../../../domain/order/orderItem";
-import { Card } from "../../../domain/order/card";
-import { Payment } from "../../../domain/payment/payment";
+} from "@core/constants";
+import { Order } from "@domain/order/order";
+import { UniqueEntityID } from "@core/UniqueEntityID";
+import { OrderItem } from "@domain/order/orderItem";
+import { Card } from "@domain/order/card";
+import { Payment } from "@domain/payment/payment";
 import { CreateOrderUseCase } from "./createOrder";
-import { PaymentDto } from "../../../infrastructure/payment/bankService/dto/paymentDto";
-import { EnvService } from "../../../infrastructure/env";
+import { PaymentDto } from "@infrastructure/payment/bankService/dto/paymentDto";
+import { EnvService } from "@infrastructure/env";
 
 describe("Create order use case", () => {
   let useCase: CreateOrderUseCase;

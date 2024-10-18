@@ -5,7 +5,7 @@ import {
   Updateable,
   JSONColumnType,
 } from "kysely";
-import { UniqueEntityID } from "src/core/UniqueEntityID";
+import { UniqueEntityID } from "@core/UniqueEntityID";
 
 export interface BankResponseTable {
   guid: UniqueEntityID;
