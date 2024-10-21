@@ -11,7 +11,7 @@ export class OrderMapper {
     orderModel: OrderTable,
     orderItemModel: OrderItemTable[],
     productModel: ProductTable[]
-  ): Order | null {
+  ): Order {
     let card = null;
     if (orderModel.card) {
       card = new Card({
@@ -39,10 +39,6 @@ export class OrderMapper {
         });
       })
       .filter((el): el is OrderItem => el !== undefined);
-
-    if (!orderItems.length) {
-      return null;
-    }
 
     const order = new Order({
       orderNumber: orderModel.orderNumber,

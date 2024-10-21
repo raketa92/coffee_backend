@@ -21,15 +21,15 @@ export class OrderItem {
   @IsNumber()
   readonly quantity: number;
   @IsString()
-  readonly productId: string;
+  readonly productGuid: string;
 }
 
 export class CreateOrderDto {
   @IsString()
   @Optional()
-  userId: string;
+  userGuid: string;
   @IsString()
-  shopId: string;
+  shopGuid: string;
   @IsString()
   phone: string;
   @IsString()

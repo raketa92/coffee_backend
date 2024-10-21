@@ -20,6 +20,25 @@
         "sourceMaps": true,
         "stopOnEntry": false,
         "console": "integratedTerminal",
-    }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest watch current file",
+      "env": {
+          "STAGE": "test",
+      },
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "args": [
+          "--detectOpenHandles",
+          "${fileDirname}/${fileBasename}",
+          "--verbose",
+          "-i",
+          "--no-cache",
+          "--watchAll"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+  }
   ]
 }

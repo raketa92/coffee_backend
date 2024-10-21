@@ -1,9 +1,9 @@
 import { RedisService } from "@infrastructure/persistence/redis/redis.service";
 import { BankService } from "@application/coffee_shop/ports/IBankService";
 import { PaymentRepository } from "@application/coffee_shop/ports/IPaymentRepository";
-import { OrderRepository } from "@application/coffee_shop/ports/order.repository";
+import { OrderRepository } from "@/application/coffee_shop/ports/orderRepository";
 import { Test, TestingModule } from "@nestjs/testing";
-import { CreateOrderDto } from "@infrastructure/http/dto/createOrderDto";
+import { CreateOrderDto } from "@/infrastructure/http/dto/order/createOrderDto";
 import {
   CardProvider,
   OrderStatus,
@@ -15,9 +15,17 @@ import { UniqueEntityID } from "@core/UniqueEntityID";
 import { OrderItem } from "@domain/order/orderItem";
 import { Card } from "@domain/order/card";
 import { Payment } from "@domain/payment/payment";
-import { CreateOrderUseCase } from "./createOrder";
+import { CreateOrderUseCase } from "../createOrder";
 import { PaymentDto } from "@infrastructure/payment/bankService/dto/paymentDto";
 import { EnvService } from "@infrastructure/env";
+import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
+import { Kysely } from "kysely";
+import {
+  UseCaseError,
+  UseCaseErrorCode,
+  UseCaseErrorMessage,
+} from "@/application/coffee_shop/exception";
+import { CreateOrderResponseDto } from "@/infrastructure/http/dto/order/createOrderResponseDto";
 
 describe("Create order use case", () => {
   let useCase: CreateOrderUseCase;
@@ -26,6 +34,7 @@ describe("Create order use case", () => {
   let bankService: BankService;
   let redisService: RedisService;
   let configService: EnvService;
+  let kysely: Kysely<DatabaseSchema>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -61,6 +70,13 @@ describe("Create order use case", () => {
             generateOrderNumber: jest.fn(),
           },
         },
+        {
+          provide: "DB_CONNECTION",
+          useValue: {
+            transaction: jest.fn().mockReturnThis(),
+            execute: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -70,6 +86,7 @@ describe("Create order use case", () => {
     bankService = module.get<BankService>(BankService);
     redisService = module.get<RedisService>(RedisService);
     configService = module.get<EnvService>(EnvService);
+    kysely = module.get("DB_CONNECTION");
   });
 
   it("should be defined", () => {
@@ -78,18 +95,21 @@ describe("Create order use case", () => {
 
   it("should throw an error if CreateOrderDto is not provided", async () => {
     await expect(useCase.execute()).rejects.toThrow(
-      "CreateOrderDto is required."
+      new UseCaseError({
+        code: UseCaseErrorCode.BAD_REQUEST,
+        message: UseCaseErrorMessage.payload_required,
+      })
     );
   });
 
   it("should create an order and process payment when payment method is card", async () => {
     const orderNumber = "290924873425";
     const createOrderDto: CreateOrderDto = {
-      userId: "1",
-      shopId: "2",
+      userGuid: new UniqueEntityID().toString(),
+      shopGuid: new UniqueEntityID().toString(),
       orderItems: [
         {
-          productId: "c1f0012a-d013-4969-b440-5864e53c8778",
+          productGuid: new UniqueEntityID().toString(),
           quantity: 1,
         },
       ],
@@ -110,14 +130,14 @@ describe("Create order use case", () => {
     const orderProducts = createOrderDto.orderItems.map((item) => {
       return new OrderItem({
         quantity: item.quantity,
-        productId: new UniqueEntityID(item.productId),
+        productId: new UniqueEntityID(item.productGuid),
       });
     });
 
     const newOrder = new Order({
       orderNumber,
-      userGuid: new UniqueEntityID(createOrderDto.userId),
-      shopGuid: new UniqueEntityID(createOrderDto.shopId),
+      userGuid: new UniqueEntityID(createOrderDto.userGuid),
+      shopGuid: new UniqueEntityID(createOrderDto.shopGuid),
       phone: createOrderDto.phone,
       address: createOrderDto.address,
       totalPrice: createOrderDto.totalPrice,
@@ -134,8 +154,8 @@ describe("Create order use case", () => {
       currency: 934,
       language: "ru",
       orderNumber: newOrder.orderNumber,
-      userName: "test",
-      password: "test",
+      userName: "http://fake-host-api.com",
+      password: "http://fake-host-api.com",
       amount: parseInt((newOrder.totalPrice * 100).toFixed()),
       returnUrl,
     };
@@ -150,6 +170,11 @@ describe("Create order use case", () => {
       description: paymentData.description,
     });
 
+    const trxMock: any = {
+      execute: jest.fn().mockImplementation((callback) => callback(trxMock)),
+    };
+    jest.spyOn(kysely, "transaction").mockReturnValue(trxMock);
+
     (redisService.generateOrderNumber as jest.Mock).mockResolvedValue(
       orderNumber
     );
@@ -160,20 +185,41 @@ describe("Create order use case", () => {
     const result = await useCase.execute(createOrderDto);
 
     expect(redisService.generateOrderNumber).toHaveBeenCalled();
-    expect(orderRepository.save).toHaveBeenCalledWith(newOrder);
+    expect(orderRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderNumber: newOrder.orderNumber,
+        totalPrice: 100,
+      }),
+      trxMock
+    );
+    expect(orderRepository.save).toHaveBeenCalledTimes(1);
     expect(bankService.makePayment).toHaveBeenCalledWith(paymentData);
-    expect(paymentRepository.save).toHaveBeenCalledWith(newPayment);
-    expect(result).toMatchObject(newOrder);
+    expect(paymentRepository.save).toHaveBeenCalledTimes(1);
+    expect(paymentRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        paymentFor: PaytmentFor.product,
+        cardProvider: newOrder.card!.cardProvider,
+        status: OrderStatus.waitingClientApproval,
+        bankOrderId: paymentResponse.data.bankOrderId,
+        amount: paymentData.amount,
+        currency: paymentData.currency,
+        description: paymentData.description,
+      }),
+      trxMock
+    );
+    expect(result).toMatchObject(
+      new CreateOrderResponseDto(orderNumber, newOrder.status)
+    );
   });
 
   it("should create an order and process payment when payment method is cash", async () => {
     const orderNumber = "290924873425";
     const createOrderDto: CreateOrderDto = {
-      userId: "1",
-      shopId: "2",
+      userGuid: "1",
+      shopGuid: "2",
       orderItems: [
         {
-          productId: "c1f0012a-d013-4969-b440-5864e53c8778",
+          productGuid: "c1f0012a-d013-4969-b440-5864e53c8778",
           quantity: 1,
         },
       ],
@@ -186,14 +232,14 @@ describe("Create order use case", () => {
     const orderProducts = createOrderDto.orderItems.map((item) => {
       return new OrderItem({
         quantity: item.quantity,
-        productId: new UniqueEntityID(item.productId),
+        productId: new UniqueEntityID(item.productGuid),
       });
     });
 
     const newOrder = new Order({
       orderNumber,
-      userGuid: new UniqueEntityID(createOrderDto.userId),
-      shopGuid: new UniqueEntityID(createOrderDto.shopId),
+      userGuid: new UniqueEntityID(createOrderDto.userGuid),
+      shopGuid: new UniqueEntityID(createOrderDto.shopGuid),
       phone: createOrderDto.phone,
       address: createOrderDto.address,
       totalPrice: createOrderDto.totalPrice,
@@ -201,6 +247,11 @@ describe("Create order use case", () => {
       paymentMethod: createOrderDto.paymentMethod,
       orderItems: orderProducts,
     });
+
+    const trxMock: any = {
+      execute: jest.fn().mockImplementation((callback) => callback(trxMock)),
+    };
+    jest.spyOn(kysely, "transaction").mockReturnValue(trxMock);
 
     (redisService.generateOrderNumber as jest.Mock).mockResolvedValue(
       orderNumber
@@ -210,7 +261,15 @@ describe("Create order use case", () => {
     const result = await useCase.execute(createOrderDto);
 
     expect(redisService.generateOrderNumber).toHaveBeenCalled();
-    expect(orderRepository.save).toHaveBeenCalledWith(newOrder);
-    expect(result).toMatchObject(newOrder);
+    expect(orderRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderNumber: newOrder.orderNumber,
+        totalPrice: 100,
+      }),
+      trxMock
+    );
+    expect(result).toMatchObject(
+      new CreateOrderResponseDto(orderNumber, newOrder.status)
+    );
   });
 });

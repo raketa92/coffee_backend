@@ -21,7 +21,7 @@ export class OrderItem extends Entity<IOrderItemProps> {
   toJSON() {
     return {
       guid: this._guid.toValue(),
-      quanity: this.quantity,
+      quantity: this.quantity,
       productId: this.productId.toValue(),
     };
   }

@@ -87,15 +87,15 @@ export class Order extends AggregateRoot<IOrderProps> {
 
   toJSON() {
     return {
-      guid: this._guid.toValue(),
+      guid: this._guid.toString(),
       orderNumber: this._orderNumber,
-      userGuid: this._userGuid?.toValue(),
-      shopGuid: this._shopGuid.toValue(),
+      userGuid: this._userGuid?.toString(),
+      shopGuid: this._shopGuid.toString(),
       phone: this._phone,
       address: this._address,
       totalPrice: this._totalPrice,
       status: this._status,
-      paymentGuid: this._paymentGuid?.toValue(),
+      paymentGuid: this._paymentGuid?.toString(),
       paymentMethod: this._paymentMethod,
       card: this._card,
       orderItems: this._orderItems,

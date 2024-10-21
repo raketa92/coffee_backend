@@ -16,7 +16,7 @@ const generateFile = () => {
 
   const fileName = `${timestamp}-${migrationName}.ts`;
 
-  const fileContent = `import { Kysely } from 'kysely';
+  const fileContent = `import { Kysely } from "kysely";
 
 export async function up(db: Kysely<any>): Promise<void> {
   // Add migration logic here

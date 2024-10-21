@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Kysely, Transaction } from "kysely";
-import { OrderRepository } from "@application/coffee_shop/ports/order.repository";
+import { OrderRepository } from "@/application/coffee_shop/ports/orderRepository";
 import { Order } from "@domain/order/order";
 import { DatabaseSchema } from "@infrastructure/persistence/kysely/database.schema";
 import {
@@ -19,7 +19,7 @@ export class OrderRepositoryImpl implements OrderRepository {
   async save(
     data: Order,
     transaction?: Transaction<DatabaseSchema>
-  ): Promise<OrderModel> {
+  ): Promise<Order> {
     const orderModelData: OrderCreateModel = {
       guid: data.guid.toValue(),
       orderNumber: data.orderNumber,
@@ -34,9 +34,9 @@ export class OrderRepositoryImpl implements OrderRepository {
       card: data.card,
     };
     if (transaction) {
-      return this.insertOrder(transaction, orderModelData, data.orderItems);
+      await this.insertOrder(transaction, orderModelData, data.orderItems);
     } else {
-      return await this.kysely.transaction().execute(async (trx) => {
+      await this.kysely.transaction().execute(async (trx) => {
         const newOrder = await this.insertOrder(
           trx,
           orderModelData,
@@ -45,6 +45,7 @@ export class OrderRepositoryImpl implements OrderRepository {
         return newOrder;
       });
     }
+    return data;
   }
   private async insertOrder(
     trx: Transaction<DatabaseSchema>,

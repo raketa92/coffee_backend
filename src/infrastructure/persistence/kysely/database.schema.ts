@@ -1,4 +1,5 @@
 import { BankResponseTable } from "./models/bankResponse";
+import { CategoryTable } from "./models/category";
 import { OrderTable } from "./models/order";
 import { OrderItemTable } from "./models/orderItem";
 import { PaymentTable } from "./models/payment";
@@ -10,4 +11,5 @@ export interface DatabaseSchema {
   Product: ProductTable;
   Payment: PaymentTable;
   BankResponse: BankResponseTable;
+  Category: CategoryTable;
 }

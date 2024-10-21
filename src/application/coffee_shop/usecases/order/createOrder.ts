@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { UseCase } from "@core/UseCase";
-import { OrderRepository } from "@application/coffee_shop/ports/order.repository";
-import { CreateOrderDto } from "@infrastructure/http/dto/createOrderDto";
+import { OrderRepository } from "@/application/coffee_shop/ports/orderRepository";
+import { CreateOrderDto } from "@/infrastructure/http/dto/order/createOrderDto";
 import { UniqueEntityID } from "@core/UniqueEntityID";
 import { OrderStatus, PaymentMethods, PaytmentFor } from "@core/constants";
 import { Card } from "@domain/order/card";
@@ -15,27 +15,25 @@ import { OrderItem } from "@domain/order/orderItem";
 import { EnvService } from "@infrastructure/env";
 import { DatabaseSchema } from "src/infrastructure/persistence/kysely/database.schema";
 import { Kysely, Transaction } from "kysely";
-import { CreateOrderResponseDto } from "src/infrastructure/http/dto/createOrderResponseDto";
+import { CreateOrderResponseDto } from "@/infrastructure/http/dto/order/createOrderResponseDto";
 import {
   UseCaseError,
   UseCaseErrorCode,
   UseCaseErrorMessage,
-} from "../../exception";
-import { LoggerService } from "src/infrastructure/logger/logger";
+} from "@application/coffee_shop/exception";
 
 @Injectable()
 export class CreateOrderUseCase
   implements UseCase<CreateOrderDto, CreateOrderResponseDto>
 {
   constructor(
-    private orderRepository: OrderRepository,
-    private paymentRepository: PaymentRepository,
-    private bankService: BankService,
-    private configService: EnvService,
-    private redisService: RedisService,
+    private readonly orderRepository: OrderRepository,
+    private readonly paymentRepository: PaymentRepository,
+    private readonly bankService: BankService,
+    private readonly configService: EnvService,
+    private readonly redisService: RedisService,
     @Inject("DB_CONNECTION")
-    private readonly kysely: Kysely<DatabaseSchema>,
-    private readonly logger: LoggerService
+    private readonly kysely: Kysely<DatabaseSchema>
   ) {}
   public async execute(
     request?: CreateOrderDto
@@ -106,8 +104,10 @@ export class CreateOrderUseCase
   }
 
   private createOrderEntity(request: CreateOrderDto, orderNumber: string) {
-    const userId = request.userId ? new UniqueEntityID(request.userId) : null;
-    const shopId = new UniqueEntityID(request.shopId);
+    const userId = request.userGuid
+      ? new UniqueEntityID(request.userGuid)
+      : null;
+    const shopId = new UniqueEntityID(request.shopGuid);
     const status =
       request.paymentMethod === PaymentMethods.cash
         ? OrderStatus.pending
@@ -116,7 +116,7 @@ export class CreateOrderUseCase
     const orderProducts = request.orderItems.map((item) => {
       return new OrderItem({
         quantity: item.quantity,
-        productId: new UniqueEntityID(item.productId),
+        productId: new UniqueEntityID(item.productGuid),
       });
     });
 

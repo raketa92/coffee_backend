@@ -13,15 +13,12 @@
     ]
   },
   "moduleNameMapper": {
-    "@app/core/(.*)": "<rootDir>/src/core/$1",
-    "@app/core": "<rootDir>/src/core",
-    "@app/application/(.*)": "<rootDir>/src/application/$1",
-    "@app/application": "<rootDir>/src/application",
-    "@app/domain/(.*)": "<rootDir>/src/domain/$1",
-    "@app/domain": "<rootDir>/src/domain",
-    "@app/infra/(.*)": "<rootDir>/src/infra/$1",
-    "@app/infra": "<rootDir>/src/infra",
-    "@app/(.*)": "<rootDir>/src/$1",
-    "@app/": "<rootDir>/src/"
-  }
+    "^src/(.*)$": "<rootDir>/$1",
+    "@core/(.*)": "<rootDir>/src/core/$1",
+    "@application/(.*)": "<rootDir>/src/application/$1",
+    "@domain/(.*)": "<rootDir>/src/domain/$1",
+    "@infrastructure/(.*)": "<rootDir>/src/infrastructure/$1",
+    "@/(.*)": "<rootDir>/src/$1"
+  },
+  "roots": ["<rootDir>/src"]
 }

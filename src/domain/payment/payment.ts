@@ -36,6 +36,20 @@ export class Payment extends AggregateRoot<IPaymentProps> {
     this._description = props.description;
   }
 
+  toJSON() {
+    return {
+      guid: this._guid.toString(),
+      paymentFor: this._paymentFor,
+      cardProvider: this._cardProvider,
+      status: this._status,
+      orderGuid: this._orderGuid.toString(),
+      bankOrderId: this._bankOrderId,
+      amount: this._amount,
+      currency: this._currency,
+      description: this._description,
+    };
+  }
+
   get guid(): UniqueEntityID {
     return this._guid;
   }
