@@ -8,6 +8,7 @@ import { OrderController } from "@infrastructure/http/order.controller";
 import { CoffeeShopModule } from "@application/coffee_shop/coffeeShop.module";
 import { EnvModule } from "@infrastructure/env";
 import { LoggerModule } from "@infrastructure/logger/logger.module";
+import { CategoryController } from "./infrastructure/http/category.controller";
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { LoggerModule } from "@infrastructure/logger/logger.module";
     EnvModule,
     LoggerModule,
   ],
-  controllers: [OrderController],
+  controllers: [OrderController, CategoryController],
   providers: [
     RedisService,
     {

@@ -5,11 +5,10 @@ import {
   Updateable,
   JSONColumnType,
 } from "kysely";
-import { UniqueEntityID } from "@core/UniqueEntityID";
 
 export interface BankResponseTable {
-  guid: UniqueEntityID;
-  paymentId: UniqueEntityID;
+  guid: string;
+  paymentId: string;
   errorCode: string | null;
   errorMessage: string | null;
   orderNumber: string;

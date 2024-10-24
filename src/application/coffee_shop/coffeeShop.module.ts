@@ -14,6 +14,7 @@ import { GetCategoriesUseCase } from "./usecases/category/getCategories";
   providers: [
     RedisService,
     CreateOrderUseCase,
+    GetCategoriesUseCase,
     {
       provide: IBankService,
       useClass: BankService,

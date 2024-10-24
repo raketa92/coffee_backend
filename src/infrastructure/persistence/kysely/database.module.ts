@@ -7,6 +7,8 @@ import { OrderRepository } from "@/application/coffee_shop/ports/orderRepository
 import { OrderRepositoryImpl } from "./repository/orderRepositoryImpl";
 import { PaymentRepositoryImpl } from "./repository/paymentRepositoryImpl";
 import { PaymentRepository } from "@application/coffee_shop/ports/IPaymentRepository";
+import { CategoryRepository } from "@/application/coffee_shop/ports/ICategoryRepository";
+import { CategoryRepositoryImpl } from "./repository/categoryRepositoryImpl";
 
 @Module({
   imports: [EnvModule],
@@ -37,7 +39,16 @@ import { PaymentRepository } from "@application/coffee_shop/ports/IPaymentReposi
       provide: PaymentRepository,
       useClass: PaymentRepositoryImpl,
     },
+    {
+      provide: CategoryRepository,
+      useClass: CategoryRepositoryImpl,
+    },
   ],
-  exports: ["DB_CONNECTION", OrderRepository, PaymentRepository],
+  exports: [
+    "DB_CONNECTION",
+    OrderRepository,
+    PaymentRepository,
+    CategoryRepository,
+  ],
 })
 export class DatabaseModule {}

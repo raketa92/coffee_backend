@@ -1,12 +1,11 @@
 import { Generated, Selectable, Insertable, Updateable } from "kysely";
-import { UniqueEntityID } from "@core/UniqueEntityID";
 
 export interface ProductTable {
-  guid: UniqueEntityID;
+  guid: string;
   name: string;
   price: number;
-  categoryGuid: UniqueEntityID;
-  shopGuid: UniqueEntityID;
+  categoryGuid: string;
+  shopGuid: string;
   rating: number;
   ingredients: string[] | null;
   createdAt: Generated<Date>;

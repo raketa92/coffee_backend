@@ -1,8 +1,7 @@
-import { UniqueEntityID } from "@/core/UniqueEntityID";
 import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 export interface CategoryTable {
-  guid: UniqueEntityID;
+  guid: string;
   name: string;
   iconUrl: string;
   createdAt: Generated<Date>;

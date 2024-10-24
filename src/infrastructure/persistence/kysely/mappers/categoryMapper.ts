@@ -1,5 +1,6 @@
 import { Category } from "@/domain/category/category";
 import { CategoryModel } from "../models/category";
+import { UniqueEntityID } from "@/core/UniqueEntityID";
 
 export class CategoryMapper {
   static toDomain(categoryModel: CategoryModel): Category {
@@ -10,7 +11,7 @@ export class CategoryMapper {
         createdAt: categoryModel.createdAt,
         updatedAt: categoryModel.updatedAt,
       },
-      categoryModel.guid
+      new UniqueEntityID(categoryModel.guid)
     );
   }
 }
