@@ -9,11 +9,17 @@ import { CoffeeShopModule } from "@application/coffee_shop/coffeeShop.module";
 import { EnvModule } from "@infrastructure/env";
 import { LoggerModule } from "@infrastructure/logger/logger.module";
 import { CategoryController } from "./infrastructure/http/category.controller";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
 
 @Module({
   imports: [
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== "production",
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, "..", "uploads/images"),
+      serveRoot: "/images",
     }),
     CoffeeShopModule,
     RedisModule,
