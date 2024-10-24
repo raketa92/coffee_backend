@@ -3,6 +3,7 @@ import { Generated, Selectable, Insertable, Updateable } from "kysely";
 export interface ProductTable {
   guid: string;
   name: string;
+  image: string;
   price: number;
   categoryGuid: string;
   shopGuid: string;

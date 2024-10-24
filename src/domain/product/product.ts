@@ -8,6 +8,7 @@ import {
 
 export interface IProductProps {
   name: string;
+  image: string;
   price: number;
   categoryGuid: UniqueEntityID;
   shopGuid: UniqueEntityID;
@@ -17,6 +18,7 @@ export interface IProductProps {
 
 export class Product extends Entity<IProductProps> {
   private readonly _name: string;
+  private readonly _image: string;
   private readonly _price: number;
   private readonly _categoryGuid: UniqueEntityID;
   private readonly _shopGuid: UniqueEntityID;
@@ -24,6 +26,8 @@ export class Product extends Entity<IProductProps> {
   private readonly _ingredients: string[] | null;
   constructor(props: IProductProps, guid?: UniqueEntityID) {
     super(guid);
+    this._name = props.name;
+    this._image = props.image;
     this._price = props.price;
     this._categoryGuid = props.categoryGuid;
     this._shopGuid = props.shopGuid;
@@ -44,6 +48,10 @@ export class Product extends Entity<IProductProps> {
 
   get name(): string {
     return this._name;
+  }
+
+  get image(): string {
+    return this._image;
   }
 
   get price(): number {

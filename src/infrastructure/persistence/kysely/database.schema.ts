@@ -4,6 +4,7 @@ import { OrderTable } from "./models/order";
 import { OrderItemTable } from "./models/orderItem";
 import { PaymentTable } from "./models/payment";
 import { ProductTable } from "./models/product";
+import { ShopTable } from "./models/shop";
 
 export interface DatabaseSchema {
   Order: OrderTable;
@@ -12,4 +13,5 @@ export interface DatabaseSchema {
   Payment: PaymentTable;
   BankResponse: BankResponseTable;
   Category: CategoryTable;
+  Shop: ShopTable;
 }
