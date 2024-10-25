@@ -80,7 +80,7 @@ const products = [
     price: 30,
     categoryGuid: categories[1].guid,
     shopGuid: shops[1].guid,
-    ingredients: [],
+    ingredients: null,
     rating: 4,
   },
   {

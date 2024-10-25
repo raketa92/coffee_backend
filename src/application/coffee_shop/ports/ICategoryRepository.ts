@@ -1,5 +1,5 @@
 import { Category } from "@/domain/category/category";
 
 export abstract class CategoryRepository {
-  getCategories: () => Promise<Category[] | null>;
+  abstract getCategories(): Promise<Category[] | null>;
 }

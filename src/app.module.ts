@@ -11,6 +11,7 @@ import { LoggerModule } from "@infrastructure/logger/logger.module";
 import { CategoryController } from "./infrastructure/http/category.controller";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
+import { ProductController } from "./infrastructure/http/product.controller";
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { join } from "path";
     EnvModule,
     LoggerModule,
   ],
-  controllers: [OrderController, CategoryController],
+  controllers: [OrderController, CategoryController, ProductController],
   providers: [
     RedisService,
     {

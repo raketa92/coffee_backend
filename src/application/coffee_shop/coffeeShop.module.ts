@@ -8,6 +8,7 @@ import { PaymentModule } from "@infrastructure/payment/payment.module";
 import { BankService as IBankService } from "./ports/IBankService";
 import { BankService } from "@infrastructure/payment/bankService/bank.service";
 import { GetCategoriesUseCase } from "./usecases/category/getCategories";
+import { GetProductsUseCase } from "./usecases/product/getProducts";
 
 @Module({
   imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule],
@@ -15,11 +16,12 @@ import { GetCategoriesUseCase } from "./usecases/category/getCategories";
     RedisService,
     CreateOrderUseCase,
     GetCategoriesUseCase,
+    GetProductsUseCase,
     {
       provide: IBankService,
       useClass: BankService,
     },
   ],
-  exports: [CreateOrderUseCase, GetCategoriesUseCase],
+  exports: [CreateOrderUseCase, GetCategoriesUseCase, GetProductsUseCase],
 })
 export class CoffeeShopModule {}
