@@ -1,4 +1,4 @@
-export type ProductsResponseDto = {
+export type ProductResponseDto = {
   guid: string;
   name: string;
   image: string;

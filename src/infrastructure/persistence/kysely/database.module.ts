@@ -11,6 +11,8 @@ import { CategoryRepository } from "@/application/coffee_shop/ports/ICategoryRep
 import { CategoryRepositoryImpl } from "./repository/categoryRepositoryImpl";
 import { ProductRepository } from "@/application/coffee_shop/ports/IProductRepository";
 import { ProductRepositoryImpl } from "./repository/productRepositoryImpl";
+import { ShopRepository } from "@/application/coffee_shop/ports/IShopRepository";
+import { ShopRepositoryImpl } from "./repository/shopRepositoryImpl";
 
 @Module({
   imports: [EnvModule],
@@ -49,6 +51,10 @@ import { ProductRepositoryImpl } from "./repository/productRepositoryImpl";
       provide: ProductRepository,
       useClass: ProductRepositoryImpl,
     },
+    {
+      provide: ShopRepository,
+      useClass: ShopRepositoryImpl,
+    },
   ],
   exports: [
     "DB_CONNECTION",
@@ -56,6 +62,7 @@ import { ProductRepositoryImpl } from "./repository/productRepositoryImpl";
     PaymentRepository,
     CategoryRepository,
     ProductRepository,
+    ShopRepository,
   ],
 })
 export class DatabaseModule {}

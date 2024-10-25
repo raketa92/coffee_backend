@@ -1,21 +1,21 @@
 import { UseCase } from "@/core/UseCase";
 import { Injectable } from "@nestjs/common";
 import { ProductRepository } from "@application/coffee_shop/ports/IProductRepository";
-import { ProductsResponseDto } from "@/infrastructure/http/dto/product/productsResponseDto";
+import { ProductResponseDto } from "@/infrastructure/http/dto/product/productsResponseDto";
 
 @Injectable()
 export class GetProductsUseCase
-  implements UseCase<void, ProductsResponseDto[] | null>
+  implements UseCase<void, ProductResponseDto[] | null>
 {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  public async execute(): Promise<ProductsResponseDto[] | null> {
+  public async execute(): Promise<ProductResponseDto[] | null> {
     const products = await this.productRepository.getProducts();
     if (!products) {
       return null;
     }
 
-    const response: ProductsResponseDto[] = products.map((item) => ({
+    const response: ProductResponseDto[] = products.map((item) => ({
       guid: item.guid.toString(),
       name: item.name,
       image: item.image,

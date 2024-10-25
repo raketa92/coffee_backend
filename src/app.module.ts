@@ -4,14 +4,12 @@ import { RedisModule } from "@infrastructure/persistence/redis/redis.module";
 import { RedisService } from "@infrastructure/persistence/redis/redis.service";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { RedisCacheInterceptor } from "@infrastructure/persistence/redis/redisCache.interceptor";
-import { OrderController } from "@infrastructure/http/order.controller";
 import { CoffeeShopModule } from "@application/coffee_shop/coffeeShop.module";
 import { EnvModule } from "@infrastructure/env";
 import { LoggerModule } from "@infrastructure/logger/logger.module";
-import { CategoryController } from "./infrastructure/http/category.controller";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
-import { ProductController } from "./infrastructure/http/product.controller";
+import { HttpModule } from "./infrastructure/http/http.module";
 
 @Module({
   imports: [
@@ -26,8 +24,8 @@ import { ProductController } from "./infrastructure/http/product.controller";
     RedisModule,
     EnvModule,
     LoggerModule,
+    HttpModule,
   ],
-  controllers: [OrderController, CategoryController, ProductController],
   providers: [
     RedisService,
     {
