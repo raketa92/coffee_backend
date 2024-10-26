@@ -21,6 +21,7 @@ import { ShopRepositoryImpl } from "./repository/shopRepositoryImpl";
       provide: "DB_CONNECTION",
       useFactory: async (configService: EnvService) => {
         const db = new Kysely<DatabaseSchema>({
+          log: ["query", "error"],
           dialect: new PostgresDialect({
             pool: new Pool({
               host: configService.get("POSTGRES_HOST"),

@@ -14,7 +14,11 @@ async function bootstrap() {
   const port = configService.get("PORT");
   const loggerService = app.get(LoggerService);
   app.useGlobalInterceptors(new ResponseInterceptor(loggerService));
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    })
+  );
   await app.listen(port);
 }
 bootstrap();

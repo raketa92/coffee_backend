@@ -2,15 +2,18 @@ import { UseCase } from "@/core/UseCase";
 import { Injectable } from "@nestjs/common";
 import { ProductRepository } from "@application/coffee_shop/ports/IProductRepository";
 import { ProductResponseDto } from "@/infrastructure/http/dto/product/productsResponseDto";
+import { ProductFilterDto } from "@/infrastructure/http/dto/product/params";
 
 @Injectable()
 export class GetProductsUseCase
-  implements UseCase<void, ProductResponseDto[] | null>
+  implements UseCase<ProductFilterDto, ProductResponseDto[] | null>
 {
   constructor(private readonly productRepository: ProductRepository) {}
 
-  public async execute(): Promise<ProductResponseDto[] | null> {
-    const products = await this.productRepository.getProducts();
+  public async execute(
+    filter?: ProductFilterDto
+  ): Promise<ProductResponseDto[] | null> {
+    const products = await this.productRepository.getProducts(filter);
     if (!products) {
       return null;
     }
