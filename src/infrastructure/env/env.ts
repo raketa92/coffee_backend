@@ -7,6 +7,10 @@ export const evnSchema = z.object({
   REDIS_HOST: z.coerce.string().optional().default("localhost"),
   REDIS_PORT: z.coerce.number().optional().default(6379),
   REDIS_PASSWORD: z.coerce.string().optional(),
+  CACHE_TTL: z.coerce.number().default(300),
+  CACHE_ENABLED: z.coerce
+    .string()
+    .transform((value) => value.toLowerCase() === "true"),
   POSTGRES_HOST: z.coerce.string().optional().default("localhost"),
   POSTGRES_USER: z.coerce.string(),
   POSTGRES_PASSWORD: z.coerce.string(),

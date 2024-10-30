@@ -5,7 +5,7 @@ const tableName = "OrderItem";
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable(tableName)
-    .addColumn("guid", "uuid", (col) => col.primaryKey())
+    .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
     .addColumn("orderGuid", "uuid", (col) =>
       col.references("Order.guid").onDelete("cascade")
     )

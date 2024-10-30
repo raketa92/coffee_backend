@@ -6,7 +6,7 @@ const tableName = "Order";
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable(tableName)
-    .addColumn("guid", "uuid", (col) => col.primaryKey())
+    .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
     .addColumn("orderNumber", "varchar(50)", (col) => col.notNull().unique())
     .addColumn("userGuid", "uuid", (col) => col.notNull())
     .addColumn("shopGuid", "uuid", (col) => col.notNull())

@@ -1,14 +1,17 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Kysely, Transaction } from "kysely";
+import { jsonArrayFrom, jsonObjectFrom } from "kysely/helpers/postgres";
 import { OrderRepository } from "@/application/coffee_shop/ports/orderRepository";
 import { Order } from "@domain/order/order";
 import { DatabaseSchema } from "@infrastructure/persistence/kysely/database.schema";
 import {
   OrderCreateModel,
   OrderModel,
+  OrderModelFull,
 } from "@infrastructure/persistence/kysely/models/order";
 import { OrderItemCreateModel } from "@infrastructure/persistence/kysely/models/orderItem";
 import { OrderItem } from "@domain/order/orderItem";
+import { OrderFilterDto } from "@/infrastructure/http/dto/order/params";
 
 @Injectable()
 export class OrderRepositoryImpl implements OrderRepository {
@@ -16,6 +19,35 @@ export class OrderRepositoryImpl implements OrderRepository {
     @Inject("DB_CONNECTION")
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}
+  async getOrders(filter?: OrderFilterDto): Promise<OrderModelFull[] | null> {
+    let query = this.kysely
+      .selectFrom("Order")
+      .selectAll("Order")
+      .select((oi) =>
+        jsonArrayFrom(
+          oi
+            .selectFrom("OrderItem")
+            .whereRef("OrderItem.orderGuid", "=", "Order.guid")
+            .selectAll("OrderItem")
+            .select((p) =>
+              jsonObjectFrom(
+                p
+                  .selectFrom("Product")
+                  .limit(1)
+                  .whereRef("Product.guid", "=", "OrderItem.productGuid")
+                  .selectAll("Product")
+              ).as("Product")
+            )
+        ).as("OrderItems")
+      );
+
+    if (filter?.orderNumbers) {
+      query = query.where("orderNumber", "in", filter.orderNumbers);
+    }
+
+    const orders: OrderModelFull[] = await query.selectAll().execute();
+    return orders;
+  }
   async save(
     data: Order,
     transaction?: Transaction<DatabaseSchema>

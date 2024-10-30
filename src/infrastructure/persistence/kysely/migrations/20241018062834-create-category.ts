@@ -5,7 +5,7 @@ const tableName = "Category";
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable(tableName)
-    .addColumn("guid", "uuid", (col) => col.primaryKey())
+    .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
     .addColumn("name", "text", (col) => col.notNull().unique())
     .addColumn("iconUrl", "text", (col) => col.notNull())
     .$call(withTimestamps)

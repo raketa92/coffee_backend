@@ -1,5 +1,6 @@
 import { Generated, Selectable, Insertable, Updateable } from "kysely";
 import { CardProvider, OrderStatus, PaymentMethods } from "@core/constants";
+import { OrderItemModelFull } from "./orderItem";
 
 export interface OrderTable {
   guid: string;
@@ -20,6 +21,10 @@ export interface OrderTable {
 export type OrderModel = Selectable<OrderTable>;
 export type OrderCreateModel = Insertable<OrderTable>;
 export type OrderUpdateModel = Updateable<OrderTable>;
+
+export type OrderModelFull = OrderModel & {
+  OrderItems: OrderItemModelFull[];
+};
 
 type CardModel = {
   cardNumber: string;

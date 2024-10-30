@@ -54,7 +54,7 @@ const shops = [
 
 const products = [
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "f7cd3818-8696-4f00-866a-34e202025a1a",
     name: "Cappucino",
     image: "cappucino.jpg",
     price: 25,
@@ -64,7 +64,7 @@ const products = [
     rating: 4,
   },
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "f67fb5ee-4150-4f2a-b5a7-85639d1f08ce",
     name: "Glace",
     image: "glace.jpg",
     price: 30,
@@ -74,7 +74,7 @@ const products = [
     rating: 4,
   },
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "ebc1045b-724d-476f-93a4-c7f561a1a291",
     name: "Frappucino",
     image: "frappucino.jpg",
     price: 30,
@@ -84,7 +84,7 @@ const products = [
     rating: 4,
   },
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "df114271-cc26-4946-b0dc-d9f90e7c5d58",
     name: "Trubka",
     image: "trubka.jpg",
     price: 5,
@@ -93,7 +93,7 @@ const products = [
     rating: 4,
   },
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "84405e64-666c-4f25-b28f-b44b431c533d",
     name: "Biscuit",
     image: "biscuit.jpg",
     price: 8,
@@ -102,7 +102,7 @@ const products = [
     rating: 4,
   },
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "0b295934-2291-43de-a292-53e891eae1d0",
     name: "Lemon tea",
     image: "lemon_tea.jpg",
     price: 10,

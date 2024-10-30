@@ -6,7 +6,7 @@ const tableName = "BankResponse";
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable(tableName)
-    .addColumn("guid", "uuid", (col) => col.primaryKey())
+    .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
     .addColumn("paymentId", "uuid", (col) => col.references("Payment.guid"))
     .addColumn("errorCode", "varchar(50)")
     .addColumn("errorMessage", "varchar")

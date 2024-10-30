@@ -15,7 +15,7 @@ import { OrderItem } from "@domain/order/orderItem";
 import { EnvService } from "@infrastructure/env";
 import { DatabaseSchema } from "src/infrastructure/persistence/kysely/database.schema";
 import { Kysely, Transaction } from "kysely";
-import { CreateOrderResponseDto } from "@/infrastructure/http/dto/order/createOrderResponseDto";
+import { CreateOrderResponseDto } from "@/infrastructure/http/dto/order/orderResponseDto";
 import {
   UseCaseError,
   UseCaseErrorCode,
@@ -61,7 +61,12 @@ export class CreateOrderUseCase
           return newOrder;
         });
 
-      return new CreateOrderResponseDto(orderNumber, createdOrder.status);
+      const response: CreateOrderResponseDto = {
+        orderNumber,
+        status: createdOrder.status,
+      };
+
+      return response;
     } catch (error) {
       throw new UseCaseError({
         code: UseCaseErrorCode.BAD_REQUEST,

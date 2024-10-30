@@ -25,7 +25,6 @@ import {
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "@/application/coffee_shop/exception";
-import { CreateOrderResponseDto } from "@/infrastructure/http/dto/order/createOrderResponseDto";
 
 describe("Create order use case", () => {
   let useCase: CreateOrderUseCase;
@@ -207,9 +206,7 @@ describe("Create order use case", () => {
       }),
       trxMock
     );
-    expect(result).toMatchObject(
-      new CreateOrderResponseDto(orderNumber, newOrder.status)
-    );
+    expect(result).toMatchObject({ orderNumber, status: newOrder.status });
   });
 
   it("should create an order and process payment when payment method is cash", async () => {
@@ -268,8 +265,6 @@ describe("Create order use case", () => {
       }),
       trxMock
     );
-    expect(result).toMatchObject(
-      new CreateOrderResponseDto(orderNumber, newOrder.status)
-    );
+    expect(result).toMatchObject({ orderNumber, status: newOrder.status });
   });
 });

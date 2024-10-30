@@ -1,17 +1,11 @@
 import { Order } from "@domain/order/order";
-import { OrderTable } from "@infrastructure/persistence/kysely/models/order";
+import { OrderModelFull } from "@infrastructure/persistence/kysely/models/order";
 import { Card } from "@domain/order/card";
-import { OrderItemTable } from "@infrastructure/persistence/kysely/models/orderItem";
 import { OrderItem } from "@domain/order/orderItem";
-import { ProductTable } from "@infrastructure/persistence/kysely/models/product";
 import { UniqueEntityID } from "@core/UniqueEntityID";
 
 export class OrderMapper {
-  static toDomain(
-    orderModel: OrderTable,
-    orderItemModel: OrderItemTable[],
-    productModel: ProductTable[]
-  ): Order {
+  static toDomain(orderModel: OrderModelFull): Order {
     let card = null;
     if (orderModel.card) {
       card = new Card({
@@ -24,21 +18,17 @@ export class OrderMapper {
       });
     }
 
-    const orderItems = orderItemModel
-      .map((item) => {
-        const currentProduct = productModel.find(
-          (el) => el.guid.toString() === item.productGuid.toString()
-        );
-        if (!currentProduct) {
-          return undefined;
-        }
+    const orderItems = orderModel.OrderItems.map((item) => {
+      const currentProduct = item.Product;
+      if (!currentProduct) {
+        return undefined;
+      }
 
-        return new OrderItem({
-          quantity: item.quantity,
-          productId: new UniqueEntityID(item.productGuid),
-        });
-      })
-      .filter((el): el is OrderItem => el !== undefined);
+      return new OrderItem({
+        quantity: item.quantity,
+        productId: new UniqueEntityID(item.productGuid),
+      });
+    }).filter((el): el is OrderItem => el !== undefined);
 
     const order = new Order({
       orderNumber: orderModel.orderNumber,
@@ -57,6 +47,7 @@ export class OrderMapper {
       card,
       orderItems,
     });
+    console.log(`✅  order:`, JSON.stringify(order));
     return order;
   }
 }

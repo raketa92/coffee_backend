@@ -10,12 +10,14 @@ import { BankService } from "@infrastructure/payment/bankService/bank.service";
 import { GetCategoriesUseCase } from "./usecases/category/getCategories";
 import { GetProductsUseCase } from "./usecases/product/getProducts";
 import { GetShopsUseCase } from "./usecases/shop/getShops";
+import { GetOrdersUseCase } from "./usecases/order/getOrders";
 
 @Module({
   imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule],
   providers: [
     RedisService,
     CreateOrderUseCase,
+    GetOrdersUseCase,
     GetCategoriesUseCase,
     GetProductsUseCase,
     GetShopsUseCase,
@@ -26,6 +28,7 @@ import { GetShopsUseCase } from "./usecases/shop/getShops";
   ],
   exports: [
     CreateOrderUseCase,
+    GetOrdersUseCase,
     GetCategoriesUseCase,
     GetProductsUseCase,
     GetShopsUseCase,
