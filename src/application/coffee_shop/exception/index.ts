@@ -9,6 +9,8 @@ export type UseCaseErrorCode =
 export const UseCaseErrorMessage = {
   payload_required: "Create order payload is required",
   create_order_error: "Error creating order",
+  productNotExist: (productGuid: string) =>
+    `Product with ID ${productGuid} does not exist.`,
 };
 
 interface UseCaseErrorParams {

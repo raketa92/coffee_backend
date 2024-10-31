@@ -21,6 +21,7 @@ import {
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "@application/coffee_shop/exception";
+import { ProductRepository } from "../../ports/IProductRepository";
 
 @Injectable()
 export class CreateOrderUseCase
@@ -29,6 +30,7 @@ export class CreateOrderUseCase
   constructor(
     private readonly orderRepository: OrderRepository,
     private readonly paymentRepository: PaymentRepository,
+    private readonly productRepository: ProductRepository,
     private readonly bankService: BankService,
     private readonly configService: EnvService,
     private readonly redisService: RedisService,
@@ -51,7 +53,7 @@ export class CreateOrderUseCase
       const createdOrder = await this.kysely
         .transaction()
         .execute(async (trx) => {
-          const newOrder = this.createOrderEntity(request, orderNumber);
+          const newOrder = await this.createOrderEntity(request, orderNumber);
           await this.orderRepository.save(newOrder, trx);
 
           if (request.paymentMethod === PaymentMethods.card) {
@@ -108,7 +110,10 @@ export class CreateOrderUseCase
     await this.paymentRepository.save(newPayment, trx);
   }
 
-  private createOrderEntity(request: CreateOrderDto, orderNumber: string) {
+  private async createOrderEntity(
+    request: CreateOrderDto,
+    orderNumber: string
+  ) {
     const userId = request.userGuid
       ? new UniqueEntityID(request.userGuid)
       : null;
@@ -117,6 +122,23 @@ export class CreateOrderUseCase
       request.paymentMethod === PaymentMethods.cash
         ? OrderStatus.pending
         : OrderStatus.waitingClientApproval;
+
+    const productsFromDb = await this.productRepository.getProductsByGuids(
+      request.orderItems.map((item) => item.productGuid)
+    );
+
+    const existingProductGuids = new Set(
+      productsFromDb.map((item) => item.guid)
+    );
+
+    request.orderItems.forEach((item) => {
+      if (!existingProductGuids.has(item.productGuid)) {
+        throw new UseCaseError({
+          code: UseCaseErrorCode.BAD_REQUEST,
+          message: UseCaseErrorMessage.productNotExist(item.productGuid),
+        });
+      }
+    });
 
     const orderProducts = request.orderItems.map((item) => {
       return new OrderItem({

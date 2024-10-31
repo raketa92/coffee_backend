@@ -1,10 +1,9 @@
 import { ProductRepository } from "@/application/coffee_shop/ports/IProductRepository";
-import { Product } from "@/domain/product/product";
 import { Inject, Injectable } from "@nestjs/common";
-import { Kysely } from "kysely";
+import { Kysely, Transaction } from "kysely";
 import { DatabaseSchema } from "../database.schema";
-import { ProductMapper } from "../mappers/productMapper";
 import { ProductFilterDto } from "@/infrastructure/http/dto/product/params";
+import { ProductModel } from "../models/product";
 
 @Injectable()
 export class ProductRepositoryImpl implements ProductRepository {
@@ -12,7 +11,25 @@ export class ProductRepositoryImpl implements ProductRepository {
     @Inject("DB_CONNECTION")
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}
-  async getProducts(filter?: ProductFilterDto): Promise<Product[] | null> {
+  async getProductsByGuids(
+    productGuids: string[],
+    transaction?: Transaction<DatabaseSchema>
+  ): Promise<{ guid: string }[]> {
+    if (transaction) {
+      return await transaction
+        .selectFrom("Product")
+        .where("Product.guid", "in", productGuids)
+        .select("Product.guid")
+        .execute();
+    } else {
+      return await this.kysely
+        .selectFrom("Product")
+        .where("Product.guid", "in", productGuids)
+        .select("Product.guid")
+        .execute();
+    }
+  }
+  async getProducts(filter?: ProductFilterDto): Promise<ProductModel[] | null> {
     let query = this.kysely.selectFrom("Product").selectAll();
 
     if (filter?.categoryGuid) {
@@ -35,9 +52,6 @@ export class ProductRepositoryImpl implements ProductRepository {
 
     const products = await query.execute();
 
-    const result = products.map((item) => {
-      return ProductMapper.toDomain(item);
-    });
-    return result;
+    return products;
   }
 }
