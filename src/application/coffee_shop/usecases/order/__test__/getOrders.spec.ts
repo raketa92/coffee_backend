@@ -51,10 +51,16 @@ describe("Get orders use case", () => {
         paymentGuid: new UniqueEntityID().toString(),
         paymentMethod: PaymentMethods.cash,
         card: null,
-        orderItems: [
+        OrderItems: [
           {
-            productGuid: new UniqueEntityID().toString(),
             quantity: 1,
+            Product: {
+              name: "coffee",
+              image: "coffee.png",
+              price: 11.2,
+              rating: 4,
+              ingredients: [],
+            },
           },
         ],
       },
@@ -77,10 +83,16 @@ describe("Get orders use case", () => {
           cvv: 123,
           cardProvider: CardProvider.halkBank,
         },
-        orderItems: [
+        OrderItems: [
           {
-            productGuid: new UniqueEntityID().toString(),
             quantity: 1,
+            Product: {
+              name: "coffee2",
+              image: "coffee.png",
+              price: 14.2,
+              rating: 4.5,
+              ingredients: ["ice"],
+            },
           },
         ],
       },
@@ -90,14 +102,38 @@ describe("Get orders use case", () => {
 
     const expectedResponse = [
       {
-        guid: mockOrders[0].guid,
+        orderNumber: mockOrders[0].orderNumber,
         status: mockOrders[0].status,
-        orderItems: mockOrders[0].orderItems,
+        OrderItems: [
+          {
+            quantity: mockOrders[0].OrderItems[0].quantity,
+            Product: {
+              name: mockOrders[0].OrderItems[0].Product.name,
+              image: mockOrders[0].OrderItems[0].Product.image,
+              price: mockOrders[0].OrderItems[0].Product.price,
+              rating: mockOrders[0].OrderItems[0].Product.rating,
+              ingredients:
+                mockOrders[0].OrderItems[0].Product.ingredients ?? undefined,
+            },
+          },
+        ],
       },
       {
-        guid: mockOrders[1].guid,
+        orderNumber: mockOrders[1].orderNumber,
         status: mockOrders[1].status,
-        orderItems: mockOrders[1].orderItems,
+        OrderItems: [
+          {
+            quantity: mockOrders[1].OrderItems[0].quantity,
+            Product: {
+              name: mockOrders[1].OrderItems[0].Product.name,
+              image: mockOrders[1].OrderItems[0].Product.image,
+              price: mockOrders[1].OrderItems[0].Product.price,
+              rating: mockOrders[1].OrderItems[0].Product.rating,
+              ingredients:
+                mockOrders[1].OrderItems[0].Product.ingredients ?? undefined,
+            },
+          },
+        ],
       },
     ];
 

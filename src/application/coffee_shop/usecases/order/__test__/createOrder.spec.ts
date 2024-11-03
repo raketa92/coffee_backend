@@ -2,6 +2,7 @@ import { RedisService } from "@infrastructure/persistence/redis/redis.service";
 import { BankService } from "@application/coffee_shop/ports/IBankService";
 import { PaymentRepository } from "@application/coffee_shop/ports/IPaymentRepository";
 import { OrderRepository } from "@/application/coffee_shop/ports/orderRepository";
+import { ProductRepository } from "@/application/coffee_shop/ports/IProductRepository";
 import { Test, TestingModule } from "@nestjs/testing";
 import { CreateOrderDto } from "@/infrastructure/http/dto/order/createOrderDto";
 import {
@@ -30,6 +31,7 @@ describe("Create order use case", () => {
   let useCase: CreateOrderUseCase;
   let orderRepository: OrderRepository;
   let paymentRepository: PaymentRepository;
+  let productRepository: ProductRepository;
   let bankService: BankService;
   let redisService: RedisService;
   let configService: EnvService;
@@ -49,6 +51,12 @@ describe("Create order use case", () => {
           provide: PaymentRepository,
           useValue: {
             save: jest.fn(),
+          },
+        },
+        {
+          provide: ProductRepository,
+          useValue: {
+            getProductsByGuids: jest.fn(),
           },
         },
         {
@@ -82,6 +90,7 @@ describe("Create order use case", () => {
     useCase = module.get<CreateOrderUseCase>(CreateOrderUseCase);
     orderRepository = module.get<OrderRepository>(OrderRepository);
     paymentRepository = module.get<PaymentRepository>(PaymentRepository);
+    productRepository = module.get<ProductRepository>(ProductRepository);
     bankService = module.get<BankService>(BankService);
     redisService = module.get<RedisService>(RedisService);
     configService = module.get<EnvService>(EnvService);
@@ -169,6 +178,15 @@ describe("Create order use case", () => {
       description: paymentData.description,
     });
 
+    const productsInDb = [
+      {
+        guid: createOrderDto.orderItems[0].productGuid,
+      },
+      {
+        guid: new UniqueEntityID().toString(),
+      },
+    ];
+
     const trxMock: any = {
       execute: jest.fn().mockImplementation((callback) => callback(trxMock)),
     };
@@ -178,6 +196,9 @@ describe("Create order use case", () => {
       orderNumber
     );
     (orderRepository.save as jest.Mock).mockResolvedValue(newOrder);
+    (productRepository.getProductsByGuids as jest.Mock).mockResolvedValue(
+      productsInDb
+    );
     (bankService.makePayment as jest.Mock).mockResolvedValue(paymentResponse);
     (paymentRepository.save as jest.Mock).mockResolvedValue(newPayment);
 
@@ -192,6 +213,7 @@ describe("Create order use case", () => {
       trxMock
     );
     expect(orderRepository.save).toHaveBeenCalledTimes(1);
+    expect(productRepository.getProductsByGuids).toHaveBeenCalledTimes(1);
     expect(bankService.makePayment).toHaveBeenCalledWith(paymentData);
     expect(paymentRepository.save).toHaveBeenCalledTimes(1);
     expect(paymentRepository.save).toHaveBeenCalledWith(
@@ -245,6 +267,15 @@ describe("Create order use case", () => {
       orderItems: orderProducts,
     });
 
+    const productsInDb = [
+      {
+        guid: createOrderDto.orderItems[0].productGuid,
+      },
+      {
+        guid: new UniqueEntityID().toString(),
+      },
+    ];
+
     const trxMock: any = {
       execute: jest.fn().mockImplementation((callback) => callback(trxMock)),
     };
@@ -254,10 +285,14 @@ describe("Create order use case", () => {
       orderNumber
     );
     (orderRepository.save as jest.Mock).mockResolvedValue(newOrder);
+    (productRepository.getProductsByGuids as jest.Mock).mockResolvedValue(
+      productsInDb
+    );
 
     const result = await useCase.execute(createOrderDto);
 
     expect(redisService.generateOrderNumber).toHaveBeenCalled();
+    expect(productRepository.getProductsByGuids).toHaveBeenCalled();
     expect(orderRepository.save).toHaveBeenCalledWith(
       expect.objectContaining({
         orderNumber: newOrder.orderNumber,
