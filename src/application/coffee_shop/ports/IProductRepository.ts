@@ -8,4 +8,6 @@ export abstract class ProductRepository {
   abstract getProductsByGuids(
     productGuids: string[]
   ): Promise<{ guid: string }[]>;
+
+  abstract getProduct(productGuid: string): Promise<ProductModel | null>;
 }

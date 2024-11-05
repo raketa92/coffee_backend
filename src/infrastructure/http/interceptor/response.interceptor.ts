@@ -59,7 +59,7 @@ export class ResponseInterceptor implements NestInterceptor {
       statusCode: status,
       path: request.url,
       message: exception.message,
-      result: exception,
+      result: exception instanceof HttpException ? undefined : exception,
     });
     return exception;
   }

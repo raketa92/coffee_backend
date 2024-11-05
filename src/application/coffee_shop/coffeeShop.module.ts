@@ -11,6 +11,8 @@ import { GetCategoriesUseCase } from "./usecases/category/getCategories";
 import { GetProductsUseCase } from "./usecases/product/getProducts";
 import { GetShopsUseCase } from "./usecases/shop/getShops";
 import { GetOrdersUseCase } from "./usecases/order/getOrders";
+import { GetProductUseCase } from "./usecases/product/getProduct";
+import { GetShopUseCase } from "./usecases/shop/getShop";
 
 @Module({
   imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule],
@@ -20,7 +22,9 @@ import { GetOrdersUseCase } from "./usecases/order/getOrders";
     GetOrdersUseCase,
     GetCategoriesUseCase,
     GetProductsUseCase,
+    GetProductUseCase,
     GetShopsUseCase,
+    GetShopUseCase,
     {
       provide: IBankService,
       useClass: BankService,
@@ -31,7 +35,9 @@ import { GetOrdersUseCase } from "./usecases/order/getOrders";
     GetOrdersUseCase,
     GetCategoriesUseCase,
     GetProductsUseCase,
+    GetProductUseCase,
     GetShopsUseCase,
+    GetShopUseCase,
   ],
 })
 export class CoffeeShopModule {}

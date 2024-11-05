@@ -11,6 +11,15 @@ export class ProductRepositoryImpl implements ProductRepository {
     @Inject("DB_CONNECTION")
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}
+  async getProduct(productGuid: string): Promise<ProductModel | null> {
+    const product = await this.kysely
+      .selectFrom("Product")
+      .selectAll()
+      .where("guid", "=", productGuid)
+      .executeTakeFirst();
+
+    return product ?? null;
+  }
   async getProductsByGuids(
     productGuids: string[],
     transaction?: Transaction<DatabaseSchema>
@@ -40,7 +49,7 @@ export class ProductRepositoryImpl implements ProductRepository {
       query = query.where("shopGuid", "=", filter.shopGuid);
     }
 
-    if (!!filter?.isNew) {
+    if (filter?.isNew) {
       const recentDate = new Date();
       recentDate.setDate(recentDate.getDate() - 7);
       query = query.where("createdAt", ">", recentDate);
