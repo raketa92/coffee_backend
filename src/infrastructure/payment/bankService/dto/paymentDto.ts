@@ -2,20 +2,20 @@ import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class PaymentDto {
   @IsNumber()
-  currency: number;
+  currency!: number;
   @IsString()
-  language: string;
+  language!: string;
   @IsOptional()
   @IsString()
   description?: string;
   @IsString()
-  orderNumber: string;
+  orderNumber!: string;
   @IsString()
-  userName: string;
+  userName!: string;
   @IsString()
-  password: string;
+  password!: string;
   @IsNumber()
-  amount: number;
+  amount!: number;
   @IsString()
-  returnUrl: string;
+  returnUrl!: string;
 }

@@ -8,7 +8,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable(tableName)
     .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
     .addColumn("orderNumber", "varchar(50)", (col) => col.notNull().unique())
-    .addColumn("userGuid", "uuid", (col) => col.notNull())
+    .addColumn("userGuid", "uuid")
     .addColumn("shopGuid", "uuid", (col) => col.notNull())
     .addColumn("phone", "varchar(15)", (col) => col.notNull())
     .addColumn("address", "text", (col) => col.notNull())

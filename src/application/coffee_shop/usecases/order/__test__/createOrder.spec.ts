@@ -144,7 +144,9 @@ describe("Create order use case", () => {
 
     const newOrder = new Order({
       orderNumber,
-      userGuid: new UniqueEntityID(createOrderDto.userGuid),
+      userGuid: createOrderDto.userGuid
+        ? new UniqueEntityID(createOrderDto.userGuid)
+        : new UniqueEntityID(),
       shopGuid: new UniqueEntityID(createOrderDto.shopGuid),
       phone: createOrderDto.phone,
       address: createOrderDto.address,
@@ -257,7 +259,9 @@ describe("Create order use case", () => {
 
     const newOrder = new Order({
       orderNumber,
-      userGuid: new UniqueEntityID(createOrderDto.userGuid),
+      userGuid: createOrderDto.userGuid
+        ? new UniqueEntityID(createOrderDto.userGuid)
+        : new UniqueEntityID(),
       shopGuid: new UniqueEntityID(createOrderDto.shopGuid),
       phone: createOrderDto.phone,
       address: createOrderDto.address,

@@ -22,8 +22,6 @@ export class Payment extends AggregateRoot<IPaymentProps> {
   private readonly _amount: number;
   private readonly _currency: number;
   private readonly _description?: string;
-  private readonly _createdAt: Date;
-  private readonly _updatedAt: Date;
   constructor(props: IPaymentProps, guid?: UniqueEntityID) {
     super(guid);
     this._paymentFor = props.paymentFor;

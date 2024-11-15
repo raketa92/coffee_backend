@@ -3,15 +3,15 @@ import { CardProvider, PaytmentFor } from "@core/constants";
 
 export class MakePaymentDto {
   @IsString()
-  paymentFor: PaytmentFor;
+  paymentFor!: PaytmentFor;
   @IsString()
-  cardProvider: CardProvider;
+  cardProvider!: CardProvider;
   @IsString()
-  orderNumber: string;
+  orderNumber!: string;
   @IsNumber()
-  amount: number;
+  amount!: number;
   @IsNumber()
-  currency: number;
+  currency!: number;
   @IsString()
-  description: string;
+  description!: string;
 }

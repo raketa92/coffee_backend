@@ -3,7 +3,7 @@ import { Payment } from "src/domain/payment/payment";
 import { DatabaseSchema } from "src/infrastructure/persistence/kysely/database.schema";
 
 export abstract class PaymentRepository {
-  save: (
+  abstract save: (
     data: Payment,
     transaction?: Transaction<DatabaseSchema>
   ) => Promise<Payment>;

@@ -4,11 +4,11 @@ import { IsString } from "class-validator";
 export class ApplySmsDto {
   @IsString()
   @Optional()
-  userId: string;
+  userId!: string;
   @IsString()
-  orderId: string;
+  orderId!: string;
   @IsString()
-  phone: string;
+  phone!: string;
   @IsString()
-  smsBody: string;
+  smsBody!: string;
 }

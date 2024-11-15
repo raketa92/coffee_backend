@@ -69,7 +69,7 @@ export class CreateOrderUseCase
       };
 
       return response;
-    } catch (error) {
+    } catch (error: any) {
       throw new UseCaseError({
         code: UseCaseErrorCode.BAD_REQUEST,
         message: error.message || UseCaseErrorMessage.create_order_error,

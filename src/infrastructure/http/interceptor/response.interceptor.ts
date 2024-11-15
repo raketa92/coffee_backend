@@ -58,8 +58,8 @@ export class ResponseInterceptor implements NestInterceptor {
       status: false,
       statusCode: status,
       path: request.url,
-      message: exception.message,
-      result: exception instanceof HttpException ? undefined : exception,
+      message: exception?.response?.message || exception.message,
+      result: exception,
     });
     return exception;
   }

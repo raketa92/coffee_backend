@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { CreateOrderUseCase } from "@application/coffee_shop/usecases/order/createOrder";
-import { CreateOrderDto } from "./dto/order/createOrderDto";
+import { CreateOrderDto, createOrderSchema } from "./dto/order/createOrderDto";
 import { OrderFilterDto } from "./dto/order/params";
 import { GetOrdersUseCase } from "@/application/coffee_shop/usecases/order/getOrders";
 
@@ -13,7 +13,8 @@ export class OrderController {
 
   @Post()
   async create(@Body() createOrderDto: CreateOrderDto) {
-    const response = await this.createOrderUseCase.execute(createOrderDto);
+    const body = createOrderSchema.parse(createOrderDto);
+    const response = await this.createOrderUseCase.execute(body);
     return response;
   }
 

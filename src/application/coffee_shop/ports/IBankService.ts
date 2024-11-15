@@ -8,5 +8,5 @@ export interface IPaymentReponse {
 }
 
 export abstract class BankService {
-  makePayment: (payload: PaymentDto) => Promise<IPaymentReponse>;
+  abstract makePayment: (payload: PaymentDto) => Promise<IPaymentReponse>;
 }
