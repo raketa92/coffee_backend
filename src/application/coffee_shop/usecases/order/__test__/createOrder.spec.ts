@@ -17,7 +17,6 @@ import { OrderItem } from "@domain/order/orderItem";
 import { Card } from "@domain/order/card";
 import { Payment } from "@domain/payment/payment";
 import { CreateOrderUseCase } from "../createOrder";
-import { PaymentDto } from "@infrastructure/payment/bankService/dto/paymentDto";
 import { EnvService } from "@infrastructure/env";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
 import { Kysely } from "kysely";
@@ -26,6 +25,7 @@ import {
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "@/application/coffee_shop/exception";
+import { IPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
 
 describe("Create order use case", () => {
   let useCase: CreateOrderUseCase;
@@ -160,12 +160,10 @@ describe("Create order use case", () => {
     const hostApi = configService.get("HOST_API");
     const returnUrl = `${hostApi}/payment-service/orderStatus?orderNumber=${newOrder.orderNumber}&lang=${"ru"}`;
 
-    const paymentData: PaymentDto = {
+    const paymentData: IPaymentData = {
       currency: 934,
       language: "ru",
       orderNumber: newOrder.orderNumber,
-      userName: "http://fake-host-api.com",
-      password: "http://fake-host-api.com",
       amount: parseInt((newOrder.totalPrice * 100).toFixed()),
       returnUrl,
     };

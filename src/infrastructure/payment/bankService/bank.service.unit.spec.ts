@@ -1,9 +1,9 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { BankService } from "./bank.service";
-import { PaymentDto } from "./dto/paymentDto";
 import { IPaymentReponse } from "@application/coffee_shop/ports/IBankService";
 import axios from "axios";
 import { EnvService } from "@infrastructure/env";
+import { IPaymentData } from "./dto/paymentDto";
 
 jest.mock("axios");
 
@@ -19,9 +19,9 @@ describe("Bank service", () => {
           useValue: {
             get: jest.fn((key: string) => {
               switch (key) {
-                case "HALKBANK_PAYMENT_GATEWAY":
+                case "HALK_BANK_PAYMENT_GATEWAY":
                   return "https://fake-payment-gateway.com";
-                case "HALKBANK_PAYMENT_PAY_PATH":
+                case "HALK_BANK_PAYMENT_PAY_PATH":
                   return "payment";
                 default:
                   return null;
@@ -40,20 +40,17 @@ describe("Bank service", () => {
   });
 
   it("should make a successful payment", async () => {
-    const paymentDto: PaymentDto = {
+    const paymentDto: IPaymentData = {
       currency: 934,
       language: "ru",
       orderNumber: "12345",
-      userName: "testUser",
-      password: "testPassword",
       amount: 10000,
       returnUrl: "https://test-return-url.com",
     };
 
     const mockResponse: IPaymentReponse = {
-      data: {
-        bankOrderId: "bank111",
-      },
+      orderId: "bank111",
+      formUrl: "testurl",
     };
 
     (axios.get as jest.Mock).mockResolvedValueOnce(mockResponse);
@@ -68,12 +65,10 @@ describe("Bank service", () => {
   });
 
   it("should handle payment errors", async () => {
-    const paymentDto: PaymentDto = {
+    const paymentDto: IPaymentData = {
       currency: 934,
       language: "ru",
       orderNumber: "12345",
-      userName: "testUser",
-      password: "testPassword",
       amount: 10000,
       returnUrl: "https://test-return-url.com",
     };

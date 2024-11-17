@@ -17,4 +17,6 @@ export type OrderResponseDto = {
   OrderItems: OrderItem[];
 };
 
-export type CreateOrderResponseDto = Omit<OrderResponseDto, "OrderItems">;
+export type CreateOrderResponseDto = Omit<OrderResponseDto, "OrderItems"> & {
+  formUrl?: string;
+};

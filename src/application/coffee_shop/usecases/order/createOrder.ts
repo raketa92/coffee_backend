@@ -6,7 +6,6 @@ import { UniqueEntityID } from "@core/UniqueEntityID";
 import { OrderStatus, PaymentMethods, PaytmentFor } from "@core/constants";
 import { Card } from "@domain/order/card";
 import { BankService } from "@application/coffee_shop/ports/IBankService";
-import { PaymentDto } from "@infrastructure/payment/bankService/dto/paymentDto";
 import { Payment } from "@domain/payment/payment";
 import { PaymentRepository } from "../../ports/IPaymentRepository";
 import { RedisService } from "@infrastructure/persistence/redis/redis.service";
@@ -22,6 +21,7 @@ import {
   UseCaseErrorMessage,
 } from "@application/coffee_shop/exception";
 import { ProductRepository } from "../../ports/IProductRepository";
+import { IPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
 
 @Injectable()
 export class CreateOrderUseCase
@@ -49,6 +49,7 @@ export class CreateOrderUseCase
       }
 
       const orderNumber = await this.redisService.generateOrderNumber();
+      let formUrl: string | undefined;
 
       const createdOrder = await this.kysely
         .transaction()
@@ -57,7 +58,7 @@ export class CreateOrderUseCase
           await this.orderRepository.save(newOrder, trx);
 
           if (request.paymentMethod === PaymentMethods.card) {
-            await this.processPayment(newOrder, trx);
+            formUrl = await this.processPayment(newOrder, trx);
           }
 
           return newOrder;
@@ -66,6 +67,7 @@ export class CreateOrderUseCase
       const response: CreateOrderResponseDto = {
         orderNumber,
         status: createdOrder.status,
+        formUrl,
       };
 
       return response;
@@ -80,17 +82,13 @@ export class CreateOrderUseCase
   private async processPayment(
     newOrder: Order,
     trx?: Transaction<DatabaseSchema>
-  ) {
+  ): Promise<string> {
     const hostApi = this.configService.get("HOST_API");
     const returnUrl = `${hostApi}/payment-service/orderStatus?orderNumber=${newOrder.orderNumber}&lang=${"ru"}`;
-    const USERNAME = this.configService.get("HALK_BANK_LOGIN");
-    const PASSWORD = this.configService.get("HALK_BANK_PASSWORD");
-    const paymentData: PaymentDto = {
+    const paymentData: IPaymentData = {
       currency: 934,
       language: "ru",
       orderNumber: newOrder.orderNumber,
-      userName: USERNAME,
-      password: PASSWORD,
       amount: parseInt((newOrder.totalPrice * 100).toFixed()),
       returnUrl,
     };
@@ -101,13 +99,14 @@ export class CreateOrderUseCase
       cardProvider: newOrder.card!.cardProvider,
       status: OrderStatus.waitingClientApproval,
       orderGuid: newOrder.guid,
-      bankOrderId: paymentResponse.data.bankOrderId,
+      bankOrderId: paymentResponse.orderId,
       amount: paymentData.amount,
       currency: paymentData.currency,
       description: paymentData.description,
     });
 
     await this.paymentRepository.save(newPayment, trx);
+    return paymentResponse.formUrl;
   }
 
   private async createOrderEntity(

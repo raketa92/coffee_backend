@@ -16,11 +16,16 @@ export const evnSchema = z.object({
   POSTGRES_PASSWORD: z.coerce.string(),
   POSTGRES_DB: z.coerce.string(),
   POSTGRES_PORT: z.coerce.number().optional().default(5632),
-  HALKBANK_PAYMENT_GATEWAY: z.coerce.string(),
-  HALKBANK_PAYMENT_PAY_PATH: z.coerce.string(),
-  HALKBANK_PAYMENT_CHECK_PATH: z.coerce.string(),
+  HALK_BANK_PAYMENT_GATEWAY: z.coerce.string(),
+  HALK_BANK_PAYMENT_PAY_PATH: z.coerce.string(),
+  HALK_BANK_PAYMENT_CHECK_PATH: z.coerce.string(),
   HALK_BANK_LOGIN: z.coerce.string(),
   HALK_BANK_PASSWORD: z.coerce.string(),
+  RYSGAL_BANK_PAYMENT_GATEWAY: z.coerce.string(),
+  RYSGAL_BANK_PAYMENT_PAY_PATH: z.coerce.string(),
+  RYSGAL_BANK_PAYMENT_CHECK_PATH: z.coerce.string(),
+  RYSGAL_BANK_LOGIN: z.coerce.string(),
+  RYSGAL_BANK_PASSWORD: z.coerce.string(),
 });
 
 export type Env = z.infer<typeof evnSchema>;

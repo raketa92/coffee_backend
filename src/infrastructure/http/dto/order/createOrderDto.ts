@@ -70,7 +70,7 @@ export const createOrderSchema = z.object({
       month: z.number().int().min(1).max(12),
       year: z.number().int(),
       name: z.string(),
-      cvv: z.number().int().min(100).max(999),
+      cvv: z.number().int(),
       cardProvider: z.nativeEnum(CardProvider),
     })
     .optional()

@@ -1,21 +1,13 @@
-import { IsNumber, IsOptional, IsString } from "class-validator";
-
-export class PaymentDto {
-  @IsNumber()
-  currency!: number;
-  @IsString()
-  language!: string;
-  @IsOptional()
-  @IsString()
+export interface IPaymentData {
+  currency: number;
+  language?: string;
   description?: string;
-  @IsString()
-  orderNumber!: string;
-  @IsString()
-  userName!: string;
-  @IsString()
-  password!: string;
-  @IsNumber()
-  amount!: number;
-  @IsString()
-  returnUrl!: string;
+  orderNumber: string;
+  amount: number;
+  returnUrl: string;
+}
+
+export interface IPaymentPayload extends IPaymentData {
+  userName: string;
+  password: string;
 }
