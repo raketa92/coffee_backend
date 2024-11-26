@@ -1,6 +1,6 @@
 import { UseCase } from "@/core/UseCase";
-import { Injectable } from "@nestjs/common";
-import { ProductRepository } from "@application/coffee_shop/ports/IProductRepository";
+import { Inject, Injectable } from "@nestjs/common";
+import { IProductRepository } from "@/domain/product/repository/IProductRepository";
 import { ProductResponseDto } from "@/infrastructure/http/dto/product/productsResponseDto";
 import { ProductFilterDto } from "@/infrastructure/http/dto/product/params";
 
@@ -8,7 +8,10 @@ import { ProductFilterDto } from "@/infrastructure/http/dto/product/params";
 export class GetProductsUseCase
   implements UseCase<ProductFilterDto, ProductResponseDto[] | null>
 {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(
+    @Inject(IProductRepository)
+    private readonly productRepository: IProductRepository
+  ) {}
 
   public async execute(
     filter?: ProductFilterDto

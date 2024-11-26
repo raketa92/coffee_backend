@@ -1,37 +1,31 @@
 import { RedisService } from "@infrastructure/persistence/redis/redis.service";
 import { BankService } from "@application/coffee_shop/ports/IBankService";
-import { PaymentRepository } from "@application/coffee_shop/ports/IPaymentRepository";
-import { OrderRepository } from "@/application/coffee_shop/ports/orderRepository";
-import { ProductRepository } from "@/application/coffee_shop/ports/IProductRepository";
+import { IPaymentRepository } from "@/domain/payment/repository/IPaymentRepository";
+import { IOrderRepository } from "@/domain/order/repository/orderRepository";
+import { IProductRepository } from "@/domain/product/repository/IProductRepository";
 import { Test, TestingModule } from "@nestjs/testing";
 import { CreateOrderDto } from "@/infrastructure/http/dto/order/createOrderDto";
 import {
-  CardProvider,
   OrderStatus,
   PaymentMethods,
+  PaymentStatus,
   PaytmentFor,
 } from "@core/constants";
 import { Order } from "@domain/order/order";
 import { UniqueEntityID } from "@core/UniqueEntityID";
 import { OrderItem } from "@domain/order/orderItem";
-import { Card } from "@domain/order/card";
 import { Payment } from "@domain/payment/payment";
 import { CreateOrderUseCase } from "../createOrder";
 import { EnvService } from "@infrastructure/env";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
 import { Kysely } from "kysely";
-import {
-  UseCaseError,
-  UseCaseErrorCode,
-  UseCaseErrorMessage,
-} from "@/application/coffee_shop/exception";
 import { IPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
 
 describe("Create order use case", () => {
   let useCase: CreateOrderUseCase;
-  let orderRepository: OrderRepository;
-  let paymentRepository: PaymentRepository;
-  let productRepository: ProductRepository;
+  let orderRepository: IOrderRepository;
+  let paymentRepository: IPaymentRepository;
+  let productRepository: IProductRepository;
   let bankService: BankService;
   let redisService: RedisService;
   let configService: EnvService;
@@ -42,19 +36,19 @@ describe("Create order use case", () => {
       providers: [
         CreateOrderUseCase,
         {
-          provide: OrderRepository,
+          provide: IOrderRepository,
           useValue: {
             save: jest.fn(),
           },
         },
         {
-          provide: PaymentRepository,
+          provide: IPaymentRepository,
           useValue: {
             save: jest.fn(),
           },
         },
         {
-          provide: ProductRepository,
+          provide: IProductRepository,
           useValue: {
             getProductsByGuids: jest.fn(),
           },
@@ -88,9 +82,9 @@ describe("Create order use case", () => {
     }).compile();
 
     useCase = module.get<CreateOrderUseCase>(CreateOrderUseCase);
-    orderRepository = module.get<OrderRepository>(OrderRepository);
-    paymentRepository = module.get<PaymentRepository>(PaymentRepository);
-    productRepository = module.get<ProductRepository>(ProductRepository);
+    orderRepository = module.get<IOrderRepository>(IOrderRepository);
+    paymentRepository = module.get<IPaymentRepository>(IPaymentRepository);
+    productRepository = module.get<IProductRepository>(IProductRepository);
     bankService = module.get<BankService>(BankService);
     redisService = module.get<RedisService>(RedisService);
     configService = module.get<EnvService>(EnvService);
@@ -99,15 +93,6 @@ describe("Create order use case", () => {
 
   it("should be defined", () => {
     expect(useCase).toBeDefined();
-  });
-
-  it("should throw an error if CreateOrderDto is not provided", async () => {
-    await expect(useCase.execute()).rejects.toThrow(
-      new UseCaseError({
-        code: UseCaseErrorCode.BAD_REQUEST,
-        message: UseCaseErrorMessage.payload_required,
-      })
-    );
   });
 
   it("should create an order and process payment when payment method is card", async () => {
@@ -123,14 +108,6 @@ describe("Create order use case", () => {
       ],
       totalPrice: 100,
       paymentMethod: PaymentMethods.card,
-      card: {
-        cardNumber: "1234567812345678",
-        month: 12,
-        year: 25,
-        name: "John Doe",
-        cvv: 123,
-        cardProvider: CardProvider.halkBank,
-      },
       phone: "1123",
       address: "mir",
     };
@@ -138,7 +115,7 @@ describe("Create order use case", () => {
     const orderProducts = createOrderDto.orderItems.map((item) => {
       return new OrderItem({
         quantity: item.quantity,
-        productId: new UniqueEntityID(item.productGuid),
+        productGuid: new UniqueEntityID(item.productGuid),
       });
     });
 
@@ -153,12 +130,11 @@ describe("Create order use case", () => {
       totalPrice: createOrderDto.totalPrice,
       status: OrderStatus.waitingClientApproval,
       paymentMethod: createOrderDto.paymentMethod,
-      card: new Card(createOrderDto.card!),
       orderItems: orderProducts,
     });
-    const paymentResponse = { data: { bankOrderId: "bank123" } };
+    const bankResponse = { orderId: "bank123", formUrl: "testUrl" };
     const hostApi = configService.get("HOST_API");
-    const returnUrl = `${hostApi}/payment-service/orderStatus?orderNumber=${newOrder.orderNumber}&lang=${"ru"}`;
+    const returnUrl = `${hostApi}/order/status?orderNumber=${newOrder.orderNumber}&lang=${"ru"}`;
 
     const paymentData: IPaymentData = {
       currency: 934,
@@ -169,10 +145,9 @@ describe("Create order use case", () => {
     };
     const newPayment = new Payment({
       paymentFor: PaytmentFor.product,
-      cardProvider: newOrder.card!.cardProvider,
-      status: OrderStatus.waitingClientApproval,
+      status: PaymentStatus.waitingClientApproval,
       orderGuid: newOrder.guid,
-      bankOrderId: paymentResponse.data.bankOrderId,
+      bankOrderId: bankResponse.orderId,
       amount: paymentData.amount,
       currency: paymentData.currency,
       description: paymentData.description,
@@ -199,7 +174,7 @@ describe("Create order use case", () => {
     (productRepository.getProductsByGuids as jest.Mock).mockResolvedValue(
       productsInDb
     );
-    (bankService.makePayment as jest.Mock).mockResolvedValue(paymentResponse);
+    (bankService.makePayment as jest.Mock).mockResolvedValue(bankResponse);
     (paymentRepository.save as jest.Mock).mockResolvedValue(newPayment);
 
     const result = await useCase.execute(createOrderDto);
@@ -219,9 +194,8 @@ describe("Create order use case", () => {
     expect(paymentRepository.save).toHaveBeenCalledWith(
       expect.objectContaining({
         paymentFor: PaytmentFor.product,
-        cardProvider: newOrder.card!.cardProvider,
         status: OrderStatus.waitingClientApproval,
-        bankOrderId: paymentResponse.data.bankOrderId,
+        bankOrderId: bankResponse.orderId,
         amount: paymentData.amount,
         currency: paymentData.currency,
         description: paymentData.description,
@@ -251,7 +225,7 @@ describe("Create order use case", () => {
     const orderProducts = createOrderDto.orderItems.map((item) => {
       return new OrderItem({
         quantity: item.quantity,
-        productId: new UniqueEntityID(item.productGuid),
+        productGuid: new UniqueEntityID(item.productGuid),
       });
     });
 

@@ -1,13 +1,15 @@
 import { UseCase } from "@/core/UseCase";
 import { ShopResponseDto } from "@/infrastructure/http/dto/shop/shopsResponseDto";
-import { Injectable } from "@nestjs/common";
-import { ShopRepository } from "../../ports/IShopRepository";
+import { Inject, Injectable } from "@nestjs/common";
+import { IShopRepository } from "@domain/shop/repository/IShopRepository";
 
 @Injectable()
 export class GetShopsUseCase
   implements UseCase<void, ShopResponseDto[] | null>
 {
-  constructor(private readonly shopRepository: ShopRepository) {}
+  constructor(
+    @Inject(IShopRepository) private readonly shopRepository: IShopRepository
+  ) {}
 
   public async execute(): Promise<ShopResponseDto[] | null> {
     const shops = await this.shopRepository.getShops();

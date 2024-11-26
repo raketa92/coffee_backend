@@ -1,14 +1,16 @@
 import { UseCase } from "@/core/UseCase";
 import { OrderResponseDto } from "@/infrastructure/http/dto/order/orderResponseDto";
 import { OrderFilterDto } from "@/infrastructure/http/dto/order/params";
-import { Injectable } from "@nestjs/common";
-import { OrderRepository } from "../../ports/orderRepository";
+import { Inject, Injectable } from "@nestjs/common";
+import { IOrderRepository } from "@domain/order/repository/orderRepository";
 
 @Injectable()
 export class GetOrdersUseCase
   implements UseCase<OrderFilterDto, OrderResponseDto[] | null>
 {
-  constructor(private readonly orderRepisitory: OrderRepository) {}
+  constructor(
+    @Inject(IOrderRepository) private readonly orderRepisitory: IOrderRepository
+  ) {}
 
   public async execute(
     filter?: OrderFilterDto

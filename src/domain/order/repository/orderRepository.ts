@@ -4,11 +4,14 @@ import { Transaction } from "kysely";
 import { Order } from "src/domain/order/order";
 import { DatabaseSchema } from "src/infrastructure/persistence/kysely/database.schema";
 
-export abstract class OrderRepository {
-  abstract save(
+export interface IOrderRepository {
+  save(data: Order, transaction?: Transaction<DatabaseSchema>): Promise<Order>;
+  saveOrder(
     data: Order,
     transaction?: Transaction<DatabaseSchema>
-  ): Promise<Order>;
-
-  abstract getOrders(filter?: OrderFilterDto): Promise<OrderModelFull[] | null>;
+  ): Promise<void>;
+  getOrders(filter?: OrderFilterDto): Promise<OrderModelFull[] | null>;
+  getOrder(orderNumber: string): Promise<OrderModelFull | null>;
 }
+
+export const IOrderRepository = Symbol("IOrderRepository");

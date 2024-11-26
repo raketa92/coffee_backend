@@ -1,16 +1,28 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Kysely, Transaction } from "kysely";
 import { DatabaseSchema } from "@infrastructure/persistence/kysely/database.schema";
-import { PaymentRepository } from "@application/coffee_shop/ports/IPaymentRepository";
+import { IPaymentRepository } from "@/domain/payment/repository/IPaymentRepository";
 import { Payment } from "@domain/payment/payment";
-import { PaymentCreateModel } from "@infrastructure/persistence/kysely/models/payment";
+import {
+  PaymentCreateModel,
+  PaymentModel,
+} from "@infrastructure/persistence/kysely/models/payment";
 
 @Injectable()
-export class PaymentRepositoryImpl implements PaymentRepository {
+export class PaymentRepositoryImpl implements IPaymentRepository {
   constructor(
     @Inject("DB_CONNECTION")
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}
+  async getPayment(orderGuid: string): Promise<PaymentModel | null> {
+    const payment = await this.kysely
+      .selectFrom("Payment")
+      .selectAll()
+      .where("orderGuid", "=", orderGuid)
+      .executeTakeFirst();
+
+    return payment ?? null;
+  }
   async save(
     data: Payment,
     transaction?: Transaction<DatabaseSchema>

@@ -3,15 +3,15 @@ import { Kysely, PostgresDialect } from "kysely";
 import { Pool } from "pg";
 import { EnvModule, EnvService } from "@infrastructure/env";
 import { DatabaseSchema } from "./database.schema";
-import { OrderRepository } from "@/application/coffee_shop/ports/orderRepository";
+import { IOrderRepository } from "@/domain/order/repository/orderRepository";
 import { OrderRepositoryImpl } from "./repository/orderRepositoryImpl";
 import { PaymentRepositoryImpl } from "./repository/paymentRepositoryImpl";
-import { PaymentRepository } from "@application/coffee_shop/ports/IPaymentRepository";
-import { CategoryRepository } from "@/application/coffee_shop/ports/ICategoryRepository";
+import { IPaymentRepository } from "@/domain/payment/repository/IPaymentRepository";
+import { ICategoryRepository } from "@/domain/category/repository/ICategoryRepository";
 import { CategoryRepositoryImpl } from "./repository/categoryRepositoryImpl";
-import { ProductRepository } from "@/application/coffee_shop/ports/IProductRepository";
+import { IProductRepository } from "@/domain/product/repository/IProductRepository";
 import { ProductRepositoryImpl } from "./repository/productRepositoryImpl";
-import { ShopRepository } from "@/application/coffee_shop/ports/IShopRepository";
+import { IShopRepository } from "@/domain/shop/repository/IShopRepository";
 import { ShopRepositoryImpl } from "./repository/shopRepositoryImpl";
 
 @Module({
@@ -37,33 +37,33 @@ import { ShopRepositoryImpl } from "./repository/shopRepositoryImpl";
       inject: [EnvService],
     },
     {
-      provide: OrderRepository,
+      provide: IOrderRepository,
       useClass: OrderRepositoryImpl,
     },
     {
-      provide: PaymentRepository,
+      provide: IPaymentRepository,
       useClass: PaymentRepositoryImpl,
     },
     {
-      provide: CategoryRepository,
+      provide: ICategoryRepository,
       useClass: CategoryRepositoryImpl,
     },
     {
-      provide: ProductRepository,
+      provide: IProductRepository,
       useClass: ProductRepositoryImpl,
     },
     {
-      provide: ShopRepository,
+      provide: IShopRepository,
       useClass: ShopRepositoryImpl,
     },
   ],
   exports: [
     "DB_CONNECTION",
-    OrderRepository,
-    PaymentRepository,
-    CategoryRepository,
-    ProductRepository,
-    ShopRepository,
+    IOrderRepository,
+    IPaymentRepository,
+    ICategoryRepository,
+    IProductRepository,
+    IShopRepository,
   ],
 })
 export class DatabaseModule {}

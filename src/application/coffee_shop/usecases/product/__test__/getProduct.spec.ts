@@ -1,5 +1,5 @@
 import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
-import { ProductRepository } from "@/application/coffee_shop/ports/IProductRepository";
+import { IProductRepository } from "@/domain/product/repository/IProductRepository";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
 import { Test, TestingModule } from "@nestjs/testing";
 import { GetProductUseCase } from "../getProduct";
@@ -7,14 +7,14 @@ import { NotFoundException } from "@nestjs/common";
 
 describe("Get product use case", () => {
   let useCase: GetProductUseCase;
-  let productRepository: ProductRepository;
+  let productRepository: IProductRepository;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GetProductUseCase,
         {
-          provide: ProductRepository,
+          provide: IProductRepository,
           useValue: {
             getProduct: jest.fn(),
           },
@@ -23,7 +23,7 @@ describe("Get product use case", () => {
     }).compile();
 
     useCase = module.get<GetProductUseCase>(GetProductUseCase);
-    productRepository = module.get<ProductRepository>(ProductRepository);
+    productRepository = module.get<IProductRepository>(IProductRepository);
   });
 
   it("should be defined", () => {

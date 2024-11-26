@@ -3,26 +3,26 @@ import { Entity } from "@core/Entity";
 
 export interface IOrderItemProps {
   quantity: number;
-  productId: UniqueEntityID;
+  productGuid: UniqueEntityID;
 }
 
 export class OrderItem extends Entity<IOrderItemProps> {
   private readonly _quantity: number;
-  private readonly _productId: UniqueEntityID;
+  private readonly _productGuid: UniqueEntityID;
   constructor(props: IOrderItemProps, guid?: UniqueEntityID) {
     super(guid);
     if (props.quantity <= 0) {
       throw new Error("Quantity must be greater than zero");
     }
     this._quantity = props.quantity;
-    this._productId = props.productId;
+    this._productGuid = props.productGuid;
   }
 
   toJSON() {
     return {
       guid: this._guid.toValue(),
       quantity: this.quantity,
-      productId: this.productId.toValue(),
+      productGuid: this._productGuid.toValue(),
     };
   }
 
@@ -34,7 +34,7 @@ export class OrderItem extends Entity<IOrderItemProps> {
     return this._quantity;
   }
 
-  get productId(): UniqueEntityID {
-    return this._productId;
+  get productGuid(): UniqueEntityID {
+    return this._productGuid;
   }
 }

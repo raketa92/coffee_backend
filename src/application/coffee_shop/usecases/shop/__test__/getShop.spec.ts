@@ -2,19 +2,19 @@ import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
 import { Test, TestingModule } from "@nestjs/testing";
 import { GetShopUseCase } from "../getShop";
-import { ShopRepository } from "@/application/coffee_shop/ports/IShopRepository";
+import { IShopRepository } from "@/domain/shop/repository/IShopRepository";
 import { NotFoundException } from "@nestjs/common";
 
 describe("Get shop use case", () => {
   let useCase: GetShopUseCase;
-  let shopRepository: ShopRepository;
+  let shopRepository: IShopRepository;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GetShopUseCase,
         {
-          provide: ShopRepository,
+          provide: IShopRepository,
           useValue: {
             getShop: jest.fn(),
           },
@@ -23,7 +23,7 @@ describe("Get shop use case", () => {
     }).compile();
 
     useCase = module.get<GetShopUseCase>(GetShopUseCase);
-    shopRepository = module.get<ShopRepository>(ShopRepository);
+    shopRepository = module.get<IShopRepository>(IShopRepository);
   });
 
   it("should be defined", () => {

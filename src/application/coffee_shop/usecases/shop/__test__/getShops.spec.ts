@@ -1,4 +1,4 @@
-import { ShopRepository } from "@/application/coffee_shop/ports/IShopRepository";
+import { IShopRepository } from "@/domain/shop/repository/IShopRepository";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
 import { ShopResponseDto } from "@/infrastructure/http/dto/shop/shopsResponseDto";
 import { TestingModule, Test } from "@nestjs/testing";
@@ -6,14 +6,14 @@ import { GetShopsUseCase } from "../getShops";
 
 describe("Get shops use case", () => {
   let useCase: GetShopsUseCase;
-  let shopRepository: ShopRepository;
+  let shopRepository: IShopRepository;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GetShopsUseCase,
         {
-          provide: ShopRepository,
+          provide: IShopRepository,
           useValue: {
             getShops: jest.fn(),
           },
@@ -22,7 +22,7 @@ describe("Get shops use case", () => {
     }).compile();
 
     useCase = module.get<GetShopsUseCase>(GetShopsUseCase);
-    shopRepository = module.get<ShopRepository>(ShopRepository);
+    shopRepository = module.get<IShopRepository>(IShopRepository);
   });
 
   it("should be defined", () => {

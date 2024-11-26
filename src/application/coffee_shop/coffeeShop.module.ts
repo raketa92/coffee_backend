@@ -13,12 +13,14 @@ import { GetShopsUseCase } from "./usecases/shop/getShops";
 import { GetOrdersUseCase } from "./usecases/order/getOrders";
 import { GetProductUseCase } from "./usecases/product/getProduct";
 import { GetShopUseCase } from "./usecases/shop/getShop";
+import { CheckOrderUseCase } from "./usecases/order/checkOrderStatus";
 
 @Module({
   imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule],
   providers: [
     RedisService,
     CreateOrderUseCase,
+    CheckOrderUseCase,
     GetOrdersUseCase,
     GetCategoriesUseCase,
     GetProductsUseCase,
@@ -33,6 +35,7 @@ import { GetShopUseCase } from "./usecases/shop/getShop";
   exports: [
     CreateOrderUseCase,
     GetOrdersUseCase,
+    CheckOrderUseCase,
     GetCategoriesUseCase,
     GetProductsUseCase,
     GetProductUseCase,

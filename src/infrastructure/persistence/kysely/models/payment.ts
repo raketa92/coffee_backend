@@ -5,7 +5,7 @@ export interface PaymentTable {
   guid: string;
   orderGuid: string;
   paymentFor: PaytmentFor;
-  cardProvider: CardProvider;
+  cardProvider?: CardProvider;
   status: string;
   bankOrderId: string;
   amount: number;

@@ -13,7 +13,9 @@ export const UseCaseErrorMessage = {
   productNotExist: (productGuid: string) =>
     `Product with ID ${productGuid} does not exist.`,
   product_not_found: "Product not found",
+  order_not_found: "Order not found",
   shop_not_found: "Shop not found",
+  payment_not_found: "Payment not found",
 };
 
 interface UseCaseErrorParams {

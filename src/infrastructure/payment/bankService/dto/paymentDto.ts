@@ -11,3 +11,13 @@ export interface IPaymentPayload extends IPaymentData {
   userName: string;
   password: string;
 }
+
+export interface ICheckPaymentData {
+  orderId: string;
+  language?: string;
+}
+
+export interface ICheckPaymentPayload extends ICheckPaymentData {
+  userName: string;
+  password: string;
+}

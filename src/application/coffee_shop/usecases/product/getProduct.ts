@@ -1,12 +1,15 @@
 import { UseCase } from "@/core/UseCase";
-import { ProductRepository } from "@application/coffee_shop/ports/IProductRepository";
+import { IProductRepository } from "@/domain/product/repository/IProductRepository";
 import { ProductResponseDto } from "@/infrastructure/http/dto/product/productsResponseDto";
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { UseCaseErrorMessage } from "../../exception";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { UseCaseErrorMessage } from "@application/coffee_shop/exception";
 
 @Injectable()
 export class GetProductUseCase implements UseCase<string, ProductResponseDto> {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(
+    @Inject(IProductRepository)
+    private readonly productRepository: IProductRepository
+  ) {}
 
   public async execute(productGuid: string): Promise<ProductResponseDto> {
     const product = await this.productRepository.getProduct(productGuid);

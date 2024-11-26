@@ -1,4 +1,4 @@
-import { CategoryRepository } from "@/application/coffee_shop/ports/ICategoryRepository";
+import { ICategoryRepository } from "@/domain/category/repository/ICategoryRepository";
 import { Inject, Injectable } from "@nestjs/common";
 import { Kysely } from "kysely";
 import { DatabaseSchema } from "../database.schema";
@@ -6,7 +6,7 @@ import { CategoryMapper } from "../mappers/categoryMapper";
 import { Category } from "@/domain/category/category";
 
 @Injectable()
-export class CategoryRepositoryImpl implements CategoryRepository {
+export class CategoryRepositoryImpl implements ICategoryRepository {
   constructor(
     @Inject("DB_CONNECTION")
     private readonly kysely: Kysely<DatabaseSchema>

@@ -1,13 +1,17 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { UseCase } from "@core/UseCase";
-import { OrderRepository } from "@/application/coffee_shop/ports/orderRepository";
+import { IOrderRepository } from "@/domain/order/repository/orderRepository";
 import { CreateOrderDto } from "@/infrastructure/http/dto/order/createOrderDto";
 import { UniqueEntityID } from "@core/UniqueEntityID";
-import { OrderStatus, PaymentMethods, PaytmentFor } from "@core/constants";
-import { Card } from "@domain/order/card";
+import {
+  OrderStatus,
+  PaymentMethods,
+  PaymentStatus,
+  PaytmentFor,
+} from "@core/constants";
 import { BankService } from "@application/coffee_shop/ports/IBankService";
 import { Payment } from "@domain/payment/payment";
-import { PaymentRepository } from "../../ports/IPaymentRepository";
+import { IPaymentRepository } from "@domain/payment/repository/IPaymentRepository";
 import { RedisService } from "@infrastructure/persistence/redis/redis.service";
 import { Order } from "@domain/order/order";
 import { OrderItem } from "@domain/order/orderItem";
@@ -20,7 +24,7 @@ import {
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "@application/coffee_shop/exception";
-import { ProductRepository } from "../../ports/IProductRepository";
+import { IProductRepository } from "@domain/product/repository/IProductRepository";
 import { IPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
 
 @Injectable()
@@ -28,9 +32,12 @@ export class CreateOrderUseCase
   implements UseCase<CreateOrderDto, CreateOrderResponseDto>
 {
   constructor(
-    private readonly orderRepository: OrderRepository,
-    private readonly paymentRepository: PaymentRepository,
-    private readonly productRepository: ProductRepository,
+    @Inject(IOrderRepository)
+    private readonly orderRepository: IOrderRepository,
+    @Inject(IPaymentRepository)
+    private readonly paymentRepository: IPaymentRepository,
+    @Inject(IProductRepository)
+    private readonly productRepository: IProductRepository,
     private readonly bankService: BankService,
     private readonly configService: EnvService,
     private readonly redisService: RedisService,
@@ -38,16 +45,9 @@ export class CreateOrderUseCase
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}
   public async execute(
-    request?: CreateOrderDto
+    request: CreateOrderDto
   ): Promise<CreateOrderResponseDto> {
     try {
-      if (!request) {
-        throw new UseCaseError({
-          code: UseCaseErrorCode.BAD_REQUEST,
-          message: UseCaseErrorMessage.payload_required,
-        });
-      }
-
       const orderNumber = await this.redisService.generateOrderNumber();
       let formUrl: string | undefined;
 
@@ -84,7 +84,7 @@ export class CreateOrderUseCase
     trx?: Transaction<DatabaseSchema>
   ): Promise<string> {
     const hostApi = this.configService.get("HOST_API");
-    const returnUrl = `${hostApi}/payment-service/orderStatus?orderNumber=${newOrder.orderNumber}&lang=${"ru"}`;
+    const returnUrl = `${hostApi}/order/status?orderNumber=${newOrder.orderNumber}&lang=${"ru"}`;
     const paymentData: IPaymentData = {
       currency: 934,
       language: "ru",
@@ -96,8 +96,7 @@ export class CreateOrderUseCase
 
     const newPayment = new Payment({
       paymentFor: PaytmentFor.product,
-      cardProvider: newOrder.card!.cardProvider,
-      status: OrderStatus.waitingClientApproval,
+      status: PaymentStatus.waitingClientApproval,
       orderGuid: newOrder.guid,
       bankOrderId: paymentResponse.orderId,
       amount: paymentData.amount,
@@ -142,22 +141,9 @@ export class CreateOrderUseCase
     const orderProducts = request.orderItems.map((item) => {
       return new OrderItem({
         quantity: item.quantity,
-        productId: new UniqueEntityID(item.productGuid),
+        productGuid: new UniqueEntityID(item.productGuid),
       });
     });
-
-    let orderCard = null;
-    if (request.card && request.paymentMethod === PaymentMethods.card) {
-      const { card } = request;
-      orderCard = new Card({
-        cardNumber: card.cardNumber,
-        month: card.month,
-        year: card.year,
-        name: card.name,
-        cvv: card.cvv,
-        cardProvider: card.cardProvider,
-      });
-    }
 
     const newOrder = new Order({
       orderNumber,
@@ -168,7 +154,6 @@ export class CreateOrderUseCase
       totalPrice: request.totalPrice,
       status,
       paymentMethod: request.paymentMethod,
-      card: orderCard,
       orderItems: orderProducts,
     });
     return newOrder;

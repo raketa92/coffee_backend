@@ -32,5 +32,5 @@ export interface BankResponseTable {
 }
 
 export type BankResponseModel = Selectable<BankResponseTable>;
-export type OrderCreateModel = Insertable<BankResponseTable>;
-export type OrderUpdateModel = Updateable<BankResponseTable>;
+export type BankResponseCreateModel = Insertable<BankResponseTable>;
+export type BankResponseUpdateModel = Updateable<BankResponseTable>;

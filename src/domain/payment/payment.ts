@@ -1,11 +1,11 @@
 import { UniqueEntityID } from "@core/UniqueEntityID";
-import { CardProvider, PaytmentFor } from "@core/constants";
+import { CardProvider, PaymentStatus, PaytmentFor } from "@core/constants";
 import { AggregateRoot } from "@core/AggregateRoot";
 
 export interface IPaymentProps {
   paymentFor: PaytmentFor;
-  cardProvider: CardProvider;
-  status: string;
+  cardProvider?: CardProvider;
+  status: PaymentStatus;
   orderGuid: UniqueEntityID;
   bankOrderId: string;
   amount: number;
@@ -15,13 +15,14 @@ export interface IPaymentProps {
 
 export class Payment extends AggregateRoot<IPaymentProps> {
   private readonly _paymentFor: PaytmentFor;
-  private readonly _cardProvider: CardProvider;
-  private readonly _status: string;
+  private readonly _cardProvider?: CardProvider;
+  private _status: PaymentStatus;
   private readonly _orderGuid: UniqueEntityID;
   private readonly _bankOrderId: string;
   private readonly _amount: number;
   private readonly _currency: number;
   private readonly _description?: string;
+  private _isDirty: boolean = false;
   constructor(props: IPaymentProps, guid?: UniqueEntityID) {
     super(guid);
     this._paymentFor = props.paymentFor;
@@ -48,6 +49,22 @@ export class Payment extends AggregateRoot<IPaymentProps> {
     };
   }
 
+  private markDirty() {
+    this._isDirty = true;
+  }
+
+  changeStatus(newStatus: PaymentStatus) {
+    if (this._status === PaymentStatus.paid) {
+      throw new Error("Payment status can't be changed after it's paid");
+    }
+    this._status = newStatus;
+    this.markDirty();
+  }
+
+  get isDirty(): boolean {
+    return this._isDirty;
+  }
+
   get guid(): UniqueEntityID {
     return this._guid;
   }
@@ -56,7 +73,7 @@ export class Payment extends AggregateRoot<IPaymentProps> {
     return this._paymentFor;
   }
 
-  get cardProvider(): CardProvider {
+  get cardProvider(): CardProvider | undefined {
     return this._cardProvider;
   }
 

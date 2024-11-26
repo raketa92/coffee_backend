@@ -1,4 +1,4 @@
-import { OrderRepository } from "@/application/coffee_shop/ports/orderRepository";
+import { IOrderRepository } from "@/domain/order/repository/orderRepository";
 import { GetOrdersUseCase } from "../getOrders";
 import { Test, TestingModule } from "@nestjs/testing";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
@@ -6,14 +6,14 @@ import { CardProvider, OrderStatus, PaymentMethods } from "@/core/constants";
 
 describe("Get orders use case", () => {
   let useCase: GetOrdersUseCase;
-  let orderRepository: OrderRepository;
+  let orderRepository: IOrderRepository;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GetOrdersUseCase,
         {
-          provide: OrderRepository,
+          provide: IOrderRepository,
           useValue: {
             getOrders: jest.fn(),
           },
@@ -22,7 +22,7 @@ describe("Get orders use case", () => {
     }).compile();
 
     useCase = module.get<GetOrdersUseCase>(GetOrdersUseCase);
-    orderRepository = module.get<OrderRepository>(OrderRepository);
+    orderRepository = module.get<IOrderRepository>(IOrderRepository);
   });
 
   it("should be defined", () => {

@@ -1,4 +1,4 @@
-import { ProductRepository } from "@/application/coffee_shop/ports/IProductRepository";
+import { IProductRepository } from "@/domain/product/repository/IProductRepository";
 import { Inject, Injectable } from "@nestjs/common";
 import { Kysely, Transaction } from "kysely";
 import { DatabaseSchema } from "../database.schema";
@@ -6,7 +6,7 @@ import { ProductFilterDto } from "@/infrastructure/http/dto/product/params";
 import { ProductModel } from "../models/product";
 
 @Injectable()
-export class ProductRepositoryImpl implements ProductRepository {
+export class ProductRepositoryImpl implements IProductRepository {
   constructor(
     @Inject("DB_CONNECTION")
     private readonly kysely: Kysely<DatabaseSchema>

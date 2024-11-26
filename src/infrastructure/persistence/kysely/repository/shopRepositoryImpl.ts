@@ -2,12 +2,12 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Kysely } from "kysely";
 import { DatabaseSchema } from "../database.schema";
 import { Shop } from "@/domain/shop/shop";
-import { ShopRepository } from "@/application/coffee_shop/ports/IShopRepository";
+import { IShopRepository } from "@/domain/shop/repository/IShopRepository";
 import { ShopMapper } from "../mappers/shopMapper";
 import { ShopModel } from "../models/shop";
 
 @Injectable()
-export class ShopRepositoryImpl implements ShopRepository {
+export class ShopRepositoryImpl implements IShopRepository {
   constructor(
     @Inject("DB_CONNECTION")
     private readonly kysely: Kysely<DatabaseSchema>

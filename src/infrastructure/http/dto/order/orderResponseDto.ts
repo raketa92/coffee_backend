@@ -20,3 +20,5 @@ export type OrderResponseDto = {
 export type CreateOrderResponseDto = Omit<OrderResponseDto, "OrderItems"> & {
   formUrl?: string;
 };
+
+export type CheckOrderResponseDto = Pick<OrderResponseDto, "status">;

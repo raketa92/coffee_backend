@@ -1,18 +1,18 @@
-import { ProductRepository } from "@/application/coffee_shop/ports/IProductRepository";
+import { IProductRepository } from "@/domain/product/repository/IProductRepository";
 import { GetProductsUseCase } from "../getProducts";
 import { Test, TestingModule } from "@nestjs/testing";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
 
 describe("Get products use case", () => {
   let useCase: GetProductsUseCase;
-  let productRepository: ProductRepository;
+  let productRepository: IProductRepository;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GetProductsUseCase,
         {
-          provide: ProductRepository,
+          provide: IProductRepository,
           useValue: {
             getProducts: jest.fn(),
           },
@@ -21,7 +21,7 @@ describe("Get products use case", () => {
     }).compile();
 
     useCase = module.get<GetProductsUseCase>(GetProductsUseCase);
-    productRepository = module.get<ProductRepository>(ProductRepository);
+    productRepository = module.get<IProductRepository>(IProductRepository);
   });
 
   it("should be defined", () => {

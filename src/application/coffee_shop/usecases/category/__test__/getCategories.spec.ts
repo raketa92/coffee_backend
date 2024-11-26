@@ -1,18 +1,18 @@
-import { CategoryRepository } from "@/application/coffee_shop/ports/ICategoryRepository";
+import { ICategoryRepository } from "@/domain/category/repository/ICategoryRepository";
 import { GetCategoriesUseCase } from "../getCategories";
 import { Test, TestingModule } from "@nestjs/testing";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
 
 describe("Get categories use case", () => {
   let useCase: GetCategoriesUseCase;
-  let categoryRepository: CategoryRepository;
+  let categoryRepository: ICategoryRepository;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GetCategoriesUseCase,
         {
-          provide: CategoryRepository,
+          provide: ICategoryRepository,
           useValue: {
             getCategories: jest.fn(),
           },
@@ -21,7 +21,7 @@ describe("Get categories use case", () => {
     }).compile();
 
     useCase = module.get<GetCategoriesUseCase>(GetCategoriesUseCase);
-    categoryRepository = module.get<CategoryRepository>(CategoryRepository);
+    categoryRepository = module.get<ICategoryRepository>(ICategoryRepository);
   });
 
   it("should be defined", () => {
