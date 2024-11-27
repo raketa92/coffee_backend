@@ -22,7 +22,8 @@ export class Payment extends AggregateRoot<IPaymentProps> {
   private readonly _amount: number;
   private readonly _currency: number;
   private readonly _description?: string;
-  private _isDirty: boolean = false;
+  private _changedFields: Set<keyof Payment> = new Set();
+
   constructor(props: IPaymentProps, guid?: UniqueEntityID) {
     super(guid);
     this._paymentFor = props.paymentFor;
@@ -49,20 +50,21 @@ export class Payment extends AggregateRoot<IPaymentProps> {
     };
   }
 
-  private markDirty() {
-    this._isDirty = true;
+  private addChangedFields(field: keyof Payment) {
+    this._changedFields.add(field);
+  }
+
+  clearChangedFields(): void {
+    this._changedFields.clear();
   }
 
   changeStatus(newStatus: PaymentStatus) {
-    if (this._status === PaymentStatus.paid) {
-      throw new Error("Payment status can't be changed after it's paid");
-    }
     this._status = newStatus;
-    this.markDirty();
+    this.addChangedFields("status");
   }
 
-  get isDirty(): boolean {
-    return this._isDirty;
+  get changedFields(): string[] {
+    return Array.from(this._changedFields);
   }
 
   get guid(): UniqueEntityID {

@@ -8,6 +8,7 @@ import {
   OrderCreateModel,
   OrderModel,
   OrderModelFull,
+  OrderUpdateModel,
 } from "@infrastructure/persistence/kysely/models/order";
 import { OrderItemCreateModel } from "@infrastructure/persistence/kysely/models/orderItem";
 import { OrderItem } from "@domain/order/orderItem";
@@ -80,8 +81,8 @@ export class OrderRepositoryImpl implements IOrderRepository {
     transaction?: Transaction<DatabaseSchema>
   ): Promise<Order> {
     const orderModelData = OrderMapper.toDbModel(order);
+
     if (transaction) {
-      // await this.insertOrder(transaction, orderModelData, order.orderItems);
       await this.saveOrder(order, transaction);
       await this.saveOrderItems(
         order.orderItems,
@@ -92,12 +93,6 @@ export class OrderRepositoryImpl implements IOrderRepository {
       await this.kysely.transaction().execute(async (trx) => {
         await this.saveOrder(order, trx);
         await this.saveOrderItems(order.orderItems, orderModelData.guid, trx);
-        // const newOrder = await this.insertOrder(
-        //   trx,
-        //   orderModelData,
-        //   order.orderItems
-        // );
-        // return newOrder;
       });
     }
     return order;
@@ -133,12 +128,10 @@ export class OrderRepositoryImpl implements IOrderRepository {
     orderGuid: string,
     transaction: Transaction<DatabaseSchema>
   ): Promise<void> {
-    const orderItemModels = orderItems.map((item) => ({
-      guid: item.guid.toValue(),
-      orderGuid,
-      quantity: item.quantity,
-      productGuid: item.productGuid.toValue(),
-    }));
+    const orderItemModels = OrderMapper.toOrderItemDbModel(
+      orderItems,
+      orderGuid
+    );
 
     await transaction.insertInto("OrderItem").values(orderItemModels).execute();
   }
@@ -149,17 +142,46 @@ export class OrderRepositoryImpl implements IOrderRepository {
   ): Promise<void> {
     const orderModelData = OrderMapper.toDbModel(order);
     const query = transaction || this.kysely;
-    if (order.isDirty) {
-      await query
-        .updateTable("Order")
-        .set(orderModelData)
-        .where("guid", "=", order.guid.toValue())
-        .executeTakeFirstOrThrow();
-    } else {
-      await query
-        .insertInto("Order")
-        .values(orderModelData)
-        .executeTakeFirstOrThrow();
+    let updateData: OrderUpdateModel = {};
+    if (order.changedFields.length) {
+      updateData = order.changedFields.reduce(
+        (acc, field) => {
+          acc[field] = order[field as keyof Order];
+          return acc;
+        },
+        {} as Record<string, any>
+      );
     }
+
+    if (order.changedFields.length) {
+      await this.updateOrder(query, updateData, order.guid.toValue());
+    } else {
+      await this.upsertOrder(query, orderModelData);
+    }
+    order.clearChangedFields();
+  }
+
+  private async upsertOrder(
+    query: Kysely<DatabaseSchema>,
+    orderModelData: OrderCreateModel
+  ) {
+    await query
+      .insertInto("Order")
+      .values(orderModelData)
+      .onConflict((conflict) =>
+        conflict.column("guid").doUpdateSet(orderModelData)
+      )
+      .execute();
+  }
+  private async updateOrder(
+    query: Kysely<DatabaseSchema>,
+    updateData: OrderUpdateModel,
+    orderGuid: string
+  ) {
+    await query
+      .updateTable("Order")
+      .set(updateData)
+      .where("guid", "=", orderGuid)
+      .execute();
   }
 }

@@ -6,7 +6,9 @@ import { Payment } from "@domain/payment/payment";
 import {
   PaymentCreateModel,
   PaymentModel,
+  PaymentUpdateModel,
 } from "@infrastructure/persistence/kysely/models/payment";
+import { PaymentMapper } from "../mappers/paymentMapper";
 
 @Injectable()
 export class PaymentRepositoryImpl implements IPaymentRepository {
@@ -24,39 +26,52 @@ export class PaymentRepositoryImpl implements IPaymentRepository {
     return payment ?? null;
   }
   async save(
-    data: Payment,
+    payment: Payment,
     transaction?: Transaction<DatabaseSchema>
   ): Promise<Payment> {
-    const paymentModelData: PaymentCreateModel = {
-      guid: data.guid.toValue(),
-      paymentFor: data.paymentFor,
-      cardProvider: data.cardProvider,
-      status: data.status,
-      orderGuid: data.orderGuid.toValue(),
-      bankOrderId: data.bankOrderId,
-      amount: data.amount,
-      currency: data.currency,
-      description: data.description,
-    };
-    if (transaction) {
-      await this.insertPayment(transaction, paymentModelData);
+    const paymentModelData = PaymentMapper.toDbModel(payment);
+    const query = transaction || this.kysely;
+    let updateData: PaymentUpdateModel = {};
+    if (payment.changedFields.length) {
+      updateData = payment.changedFields.reduce(
+        (acc, field) => {
+          acc[field] = payment[field as keyof Payment];
+          return acc;
+        },
+        {} as Record<string, any>
+      );
+    }
+    if (payment.changedFields.length) {
+      await this.updatePayment(query, updateData, payment.guid.toValue());
     } else {
-      await this.kysely.transaction().execute(async (trx) => {
-        await this.insertPayment(trx, paymentModelData);
-      });
+      await this.upsertPayment(query, paymentModelData);
     }
 
-    return data;
+    payment.clearChangedFields();
+    return payment;
   }
 
-  private async insertPayment(
-    trx: Transaction<DatabaseSchema>,
+  private async updatePayment(
+    trx: Kysely<DatabaseSchema>,
+    updateData: PaymentUpdateModel,
+    paymentGuid: string
+  ) {
+    await trx
+      .updateTable("Payment")
+      .set(updateData)
+      .where("guid", "=", paymentGuid)
+      .execute();
+  }
+  private async upsertPayment(
+    trx: Kysely<DatabaseSchema>,
     paymentModelData: PaymentCreateModel
   ): Promise<void> {
     await trx
       .insertInto("Payment")
       .values(paymentModelData)
-      .returningAll()
-      .executeTakeFirstOrThrow();
+      .onConflict((conflict) =>
+        conflict.column("guid").doUpdateSet(paymentModelData)
+      )
+      .execute();
   }
 }

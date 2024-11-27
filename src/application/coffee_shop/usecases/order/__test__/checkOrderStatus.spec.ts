@@ -37,7 +37,7 @@ describe("Check order status use case", () => {
           provide: IOrderRepository,
           useValue: {
             getOrder: jest.fn(),
-            save: jest.fn(),
+            saveOrder: jest.fn(),
           },
         },
         {
@@ -252,8 +252,11 @@ describe("Check order status use case", () => {
 
     orderDomain.changeStatus(OrderStatus.inProgress);
     orderDomain.assignPayment(paymentDomain.guid);
-    expect(orderRepository.save).toHaveBeenCalledTimes(1);
-    expect(orderRepository.save).toHaveBeenCalledWith(orderDomain, trxMock);
+    expect(orderRepository.saveOrder).toHaveBeenCalledTimes(1);
+    expect(orderRepository.saveOrder).toHaveBeenCalledWith(
+      orderDomain,
+      trxMock
+    );
     expect(orderDomain.status).toEqual(OrderStatus.inProgress);
     expect(orderDomain.paymentGuid).toEqual(paymentDomain.guid);
 

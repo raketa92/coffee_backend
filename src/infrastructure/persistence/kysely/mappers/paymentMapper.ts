@@ -1,5 +1,5 @@
 import { UniqueEntityID } from "@/core/UniqueEntityID";
-import { PaymentModel } from "../models/payment";
+import { PaymentCreateModel, PaymentModel } from "../models/payment";
 import { Payment } from "@/domain/payment/payment";
 import { PaymentStatus } from "@/core/constants";
 
@@ -18,5 +18,20 @@ export class PaymentMapper {
       },
       new UniqueEntityID(paymentModel.guid)
     );
+  }
+
+  static toDbModel(payment: Payment): PaymentCreateModel {
+    const paymentModelData: PaymentCreateModel = {
+      guid: payment.guid.toValue(),
+      paymentFor: payment.paymentFor,
+      cardProvider: payment.cardProvider,
+      status: payment.status,
+      orderGuid: payment.orderGuid.toValue(),
+      bankOrderId: payment.bankOrderId,
+      amount: payment.amount,
+      currency: payment.currency,
+      description: payment.description,
+    };
+    return paymentModelData;
   }
 }

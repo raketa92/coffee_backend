@@ -35,7 +35,7 @@ export class Order extends AggregateRoot<IOrderProps> {
   private readonly _paymentMethod: PaymentMethods;
   private readonly _card?: Card | null;
   private readonly _orderItems: OrderItem[];
-  private _isDirty: boolean = false;
+  private _changedFields: Set<keyof Order> = new Set();
 
   constructor(props: IOrderProps, guid?: UniqueEntityID) {
     super(guid);
@@ -49,7 +49,6 @@ export class Order extends AggregateRoot<IOrderProps> {
     this._paymentGuid = props.paymentGuid;
     this._paymentMethod = props.paymentMethod;
     this._card = props.card || null;
-    this._isDirty = false;
     this._orderItems = props.orderItems;
 
     if (this._totalPrice < 0) {
@@ -60,8 +59,12 @@ export class Order extends AggregateRoot<IOrderProps> {
     }
   }
 
-  private markDirty() {
-    this._isDirty = true;
+  private addChangedFields(field: keyof Order) {
+    this._changedFields.add(field);
+  }
+
+  clearChangedFields(): void {
+    this._changedFields.clear();
   }
 
   changeStatus(newStatus: OrderStatus) {
@@ -69,7 +72,7 @@ export class Order extends AggregateRoot<IOrderProps> {
       throw new Error("Order can't be changed after it's completed");
     }
     this._status = newStatus;
-    this.markDirty();
+    this.addChangedFields("status");
   }
 
   assignPayment(paymentGuid: UniqueEntityID) {
@@ -81,7 +84,7 @@ export class Order extends AggregateRoot<IOrderProps> {
     }
     if (this.card) {
       this._paymentGuid = paymentGuid;
-      this.markDirty();
+      this.addChangedFields("paymentGuid");
     }
   }
 
@@ -99,7 +102,7 @@ export class Order extends AggregateRoot<IOrderProps> {
       paymentMethod: this._paymentMethod,
       card: this._card,
       orderItems: this._orderItems,
-      isDirty: this._isDirty,
+      changedFields: this._changedFields,
     };
   }
 
@@ -151,7 +154,7 @@ export class Order extends AggregateRoot<IOrderProps> {
     return this._orderItems;
   }
 
-  get isDirty(): boolean {
-    return this._isDirty;
+  get changedFields(): string[] {
+    return Array.from(this._changedFields);
   }
 }

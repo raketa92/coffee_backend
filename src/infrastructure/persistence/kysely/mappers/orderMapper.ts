@@ -6,6 +6,7 @@ import {
 import { Card } from "@domain/order/card";
 import { OrderItem } from "@domain/order/orderItem";
 import { UniqueEntityID } from "@core/UniqueEntityID";
+import { OrderItemModel, OrderItemModelFull } from "../models/orderItem";
 
 export class OrderMapper {
   static toDomain(orderModel: OrderModelFull): Order {
@@ -21,20 +22,7 @@ export class OrderMapper {
       });
     }
 
-    const orderItems = orderModel.OrderItems.map((item) => {
-      const currentProduct = item.Product;
-      if (!currentProduct) {
-        return undefined;
-      }
-
-      return new OrderItem(
-        {
-          quantity: item.quantity,
-          productGuid: new UniqueEntityID(item.productGuid),
-        },
-        new UniqueEntityID(item.guid)
-      );
-    }).filter((el): el is OrderItem => el !== undefined);
+    const orderItems = this.toOrderItemDomain(orderModel.OrderItems);
 
     const order = new Order(
       {
@@ -75,5 +63,38 @@ export class OrderMapper {
     };
 
     return orderDbModel;
+  }
+
+  static toOrderItemDomain(orderModel: OrderItemModelFull[]): OrderItem[] {
+    const orderItems = orderModel
+      .map((item) => {
+        const currentProduct = item.Product;
+        if (!currentProduct) {
+          return undefined;
+        }
+
+        return new OrderItem(
+          {
+            quantity: item.quantity,
+            productGuid: new UniqueEntityID(item.productGuid),
+          },
+          new UniqueEntityID(item.guid)
+        );
+      })
+      .filter((el): el is OrderItem => el !== undefined);
+    return orderItems;
+  }
+
+  static toOrderItemDbModel(
+    orderItems: OrderItem[],
+    orderGuid: string
+  ): OrderItemModel[] {
+    const orderItemModels = orderItems.map((item) => ({
+      guid: item.guid.toValue(),
+      orderGuid,
+      quantity: item.quantity,
+      productGuid: item.productGuid.toValue(),
+    }));
+    return orderItemModels;
   }
 }
