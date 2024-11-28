@@ -51,10 +51,14 @@ describe("Get orders use case", () => {
         paymentGuid: new UniqueEntityID().toString(),
         paymentMethod: PaymentMethods.cash,
         card: null,
+        shopName: "shop 1",
+        shopRating: 4.5,
+        createdAt: new Date(),
         OrderItems: [
           {
             quantity: 1,
             Product: {
+              guid: new UniqueEntityID().toString(),
               name: "coffee",
               image: "coffee.png",
               price: 11.2,
@@ -75,6 +79,9 @@ describe("Get orders use case", () => {
         status: OrderStatus.completed,
         paymentGuid: new UniqueEntityID().toString(),
         paymentMethod: PaymentMethods.card,
+        shopName: "shop 1",
+        shopRating: 4.5,
+        createdAt: new Date(),
         card: {
           cardNumber: "1234567812345678",
           month: 12,
@@ -87,6 +94,7 @@ describe("Get orders use case", () => {
           {
             quantity: 1,
             Product: {
+              guid: new UniqueEntityID().toString(),
               name: "coffee2",
               image: "coffee.png",
               price: 14.2,
@@ -104,10 +112,15 @@ describe("Get orders use case", () => {
       {
         orderNumber: mockOrders[0].orderNumber,
         status: mockOrders[0].status,
+        shopName: mockOrders[0].shopName,
+        shopRating: mockOrders[0].shopRating,
+        totalPrice: mockOrders[0].totalPrice,
+        date: mockOrders[0].createdAt,
         OrderItems: [
           {
             quantity: mockOrders[0].OrderItems[0].quantity,
             Product: {
+              guid: mockOrders[0].OrderItems[0].Product.guid,
               name: mockOrders[0].OrderItems[0].Product.name,
               image: mockOrders[0].OrderItems[0].Product.image,
               price: mockOrders[0].OrderItems[0].Product.price,
@@ -121,10 +134,15 @@ describe("Get orders use case", () => {
       {
         orderNumber: mockOrders[1].orderNumber,
         status: mockOrders[1].status,
+        shopName: mockOrders[0].shopName,
+        shopRating: mockOrders[0].shopRating,
+        totalPrice: mockOrders[0].totalPrice,
+        date: mockOrders[0].createdAt,
         OrderItems: [
           {
             quantity: mockOrders[1].OrderItems[0].quantity,
             Product: {
+              guid: mockOrders[1].OrderItems[0].Product.guid,
               name: mockOrders[1].OrderItems[0].Product.name,
               image: mockOrders[1].OrderItems[0].Product.image,
               price: mockOrders[1].OrderItems[0].Product.price,

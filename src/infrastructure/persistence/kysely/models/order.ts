@@ -23,6 +23,8 @@ export type OrderCreateModel = Insertable<OrderTable>;
 export type OrderUpdateModel = Updateable<OrderTable>;
 
 export type OrderModelFull = OrderModel & {
+  shopName: string;
+  shopRating: number;
   OrderItems: OrderItemModelFull[];
 };
 

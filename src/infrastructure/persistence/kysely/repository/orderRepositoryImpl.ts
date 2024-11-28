@@ -24,7 +24,9 @@ export class OrderRepositoryImpl implements IOrderRepository {
   async getOrder(orderNumber: string): Promise<OrderModelFull | null> {
     const query = this.kysely
       .selectFrom("Order")
+      .innerJoin("Shop", "Shop.guid", "Order.shopGuid")
       .selectAll("Order")
+      .select(["Shop.name as shopName", "Shop.rating as shopRating"])
       .where("orderNumber", "=", orderNumber)
       .select((oi) =>
         jsonArrayFrom(
@@ -50,7 +52,9 @@ export class OrderRepositoryImpl implements IOrderRepository {
   async getOrders(filter?: OrderFilterDto): Promise<OrderModelFull[] | null> {
     let query = this.kysely
       .selectFrom("Order")
+      .innerJoin("Shop", "Shop.guid", "Order.shopGuid")
       .selectAll("Order")
+      .select(["Shop.name as shopName", "Shop.rating as shopRating"])
       .select((oi) =>
         jsonArrayFrom(
           oi

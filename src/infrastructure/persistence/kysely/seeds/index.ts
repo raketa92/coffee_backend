@@ -2,7 +2,6 @@ import { Kysely, PostgresDialect } from "kysely";
 import { DatabaseSchema } from "../database.schema";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Pool } from "pg";
-import { UniqueEntityID } from "@/core/UniqueEntityID";
 
 ConfigModule.forRoot({
   envFilePath: ".env",
@@ -10,22 +9,22 @@ ConfigModule.forRoot({
 
 const categories = [
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "0d593543-11f6-4fa9-9b78-110ac15ee627",
     name: "Hot Drinks",
     iconUrl: "hot_drink.png",
   },
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "723169f0-c4ff-4b11-9f27-25c4e720c9bd",
     name: "Cold Drinks",
     iconUrl: "cold_drink.png",
   },
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "d18814f0-7a9c-4b8c-9add-1dca56f65f44",
     name: "Other Drinks",
     iconUrl: "non_coffee_drink.png",
   },
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "e1da8f1f-99b7-4906-ba52-94176a0fabca",
     name: "Snacks",
     iconUrl: "snacks.png",
   },
@@ -33,19 +32,19 @@ const categories = [
 
 const shops = [
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "40aae5c0-5129-48d3-96c8-47f99f06d410",
     name: "Coffee Start",
     image: "coffee_start.jpg",
     rating: 4.1,
   },
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "6612eb6b-e3ed-4c48-b9d6-05244f39f7ff",
     name: "Kemine coffee",
     image: "kemine_coffee.jpg",
     rating: 4.5,
   },
   {
-    guid: new UniqueEntityID().toString(),
+    guid: "2f05ac7c-f66e-41ea-b326-5f7a38bbabf1",
     name: "A Coffee",
     image: "a_coffee.jpg",
     rating: 3.8,

@@ -67,6 +67,7 @@ export class CreateOrderUseCase
       const response: CreateOrderResponseDto = {
         orderNumber,
         status: createdOrder.status,
+        totalPrice: createdOrder.totalPrice,
         formUrl,
       };
 

@@ -202,7 +202,11 @@ describe("Create order use case", () => {
       }),
       trxMock
     );
-    expect(result).toMatchObject({ orderNumber, status: newOrder.status });
+    expect(result).toMatchObject({
+      orderNumber,
+      totalPrice: newOrder.totalPrice,
+      status: newOrder.status,
+    });
   });
 
   it("should create an order and process payment when payment method is cash", async () => {

@@ -3,6 +3,7 @@ import { OrderStatus } from "@core/constants";
 type OrderItem = {
   quantity: number;
   Product?: {
+    guid?: string;
     name?: string;
     image?: string;
     price?: number;
@@ -14,10 +15,17 @@ type OrderItem = {
 export type OrderResponseDto = {
   orderNumber: string;
   status: OrderStatus;
+  shopName: string;
+  shopRating: number;
+  totalPrice: number;
+  date: Date;
   OrderItems: OrderItem[];
 };
 
-export type CreateOrderResponseDto = Omit<OrderResponseDto, "OrderItems"> & {
+export type CreateOrderResponseDto = Omit<
+  OrderResponseDto,
+  "OrderItems" | "shopName" | "shopRating" | "date"
+> & {
   formUrl?: string;
 };
 
