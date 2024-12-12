@@ -10,7 +10,7 @@ import {
   UseCaseErrorMessage,
 } from "@application/coffee_shop/exception";
 import { ICheckPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
-import { OrderStatus } from "@/core/constants";
+import { OrderStatus, PaymentMethods } from "@/core/constants";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
 import { Kysely } from "kysely";
 import { OrderMapper } from "@/infrastructure/persistence/kysely/mappers/orderMapper";
@@ -39,6 +39,11 @@ export class CheckOrderUseCase
           message: UseCaseErrorMessage.order_not_found,
         });
       }
+
+      if (orderModel.paymentMethod !== PaymentMethods.card) {
+        return { status: orderModel.status };
+      }
+
       if (
         [OrderStatus.completed, OrderStatus.canceled].includes(
           orderModel.status

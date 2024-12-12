@@ -89,7 +89,7 @@ describe("Check order status use case", () => {
     );
     expect(orderRepository.getOrder).toHaveBeenCalled();
   });
-  it("should check status and return order status", async () => {
+  it("should check status when payment method is card and return order status", async () => {
     const orderNumber = "121212";
     const product: ProductCreateModel = {
       name: "cake",
@@ -264,8 +264,7 @@ describe("Check order status use case", () => {
       status: OrderStatus.inProgress,
     });
   });
-
-  it("should return order status without checking with bankservice if status is completed", async () => {
+  it("should return order status when payment method is card without checking with bankservice if status is completed", async () => {
     const orderNumber = "121212";
     const mockOrders = [
       {
@@ -321,6 +320,99 @@ describe("Check order status use case", () => {
 
     expect(result).toEqual({
       status: OrderStatus.completed,
+    });
+  });
+
+  it("should check status when payment method is not card and return order status", async () => {
+    const orderNumber = "121212";
+    const product: ProductCreateModel = {
+      name: "cake",
+      guid: new UniqueEntityID().toString(),
+      image: "aaa",
+      price: 0,
+      categoryGuid: new UniqueEntityID().toString(),
+      shopGuid: new UniqueEntityID().toString(),
+      rating: 0,
+      ingredients: null,
+    };
+
+    const mockOrders = [
+      {
+        guid: new UniqueEntityID().toString(),
+        orderNumber: "01",
+        userGuid: new UniqueEntityID().toString(),
+        shopGuid: new UniqueEntityID().toString(),
+        phone: "993",
+        address: "mir1",
+        totalPrice: 100,
+        status: OrderStatus.completed,
+        paymentMethod: PaymentMethods.cash,
+        card: null,
+        OrderItems: [
+          {
+            guid: new UniqueEntityID().toString(),
+            quantity: 1,
+            productGuid: product.guid,
+            Product: product,
+          },
+        ],
+      },
+      {
+        guid: new UniqueEntityID().toString(),
+        orderNumber,
+        userGuid: new UniqueEntityID().toString(),
+        shopGuid: new UniqueEntityID().toString(),
+        phone: "99322",
+        address: "mir1",
+        totalPrice: 100,
+        status: OrderStatus.pending,
+        paymentMethod: PaymentMethods.cash,
+        card: null,
+        OrderItems: [
+          {
+            guid: new UniqueEntityID().toString(),
+            quantity: 1,
+            productGuid: product.guid,
+            Product: product,
+          },
+        ],
+      },
+    ];
+
+    const orderDomain = new Order(
+      {
+        orderNumber,
+        userGuid: mockOrders[1].userGuid
+          ? new UniqueEntityID(mockOrders[1].userGuid)
+          : null,
+        shopGuid: new UniqueEntityID(mockOrders[1].shopGuid),
+        phone: mockOrders[1].phone,
+        address: mockOrders[1].address,
+        totalPrice: mockOrders[1].totalPrice,
+        status: mockOrders[1].status,
+        paymentGuid: null,
+        paymentMethod: mockOrders[1].paymentMethod,
+        card: mockOrders[1].card ? new Card(mockOrders[1].card) : null,
+        orderItems: mockOrders[1].OrderItems.map(
+          (item) =>
+            new OrderItem(
+              {
+                productGuid: new UniqueEntityID(item.productGuid),
+                quantity: item.quantity,
+              },
+              new UniqueEntityID(item.guid)
+            )
+        ),
+      },
+      new UniqueEntityID(mockOrders[1].guid)
+    );
+
+    (orderRepository.getOrder as jest.Mock).mockResolvedValue(mockOrders[1]);
+    const result = await useCase.execute(orderNumber);
+
+    orderDomain.changeStatus(OrderStatus.inProgress);
+    expect(result).toEqual({
+      status: OrderStatus.pending,
     });
   });
 });

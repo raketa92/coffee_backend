@@ -27,7 +27,7 @@ export class OrderController {
   }
 
   @Get("/status/:orderNumber")
-  async checkPaymentStatus(@Param("orderNumber") orderNumber: any) {
+  async checkOrderStatus(@Param("orderNumber") orderNumber: any) {
     const response = await this.checkOrderStatusUseCase.execute(orderNumber);
     return response;
   }
