@@ -28,15 +28,12 @@ export class OrderItem {
 
 export class CreateOrderDto2 {
   @ValidateIf((dto) => {
-    console.log(`✅  typeof dto.userGuid:`, typeof dto.userGuid);
     return typeof dto.userGuid !== "undefined";
   })
   @IsString()
   @Optional()
   userGuid?: string;
   @ValidateIf((dto) => {
-    console.log(`✅  dto:`, dto);
-    console.log(`✅  typeof dto.shopGuid:`, typeof dto.shopGuid);
     return typeof dto.shopGuid === "undefined";
   })
   @IsString()
