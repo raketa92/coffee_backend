@@ -5,14 +5,17 @@ import { CoffeeShopModule } from "@application/coffee_shop/coffeeShop.module";
 import { CategoryController } from "./category.controller";
 import { ProductController } from "./product.controller";
 import { ShopController } from "./shop.controller";
+import { UserController } from "./user.controller";
+import { AuthModule } from "../auth/auth.module";
 
 @Module({
-  imports: [CoffeeShopModule],
+  imports: [CoffeeShopModule, AuthModule],
   controllers: [
     OrderController,
     CategoryController,
     ProductController,
     ShopController,
+    UserController,
   ],
   providers: [
     RedisService,
@@ -20,6 +23,7 @@ import { ShopController } from "./shop.controller";
     CategoryController,
     ProductController,
     ShopController,
+    UserController,
   ],
 })
 export class HttpModule {}

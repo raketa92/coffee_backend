@@ -5,6 +5,7 @@ import { OrderItemTable } from "./models/orderItem";
 import { PaymentTable } from "./models/payment";
 import { ProductTable } from "./models/product";
 import { ShopTable } from "./models/shop";
+import { UserTable } from "./models/user";
 
 export interface DatabaseSchema {
   Order: OrderTable;
@@ -14,4 +15,5 @@ export interface DatabaseSchema {
   BankResponse: BankResponseTable;
   Category: CategoryTable;
   Shop: ShopTable;
+  User: UserTable;
 }

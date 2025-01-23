@@ -10,6 +10,7 @@ import { LoggerModule } from "@infrastructure/logger/logger.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { HttpModule } from "./infrastructure/http/http.module";
+import { AuthModule } from "./infrastructure/auth/auth.module";
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { HttpModule } from "./infrastructure/http/http.module";
     EnvModule,
     LoggerModule,
     HttpModule,
+    AuthModule,
   ],
   providers: [
     RedisService,

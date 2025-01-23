@@ -12,7 +12,7 @@ import {
 } from "@infrastructure/persistence/kysely/models/order";
 import { OrderItemCreateModel } from "@infrastructure/persistence/kysely/models/orderItem";
 import { OrderItem } from "@domain/order/orderItem";
-import { OrderFilterDto } from "@/infrastructure/http/dto/order/params";
+import { OrderFilterDto } from "@/infrastructure/http/dto/order/filters";
 import { OrderMapper } from "../mappers/orderMapper";
 
 @Injectable()

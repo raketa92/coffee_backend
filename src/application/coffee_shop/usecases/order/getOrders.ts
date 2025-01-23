@@ -1,6 +1,6 @@
 import { UseCase } from "@/core/UseCase";
 import { OrderResponseDto } from "@/infrastructure/http/dto/order/orderResponseDto";
-import { OrderFilterDto } from "@/infrastructure/http/dto/order/params";
+import { OrderFilterDto } from "@/infrastructure/http/dto/order/filters";
 import { Inject, Injectable } from "@nestjs/common";
 import { IOrderRepository } from "@domain/order/repository/orderRepository";
 

@@ -13,6 +13,8 @@ import { IProductRepository } from "@/domain/product/repository/IProductReposito
 import { ProductRepositoryImpl } from "./repository/productRepositoryImpl";
 import { IShopRepository } from "@/domain/shop/repository/IShopRepository";
 import { ShopRepositoryImpl } from "./repository/shopRepositoryImpl";
+import { IUserRepository } from "@/domain/user/user.repository";
+import { UserRepositoryImpl } from "./repository/userRepositoryImpl";
 
 @Module({
   imports: [EnvModule],
@@ -56,6 +58,10 @@ import { ShopRepositoryImpl } from "./repository/shopRepositoryImpl";
       provide: IShopRepository,
       useClass: ShopRepositoryImpl,
     },
+    {
+      provide: IUserRepository,
+      useClass: UserRepositoryImpl,
+    },
   ],
   exports: [
     "DB_CONNECTION",
@@ -64,6 +70,7 @@ import { ShopRepositoryImpl } from "./repository/shopRepositoryImpl";
     ICategoryRepository,
     IProductRepository,
     IShopRepository,
+    IUserRepository,
   ],
 })
 export class DatabaseModule {}

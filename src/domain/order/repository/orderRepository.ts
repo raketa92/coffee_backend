@@ -1,4 +1,4 @@
-import { OrderFilterDto } from "@/infrastructure/http/dto/order/params";
+import { OrderFilterDto } from "@/infrastructure/http/dto/order/filters";
 import { OrderModelFull } from "@/infrastructure/persistence/kysely/models/order";
 import { Transaction } from "kysely";
 import { Order } from "src/domain/order/order";

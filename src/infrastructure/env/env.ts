@@ -26,6 +26,8 @@ export const evnSchema = z.object({
   RYSGAL_BANK_PAYMENT_CHECK_PATH: z.coerce.string(),
   RYSGAL_BANK_LOGIN: z.coerce.string(),
   RYSGAL_BANK_PASSWORD: z.coerce.string(),
+  JWT_SECRET: z.coerce.string(),
+  REFRESH_TOKEN_SECRET: z.coerce.string(),
 });
 
 export type Env = z.infer<typeof evnSchema>;

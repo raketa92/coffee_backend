@@ -16,6 +16,12 @@ export const UseCaseErrorMessage = {
   order_not_found: "Order not found",
   shop_not_found: "Shop not found",
   payment_not_found: "Payment not found",
+  register_user_error: "Error registering user",
+  register_anon_user_error: "Error registering anon user",
+  user_not_found: "User not found",
+  wrong_password: "Password or phone is wrong",
+  login_user_error: "Login user error",
+  login_anon_user_error: "Login anon user error",
 };
 
 interface UseCaseErrorParams {

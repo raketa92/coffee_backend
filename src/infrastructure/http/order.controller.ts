@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { CreateOrderUseCase } from "@application/coffee_shop/usecases/order/createOrder";
 import { CreateOrderDto, createOrderSchema } from "./dto/order/createOrderDto";
-import { OrderFilterDto } from "./dto/order/params";
+import { OrderFilterDto } from "./dto/order/filters";
 import { GetOrdersUseCase } from "@/application/coffee_shop/usecases/order/getOrders";
 import { CheckOrderUseCase } from "@/application/coffee_shop/usecases/order/checkOrderStatus";
 
