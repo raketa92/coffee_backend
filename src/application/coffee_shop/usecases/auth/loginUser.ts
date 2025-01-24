@@ -1,17 +1,14 @@
-import * as bcrypt from "bcrypt";
 import { UseCase } from "@/core/UseCase";
 import { UserTokenResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import {
   UseCaseError,
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "../../exception";
 import { IUserRepository } from "@/domain/user/user.repository";
-import { JwtService } from "@nestjs/jwt";
-import { EnvService } from "@/infrastructure/env";
 import { LoginUserDto } from "@/infrastructure/http/dto/user/loginUserDto";
-import { UserMapper } from "@/infrastructure/persistence/kysely/mappers/userMapper";
+import { AuthService } from "@/infrastructure/auth/auth.service";
 
 @Injectable()
 export class LoginUserUseCase
@@ -20,40 +17,26 @@ export class LoginUserUseCase
   constructor(
     @Inject(IUserRepository)
     private readonly userRepository: IUserRepository,
-    private readonly jwtService: JwtService,
-    private readonly configService: EnvService
+    private readonly authService: AuthService
   ) {}
 
   public async execute(request: LoginUserDto): Promise<UserTokenResponseDto> {
     try {
-      const userModel = await this.userRepository.getUserByFilter({
-        phone: request.phone,
-      });
-      if (!userModel) {
-        throw new NotFoundException({
-          message: UseCaseErrorMessage.user_not_found,
-        });
-      }
-
-      const isPasswordValid = await bcrypt.compare(
-        request.password,
-        userModel.password
+      const user = await this.authService.validateUser(
+        request.phone,
+        request.password
       );
-      if (!isPasswordValid) {
+
+      if (!user) {
         throw new UseCaseError({
           code: UseCaseErrorCode.BAD_REQUEST,
           message: UseCaseErrorMessage.wrong_password,
         });
       }
 
-      const user = UserMapper.toDomain(userModel);
-
       const payload = { sub: user.guid.toValue(), phone: user.phone };
-      const accessToken = this.jwtService.sign(payload);
-      const refreshToken = this.jwtService.sign(payload, {
-        secret: this.configService.get("REFRESH_TOKEN_SECRET"),
-        expiresIn: "7d",
-      });
+      const accessToken = this.authService.generateAccessToken(payload);
+      const refreshToken = this.authService.generateRefreshToken(payload);
       user.setRefreshToken(refreshToken);
       await this.userRepository.save(user);
 

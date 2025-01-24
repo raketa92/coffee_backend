@@ -9,6 +9,9 @@ import { PassportModule } from "@nestjs/passport";
 import { UserModule } from "@/domain/user/user.module";
 import { UserService } from "@/domain/user/user.service";
 import { DatabaseModule } from "../persistence/kysely/database.module";
+import { AuthController } from "./auth.controller";
+import { LoginUserUseCase } from "@/application/coffee_shop/usecases/auth/loginUser";
+import { RegisterUserUseCase } from "@/application/coffee_shop/usecases/auth/registerUser";
 
 @Module({
   imports: [
@@ -18,22 +21,26 @@ import { DatabaseModule } from "../persistence/kysely/database.module";
     EnvModule,
     JwtModule.registerAsync({
       imports: [EnvModule],
-      useFactory: async (configService: EnvService) => ({
-        secret: configService.get("JWT_SECRET"),
-        signOptions: {
-          expiresIn: "15m",
-        },
-      }),
+      useFactory: async (configService: EnvService) => {
+        const jwtSecret = configService.get("JWT_SECRET");
+        return {
+          secret: jwtSecret,
+          signOptions: { expiresIn: "5m" },
+        };
+      },
       inject: [EnvService],
     }),
   ],
   providers: [
     JwtStrategy,
     RefreshTokenStrategy,
-    AuthService,
     LocalStrategy,
+    AuthService,
     UserService,
+    RegisterUserUseCase,
+    LoginUserUseCase,
   ],
+  controllers: [AuthController],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -16,11 +16,13 @@ import { GetShopUseCase } from "./usecases/shop/getShop";
 import { CheckOrderUseCase } from "./usecases/order/checkOrderStatus";
 import { LoginUserUseCase } from "./usecases/auth/loginUser";
 import { RegisterUserUseCase } from "./usecases/auth/registerUser";
-import { AuthModule } from "@/infrastructure/auth/auth.module";
 import { JwtService } from "@nestjs/jwt";
+import { AuthService } from "@/infrastructure/auth/auth.service";
+import { UserModule } from "@/domain/user/user.module";
+import { UserService } from "@/domain/user/user.service";
 
 @Module({
-  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, AuthModule],
+  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, UserModule],
   providers: [
     RedisService,
     JwtService,
@@ -34,6 +36,8 @@ import { JwtService } from "@nestjs/jwt";
     GetShopUseCase,
     LoginUserUseCase,
     RegisterUserUseCase,
+    UserService,
+    AuthService,
     {
       provide: IBankService,
       useClass: BankService,

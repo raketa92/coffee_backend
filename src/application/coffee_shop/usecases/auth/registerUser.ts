@@ -1,4 +1,3 @@
-import * as bcrypt from "bcrypt";
 import { UseCase } from "@/core/UseCase";
 import { CreateUserDto } from "@/infrastructure/http/dto/user/createUserDto";
 import { UserTokenResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
@@ -10,8 +9,8 @@ import {
 } from "../../exception";
 import { IUserRepository } from "@/domain/user/user.repository";
 import { User } from "@/domain/user/user.entity";
-import { JwtService } from "@nestjs/jwt";
-import { EnvService } from "@/infrastructure/env";
+import { AuthService } from "@/infrastructure/auth/auth.service";
+import { UserService } from "@/domain/user/user.service";
 
 @Injectable()
 export class RegisterUserUseCase
@@ -20,21 +19,29 @@ export class RegisterUserUseCase
   constructor(
     @Inject(IUserRepository)
     private readonly userRepository: IUserRepository,
-    private readonly jwtService: JwtService,
-    private readonly configService: EnvService
+    private readonly userService: UserService,
+    private readonly authService: AuthService
   ) {}
 
   public async execute(request: CreateUserDto): Promise<UserTokenResponseDto> {
     try {
-      const hashedPassword = await bcrypt.hash(request.password, 10);
+      const userExist = await this.userService.findOne({
+        phone: request.phone,
+      });
+      if (userExist) {
+        throw new UseCaseError({
+          code: UseCaseErrorCode.BAD_REQUEST,
+          message: UseCaseErrorMessage.user_already_exists,
+        });
+      }
+      const hashedPassword = await this.authService.hashPassword(
+        request.password
+      );
       const user = new User({ ...request, password: hashedPassword });
 
       const payload = { sub: user.guid.toValue(), phone: user.phone };
-      const accessToken = this.jwtService.sign(payload);
-      const refreshToken = this.jwtService.sign(payload, {
-        secret: this.configService.get("REFRESH_TOKEN_SECRET"),
-        expiresIn: "7d",
-      });
+      const accessToken = this.authService.generateAccessToken(payload);
+      const refreshToken = this.authService.generateRefreshToken(payload);
       user.setRefreshToken(refreshToken);
       await this.userRepository.save(user);
 

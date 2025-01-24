@@ -1,3 +1,4 @@
+import * as bcrypt from "bcrypt";
 import { Kysely, PostgresDialect } from "kysely";
 import { DatabaseSchema } from "../database.schema";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -111,6 +112,15 @@ const products = [
   },
 ];
 
+const users = [
+  {
+    guid: "0b295934-2291-43de-a292-53e891eae1d1",
+    password: "",
+    phone: "+99364046654",
+    gender: "male",
+  },
+];
+
 const seed = async () => {
   const configService = new ConfigService();
   const db = new Kysely<DatabaseSchema>({
@@ -138,6 +148,12 @@ const seed = async () => {
       console.log("Seeding product");
       await trx.insertInto("Product").values(products).execute();
       console.log("Seeding product done");
+
+      console.log("Seeding user");
+      const password = await bcrypt.hash("qwerty", 10);
+      users[0].password = password;
+      await trx.insertInto("User").values(users).execute();
+      console.log("Seeding user done");
     });
   } catch (error) {
     console.error("Error seeding :", error);
