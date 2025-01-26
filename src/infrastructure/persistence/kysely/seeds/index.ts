@@ -3,6 +3,7 @@ import { Kysely, PostgresDialect } from "kysely";
 import { DatabaseSchema } from "../database.schema";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Pool } from "pg";
+import { Roles } from "@/core/constants/roles";
 
 ConfigModule.forRoot({
   envFilePath: ".env",
@@ -118,6 +119,7 @@ const users = [
     password: "",
     phone: "+99364046654",
     gender: "male",
+    roles: [Roles.user],
   },
 ];
 

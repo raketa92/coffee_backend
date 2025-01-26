@@ -1,4 +1,4 @@
-import { Kysely } from "kysely";
+import { Kysely, sql } from "kysely";
 import { withTimestamps } from "../helpers/dateColumns";
 
 const tableName = "User";
@@ -14,6 +14,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("firstName", "varchar(30)")
     .addColumn("lastName", "varchar(30)")
     .addColumn("gender", "varchar(20)", (col) => col.notNull())
+    .addColumn("roles", sql`text[]`, (col) => col.notNull())
     .addColumn("refreshToken", "text")
     .$call(withTimestamps)
     .execute();

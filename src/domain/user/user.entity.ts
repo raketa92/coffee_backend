@@ -9,6 +9,7 @@ export interface IUserProps {
   firstName?: string | null;
   lastName?: string | null;
   gender: string;
+  roles: string[];
 }
 
 export class User extends AggregateRoot<IUserProps> {
@@ -19,6 +20,7 @@ export class User extends AggregateRoot<IUserProps> {
   private _firstName?: string | null;
   private _lastName?: string | null;
   private _gender: string;
+  private _roles: string[];
   private _refreshToken?: string | null;
   private _changedFields: Set<keyof User> = new Set();
 
@@ -31,6 +33,7 @@ export class User extends AggregateRoot<IUserProps> {
     this._firstName = props.firstName;
     this._lastName = props.lastName;
     this._gender = props.gender;
+    this._roles = props.roles;
   }
 
   private addChangedFields(field: keyof User) {
@@ -56,6 +59,7 @@ export class User extends AggregateRoot<IUserProps> {
       firstName: this._firstName,
       lastName: this._lastName,
       gender: this._gender,
+      roles: this._roles,
     };
   }
 
@@ -93,6 +97,10 @@ export class User extends AggregateRoot<IUserProps> {
 
   get gender(): string {
     return this._gender;
+  }
+
+  get roles(): string[] {
+    return this._roles;
   }
 
   get changedFields(): string[] {

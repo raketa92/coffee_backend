@@ -11,6 +11,7 @@ import {
   UseCaseErrorMessage,
 } from "@/application/coffee_shop/exception";
 import { AuthService } from "@/infrastructure/auth/auth.service";
+import { Roles } from "@/core/constants/roles";
 
 jest.mock("bcrypt", () => ({
   compare: jest.fn(),
@@ -104,6 +105,7 @@ describe("Login user use case", () => {
       firstName: "some_first_name",
       lastName: "some_last_name",
       gender: "male",
+      roles: [Roles.user],
       refreshToken: "old_refreshToken",
       createdAt: new Date(),
       updatedAt: new Date(),

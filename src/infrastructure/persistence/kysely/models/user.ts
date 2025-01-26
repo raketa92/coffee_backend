@@ -9,6 +9,7 @@ export interface UserTable {
   firstName: string | null;
   lastName: string | null;
   gender: string;
+  roles: string[];
   refreshToken: string | null;
   createdAt: Generated<Date>;
   updatedAt: Generated<Date>;

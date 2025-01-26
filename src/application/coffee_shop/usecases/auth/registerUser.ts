@@ -11,6 +11,7 @@ import { IUserRepository } from "@/domain/user/user.repository";
 import { User } from "@/domain/user/user.entity";
 import { AuthService } from "@/infrastructure/auth/auth.service";
 import { UserService } from "@/domain/user/user.service";
+import { Roles } from "@/core/constants/roles";
 
 @Injectable()
 export class RegisterUserUseCase
@@ -37,7 +38,11 @@ export class RegisterUserUseCase
       const hashedPassword = await this.authService.hashPassword(
         request.password
       );
-      const user = new User({ ...request, password: hashedPassword });
+      const user = new User({
+        ...request,
+        roles: [Roles.user],
+        password: hashedPassword,
+      });
 
       const payload = { sub: user.guid.toValue(), phone: user.phone };
       const accessToken = this.authService.generateAccessToken(payload);

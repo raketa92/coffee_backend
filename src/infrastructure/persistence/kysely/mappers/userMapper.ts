@@ -13,6 +13,7 @@ export class UserMapper {
         gender: userModel.gender,
         password: userModel.password,
         email: userModel.email,
+        roles: userModel.roles,
       },
       new UniqueEntityID(userModel.guid)
     );
@@ -28,6 +29,7 @@ export class UserMapper {
       password: user.password,
       gender: user.gender,
       email: user.email,
+      roles: user.roles,
       refreshToken: user.refreshToken,
     };
 

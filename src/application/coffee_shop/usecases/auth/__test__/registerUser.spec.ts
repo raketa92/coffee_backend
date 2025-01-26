@@ -10,6 +10,7 @@ import {
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "@/application/coffee_shop/exception";
+import { Roles } from "@/core/constants/roles";
 
 jest.mock("bcrypt", () => ({
   hash: jest.fn(),
@@ -89,7 +90,11 @@ describe("Register user use case", () => {
       email: "cp@kkk.com",
     };
     const hashedPassword = "mocked_hashed_password";
-    const user = new User({ ...createUserDto, password: hashedPassword });
+    const user = new User({
+      ...createUserDto,
+      roles: [Roles.user],
+      password: hashedPassword,
+    });
     (userService.findOne as jest.Mock).mockResolvedValue(user);
 
     await expect(useCase.execute(createUserDto)).rejects.toThrow(
@@ -122,7 +127,11 @@ describe("Register user use case", () => {
       refreshToken
     );
 
-    const user = new User({ ...createUserDto, password: hashedPassword });
+    const user = new User({
+      ...createUserDto,
+      roles: [Roles.user],
+      password: hashedPassword,
+    });
     const payload = {
       sub: "8524994a-58c6-4b12-a965-80693a7b9803",
       phone: user.phone,
