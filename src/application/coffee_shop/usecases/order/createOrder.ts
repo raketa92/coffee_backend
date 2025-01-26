@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { randomUUID } from "crypto";
 import { UseCase } from "@core/UseCase";
 import { IOrderRepository } from "@/domain/order/repository/orderRepository";
 import { CreateOrderDto } from "@/infrastructure/http/dto/order/createOrderDto";
@@ -50,11 +51,16 @@ export class CreateOrderUseCase
     try {
       const orderNumber = await this.redisService.generateOrderNumber();
       let formUrl: string | undefined;
+      const orderGuid = randomUUID();
 
       const createdOrder = await this.kysely
         .transaction()
         .execute(async (trx) => {
-          const newOrder = await this.createOrderEntity(request, orderNumber);
+          const newOrder = await this.createOrderEntity(
+            request,
+            orderGuid,
+            orderNumber
+          );
           await this.orderRepository.save(newOrder, trx);
 
           if (request.paymentMethod === PaymentMethods.card) {
@@ -65,6 +71,7 @@ export class CreateOrderUseCase
         });
 
       const response: CreateOrderResponseDto = {
+        guid: orderGuid,
         orderNumber,
         status: createdOrder.status,
         totalPrice: createdOrder.totalPrice,
@@ -111,6 +118,7 @@ export class CreateOrderUseCase
 
   private async createOrderEntity(
     request: CreateOrderDto,
+    orderGuid: string,
     orderNumber: string
   ) {
     const userId = request.userGuid
@@ -146,17 +154,20 @@ export class CreateOrderUseCase
       });
     });
 
-    const newOrder = new Order({
-      orderNumber,
-      userGuid: userId,
-      shopGuid: shopId,
-      phone: request.phone,
-      address: request.address,
-      totalPrice: request.totalPrice,
-      status,
-      paymentMethod: request.paymentMethod,
-      orderItems: orderProducts,
-    });
+    const newOrder = new Order(
+      {
+        orderNumber,
+        userGuid: userId,
+        shopGuid: shopId,
+        phone: request.phone,
+        address: request.address,
+        totalPrice: request.totalPrice,
+        status,
+        paymentMethod: request.paymentMethod,
+        orderItems: orderProducts,
+      },
+      new UniqueEntityID(orderGuid)
+    );
     return newOrder;
   }
 }

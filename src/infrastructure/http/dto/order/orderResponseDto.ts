@@ -13,6 +13,7 @@ type OrderItem = {
 };
 
 export type OrderResponseDto = {
+  guid: string;
   orderNumber: string;
   status: OrderStatus;
   shopName: string;

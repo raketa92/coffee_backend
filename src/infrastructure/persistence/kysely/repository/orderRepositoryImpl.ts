@@ -27,7 +27,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
       .innerJoin("Shop", "Shop.guid", "Order.shopGuid")
       .selectAll("Order")
       .select(["Shop.name as shopName", "Shop.rating as shopRating"])
-      .where("guid", "=", orderGuid)
+      .where("Order.guid", "=", orderGuid)
       .select((oi) =>
         jsonArrayFrom(
           oi
@@ -81,7 +81,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
       query = query.where("guid", "in", filter.orderGuids);
     }
 
-    const orders: OrderModelFull[] = await query.selectAll().execute();
+    const orders: OrderModelFull[] = await query.execute();
     return orders;
   }
   async save(

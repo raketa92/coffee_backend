@@ -21,6 +21,7 @@ export class GetOrdersUseCase
     }
 
     const response: OrderResponseDto[] = orders.map((item) => ({
+      guid: item.guid,
       orderNumber: item.orderNumber,
       status: item.status,
       shopName: item.shopName,
