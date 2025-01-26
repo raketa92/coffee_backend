@@ -11,7 +11,7 @@ export interface IOrderRepository {
     transaction?: Transaction<DatabaseSchema>
   ): Promise<void>;
   getOrders(filter?: OrderFilterDto): Promise<OrderModelFull[] | null>;
-  getOrder(orderNumber: string): Promise<OrderModelFull | null>;
+  getOrder(orderGuid: string): Promise<OrderModelFull | null>;
 }
 
 export const IOrderRepository = Symbol("IOrderRepository");

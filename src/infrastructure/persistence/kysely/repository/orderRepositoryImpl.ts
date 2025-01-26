@@ -21,13 +21,13 @@ export class OrderRepositoryImpl implements IOrderRepository {
     @Inject("DB_CONNECTION")
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}
-  async getOrder(orderNumber: string): Promise<OrderModelFull | null> {
+  async getOrder(orderGuid: string): Promise<OrderModelFull | null> {
     const query = this.kysely
       .selectFrom("Order")
       .innerJoin("Shop", "Shop.guid", "Order.shopGuid")
       .selectAll("Order")
       .select(["Shop.name as shopName", "Shop.rating as shopRating"])
-      .where("orderNumber", "=", orderNumber)
+      .where("guid", "=", orderGuid)
       .select((oi) =>
         jsonArrayFrom(
           oi
@@ -75,6 +75,10 @@ export class OrderRepositoryImpl implements IOrderRepository {
 
     if (filter?.orderNumbers) {
       query = query.where("orderNumber", "in", filter.orderNumbers);
+    }
+
+    if (filter?.orderGuids) {
+      query = query.where("guid", "in", filter.orderGuids);
     }
 
     const orders: OrderModelFull[] = await query.selectAll().execute();

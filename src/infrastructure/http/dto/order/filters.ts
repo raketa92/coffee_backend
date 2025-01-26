@@ -7,4 +7,9 @@ export class OrderFilterDto {
   @IsString({ each: true })
   @Transform(({ value }) => value.split(","))
   orderNumbers?: string;
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @Transform(({ value }) => value.split(","))
+  orderGuids?: string;
 }

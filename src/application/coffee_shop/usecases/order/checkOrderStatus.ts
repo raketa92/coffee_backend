@@ -31,9 +31,9 @@ export class CheckOrderUseCase
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}
 
-  public async execute(orderNumber: string): Promise<CheckOrderResponseDto> {
+  public async execute(orderGuid: string): Promise<CheckOrderResponseDto> {
     try {
-      const orderModel = await this.orderRepisitory.getOrder(orderNumber);
+      const orderModel = await this.orderRepisitory.getOrder(orderGuid);
       if (!orderModel) {
         throw new NotFoundException({
           message: UseCaseErrorMessage.order_not_found,
