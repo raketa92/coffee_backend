@@ -26,6 +26,12 @@ export class OrderController {
     return response;
   }
 
+  @Get("/guid")
+  async getOrdersByGuid(@Query() filter: OrderFilterDto) {
+    const response = await this.getOrdersUseCase.execute(filter);
+    return response;
+  }
+
   @Get("/status/:orderGuid")
   async checkOrderStatus(@Param("orderGuid") orderGuid: any) {
     const response = await this.checkOrderStatusUseCase.execute(orderGuid);

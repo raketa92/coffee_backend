@@ -78,7 +78,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
     }
 
     if (filter?.orderGuids) {
-      query = query.where("guid", "in", filter.orderGuids);
+      query = query.where("Order.guid", "in", filter.orderGuids);
     }
 
     const orders: OrderModelFull[] = await query.execute();

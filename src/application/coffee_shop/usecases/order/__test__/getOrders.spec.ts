@@ -110,6 +110,7 @@ describe("Get orders use case", () => {
 
     const expectedResponse = [
       {
+        guid: mockOrders[0].guid,
         orderNumber: mockOrders[0].orderNumber,
         status: mockOrders[0].status,
         shopName: mockOrders[0].shopName,
@@ -132,6 +133,7 @@ describe("Get orders use case", () => {
         ],
       },
       {
+        guid: mockOrders[1].guid,
         orderNumber: mockOrders[1].orderNumber,
         status: mockOrders[1].status,
         shopName: mockOrders[0].shopName,
