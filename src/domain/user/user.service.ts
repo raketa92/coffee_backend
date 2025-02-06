@@ -3,6 +3,8 @@ import { User } from "./user.entity";
 import { IUserRepository } from "./user.repository";
 import { UserMapper } from "@/infrastructure/persistence/kysely/mappers/userMapper";
 import { UserFiltersDto } from "@/infrastructure/http/dto/user/filters";
+import { Transaction } from "kysely";
+import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
 
 @Injectable()
 export class UserService {
@@ -18,5 +20,22 @@ export class UserService {
     }
     const user = UserMapper.toDomain(userModel);
     return user;
+  }
+
+  async findUserByRefreshToken(refreshToken: string): Promise<User | null> {
+    const userModel =
+      await this.userRepository.getUserByRefreshToken(refreshToken);
+    if (!userModel) {
+      return null;
+    }
+    const user = UserMapper.toDomain(userModel);
+    return user;
+  }
+
+  async save(
+    user: User,
+    transaction?: Transaction<DatabaseSchema>
+  ): Promise<void> {
+    await this.userRepository.save(user, transaction);
   }
 }

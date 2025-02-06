@@ -102,6 +102,21 @@ export class UserRepositoryImpl implements IUserRepository {
     return userModel;
   }
 
+  async getUserByRefreshToken(refreshToken: string): Promise<UserModel | null> {
+    const query = this.kysely
+      .selectFrom("User")
+      .selectAll("User")
+      .where("User.refreshToken", "=", refreshToken);
+
+    const userModel = await query.executeTakeFirst();
+
+    if (!userModel) {
+      return null;
+    }
+
+    return userModel;
+  }
+
   async updateRefreshToken(
     userGuid: string,
     refreshToken: string

@@ -15,6 +15,8 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("lastName", "varchar(30)")
     .addColumn("gender", "varchar(20)", (col) => col.notNull())
     .addColumn("roles", sql`text[]`, (col) => col.notNull())
+    .addColumn("isVerified", "boolean", (col) => col.defaultTo(false).notNull())
+    .addColumn("isActive", "boolean", (col) => col.defaultTo(false).notNull())
     .addColumn("refreshToken", "text")
     .$call(withTimestamps)
     .execute();

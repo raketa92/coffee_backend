@@ -1,9 +1,10 @@
 import * as bcrypt from "bcrypt";
 import { UserService } from "@/domain/user/user.service";
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "@/domain/user/user.entity";
 import { JwtService } from "@nestjs/jwt";
 import { EnvService } from "../env";
+import { UserTokenResponseDto } from "../http/dto/user/userTokenResponseDto";
 
 @Injectable()
 export class AuthService {
@@ -37,5 +38,25 @@ export class AuthService {
 
   async hashPassword(password: string): Promise<string> {
     return await bcrypt.hash(password, 10);
+  }
+
+  async refreshToken(refreshToken: string): Promise<UserTokenResponseDto> {
+    try {
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get("REFRESH_TOKEN_SECRET"),
+      });
+      const user = await this.userService.findUserByRefreshToken(refreshToken);
+      if (!user) {
+        throw new UnauthorizedException({ message: "Invalid refresh token" });
+      }
+      const newAccessToken = this.generateAccessToken(payload);
+      const newRefreshToken = this.generateRefreshToken(payload);
+      user.setRefreshToken(newRefreshToken);
+      await this.userService.save(user);
+
+      return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+    } catch (error: any) {
+      throw error;
+    }
   }
 }

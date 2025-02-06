@@ -1,5 +1,8 @@
 import { UseCase } from "@/core/UseCase";
-import { UserTokenResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
+import {
+  AuthResponseDto,
+  UserTokenResponseDto,
+} from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { Inject, Injectable } from "@nestjs/common";
 import {
   UseCaseError,
@@ -40,7 +43,24 @@ export class LoginUserUseCase
       user.setRefreshToken(refreshToken);
       await this.userRepository.save(user);
 
-      return { accessToken, refreshToken };
+      const userDetails: AuthResponseDto = {
+        accessToken,
+        refreshToken,
+        user: {
+          guid: user.guid.toValue(),
+          email: user.email,
+          phone: user.phone,
+          gender: user.gender,
+          role: user.roles[0],
+          isVerified: user.isVerified,
+          isActive: user.isActive,
+          userName: user.userName,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+      };
+
+      return userDetails;
     } catch (error: any) {
       throw new UseCaseError({
         code: UseCaseErrorCode.BAD_REQUEST,

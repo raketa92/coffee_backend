@@ -10,6 +10,8 @@ export interface UserTable {
   lastName: string | null;
   gender: string;
   roles: string[];
+  isVerified: boolean;
+  isActive: boolean;
   refreshToken: string | null;
   createdAt: Generated<Date>;
   updatedAt: Generated<Date>;

@@ -37,3 +37,7 @@ export enum Stages {
   dev = "dev",
   prod = "prod",
 }
+
+export const ResponseMessages = {
+  success: "success",
+};

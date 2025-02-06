@@ -1,5 +1,6 @@
 import * as bcrypt from "bcrypt";
 import { Kysely, PostgresDialect } from "kysely";
+import { JwtService } from "@nestjs/jwt";
 import { DatabaseSchema } from "../database.schema";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Pool } from "pg";
@@ -117,9 +118,12 @@ const users = [
   {
     guid: "0b295934-2291-43de-a292-53e891eae1d1",
     password: "",
+    refreshToken: "",
     phone: "+99364046654",
     gender: "male",
     roles: [Roles.user],
+    isActive: true,
+    isVerified: true,
   },
 ];
 
@@ -154,6 +158,13 @@ const seed = async () => {
       console.log("Seeding user");
       const password = await bcrypt.hash("qwerty", 10);
       users[0].password = password;
+      const payload = { sub: users[0].guid, phone: users[0].phone };
+      const jwtService = new JwtService();
+      const refreshToken = jwtService.sign(payload, {
+        secret: configService.get("REFRESH_TOKEN_SECRET"),
+        expiresIn: "7d",
+      });
+      users[0].refreshToken = refreshToken;
       await trx.insertInto("User").values(users).execute();
       console.log("Seeding user done");
     });

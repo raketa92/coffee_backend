@@ -11,6 +11,7 @@ import {
   UseCaseErrorMessage,
 } from "@/application/coffee_shop/exception";
 import { Roles } from "@/core/constants/roles";
+import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 
 jest.mock("bcrypt", () => ({
   hash: jest.fn(),
@@ -94,6 +95,8 @@ describe("Register user use case", () => {
       ...createUserDto,
       roles: [Roles.user],
       password: hashedPassword,
+      isActive: true,
+      isVerified: false,
     });
     (userService.findOne as jest.Mock).mockResolvedValue(user);
 
@@ -131,6 +134,8 @@ describe("Register user use case", () => {
       ...createUserDto,
       roles: [Roles.user],
       password: hashedPassword,
+      isActive: true,
+      isVerified: false,
     });
     const payload = {
       sub: "8524994a-58c6-4b12-a965-80693a7b9803",
@@ -156,6 +161,22 @@ describe("Register user use case", () => {
         refreshToken,
       })
     );
-    expect(result).toEqual({ accessToken, refreshToken });
+    const userDetails: AuthResponseDto = {
+      accessToken,
+      refreshToken,
+      user: {
+        guid: user.guid.toValue(),
+        email: user.email,
+        phone: user.phone,
+        gender: user.gender,
+        role: user.roles[0],
+        isVerified: user.isVerified,
+        isActive: user.isActive,
+        userName: user.userName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    };
+    expect(result).toEqual(userDetails);
   });
 });

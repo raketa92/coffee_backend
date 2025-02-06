@@ -1,6 +1,9 @@
 import { UseCase } from "@/core/UseCase";
 import { CreateUserDto } from "@/infrastructure/http/dto/user/createUserDto";
-import { UserTokenResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
+import {
+  AuthResponseDto,
+  UserTokenResponseDto,
+} from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { Inject, Injectable } from "@nestjs/common";
 import {
   UseCaseError,
@@ -24,7 +27,7 @@ export class RegisterUserUseCase
     private readonly authService: AuthService
   ) {}
 
-  public async execute(request: CreateUserDto): Promise<UserTokenResponseDto> {
+  public async execute(request: CreateUserDto): Promise<AuthResponseDto> {
     try {
       const userExist = await this.userService.findOne({
         phone: request.phone,
@@ -42,6 +45,8 @@ export class RegisterUserUseCase
         ...request,
         roles: [Roles.user],
         password: hashedPassword,
+        isActive: true,
+        isVerified: false,
       });
 
       const payload = { sub: user.guid.toValue(), phone: user.phone };
@@ -50,7 +55,24 @@ export class RegisterUserUseCase
       user.setRefreshToken(refreshToken);
       await this.userRepository.save(user);
 
-      return { accessToken, refreshToken };
+      const userDetails: AuthResponseDto = {
+        accessToken,
+        refreshToken,
+        user: {
+          guid: user.guid.toValue(),
+          email: user.email,
+          phone: user.phone,
+          gender: user.gender,
+          role: user.roles[0],
+          isVerified: user.isVerified,
+          isActive: user.isActive,
+          userName: user.userName,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+      };
+
+      return userDetails;
     } catch (error: any) {
       throw new UseCaseError({
         code: UseCaseErrorCode.BAD_REQUEST,

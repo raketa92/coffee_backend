@@ -6,6 +6,7 @@ import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.sch
 
 export interface IUserRepository {
   getUserByFilter(filter: UserFiltersDto): Promise<UserModel | null>;
+  getUserByRefreshToken(refreshToken: string): Promise<UserModel | null>;
   updateRefreshToken(userGuid: string, refreshToken: string): Promise<void>;
   save(user: User, transaction?: Transaction<DatabaseSchema>): Promise<void>;
 }

@@ -26,7 +26,7 @@ export class OrderController {
     return response;
   }
 
-  @Get("/guid")
+  @Get("/guids")
   async getOrdersByGuid(@Query() filter: OrderFilterDto) {
     const response = await this.getOrdersUseCase.execute(filter);
     return response;
