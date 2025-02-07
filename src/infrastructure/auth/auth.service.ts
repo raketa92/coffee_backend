@@ -49,8 +49,14 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException({ message: "Invalid refresh token" });
       }
-      const newAccessToken = this.generateAccessToken(payload);
-      const newRefreshToken = this.generateRefreshToken(payload);
+      const newAccessToken = this.generateAccessToken({
+        phone: payload.phone,
+        sub: payload.sub,
+      });
+      const newRefreshToken = this.generateRefreshToken({
+        phone: payload.phone,
+        sub: payload.sub,
+      });
       user.setRefreshToken(newRefreshToken);
       await this.userService.save(user);
 

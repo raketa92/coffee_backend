@@ -1,4 +1,11 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+} from "@nestjs/common";
 import {
   CreateUserDto,
   createUserSchema,
@@ -6,9 +13,10 @@ import {
 import { LoginUserDto, loginUserSchema } from "../http/dto/user/loginUserDto";
 import { LoginUserUseCase } from "@/application/coffee_shop/usecases/auth/loginUser";
 import { RegisterUserUseCase } from "@/application/coffee_shop/usecases/auth/registerUser";
-import { UserTokenDto, userTokenSchema } from "../http/dto/user/logoutUserDto";
 import { LogoutUserUseCase } from "@/application/coffee_shop/usecases/auth/logoutUser";
 import { RefreshTokenUseCase } from "@/application/coffee_shop/usecases/auth/refreshToken";
+import { Request } from "express";
+import { JwtRefreshAuthGuard } from "./guards/jwt-refresh-auth.guard";
 
 @Controller("/auth")
 export class AuthController {
@@ -34,16 +42,26 @@ export class AuthController {
   }
 
   @Post("/logout")
-  async logout(@Body() userTokenDto: UserTokenDto) {
-    const body = userTokenSchema.parse(userTokenDto);
-    const response = await this.logoutUserUseCase.execute(body);
+  @UseGuards(JwtRefreshAuthGuard)
+  async logout(@Req() req: Request) {
+    const user = req.user;
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException("No refresh token found.");
+    }
+    const refreshToken = user.refreshToken;
+    const response = await this.logoutUserUseCase.execute({ refreshToken });
     return response;
   }
 
   @Post("/refresh-token")
-  async refreshToken(@Body() userTokenDto: UserTokenDto) {
-    const body = userTokenSchema.parse(userTokenDto);
-    const response = await this.refreshTokenUseCase.execute(body);
+  @UseGuards(JwtRefreshAuthGuard)
+  async refreshToken(@Req() req: Request) {
+    const user = req.user;
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException("No refresh token found.");
+    }
+    const refreshToken = user.refreshToken;
+    const response = await this.refreshTokenUseCase.execute({ refreshToken });
     return response;
   }
 }

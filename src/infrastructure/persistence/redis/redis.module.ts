@@ -11,11 +11,11 @@ import { EnvModule, EnvService } from "@infrastructure/env";
       useFactory: (configService: EnvService) => {
         const redisHost = configService.get("REDIS_HOST");
         const redisPort = configService.get("REDIS_PORT");
-        const redisPassword = configService.get("REDIS_PASSWORD");
+        // const redisPassword = configService.get("REDIS_PASSWORD");
         return new Redis({
           host: redisHost,
           port: redisPort,
-          password: redisPassword,
+          // password: redisPassword,
         });
       },
       inject: [EnvService],

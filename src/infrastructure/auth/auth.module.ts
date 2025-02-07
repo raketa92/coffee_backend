@@ -12,6 +12,8 @@ import { DatabaseModule } from "../persistence/kysely/database.module";
 import { AuthController } from "./auth.controller";
 import { LoginUserUseCase } from "@/application/coffee_shop/usecases/auth/loginUser";
 import { RegisterUserUseCase } from "@/application/coffee_shop/usecases/auth/registerUser";
+import { LogoutUserUseCase } from "@/application/coffee_shop/usecases/auth/logoutUser";
+import { RefreshTokenUseCase } from "@/application/coffee_shop/usecases/auth/refreshToken";
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { RegisterUserUseCase } from "@/application/coffee_shop/usecases/auth/reg
     UserService,
     RegisterUserUseCase,
     LoginUserUseCase,
+    LogoutUserUseCase,
+    RefreshTokenUseCase,
   ],
   controllers: [AuthController],
   exports: [AuthService],
