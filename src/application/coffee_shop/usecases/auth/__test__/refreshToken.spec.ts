@@ -1,15 +1,15 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { UserMapper } from "@/infrastructure/persistence/kysely/mappers/userMapper";
-import { AuthService } from "@/infrastructure/auth/auth.service";
 import { Roles } from "@/core/constants/roles";
 import { RefreshTokenUseCase } from "../refreshToken";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
-import { UnauthorizedException } from "@nestjs/common";
+import { NotFoundException } from "@nestjs/common";
 import { UserService } from "@/domain/user/user.service";
-import { IUserRepository } from "@/domain/user/user.repository";
 import { JwtService } from "@nestjs/jwt";
 import { EnvService } from "@/infrastructure/env";
+import { IAuthService } from "@/application/coffee_shop/ports/IAuthService";
+import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
 
 jest.mock("@/domain/user/user.entity", () => {
   const ActualUser = jest.requireActual("@/domain/user/user.entity").User;
@@ -28,14 +28,19 @@ jest.mock("@/domain/user/user.entity", () => {
 
 describe("Refresh token use case", () => {
   let useCase: RefreshTokenUseCase;
-  let authService: AuthService;
+  let authService: IAuthService;
   let userService: UserService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RefreshTokenUseCase,
-        AuthService,
+        {
+          provide: IAuthService,
+          useValue: {
+            refreshToken: jest.fn(),
+          },
+        },
         {
           provide: EnvService,
           useValue: {
@@ -46,7 +51,7 @@ describe("Refresh token use case", () => {
           provide: JwtService,
           useValue: {
             verify: jest.fn().mockImplementation((token) => {
-              if (token === "sometoken") {
+              if (token === "mock_refresh_token") {
                 return {
                   sub: "8524994a-58c6-4b12-a965-80693a7b9803",
                   phone: "393939",
@@ -54,13 +59,7 @@ describe("Refresh token use case", () => {
               }
               throw new Error("Invalid token");
             }),
-          },
-        },
-        {
-          provide: IUserRepository,
-          useValue: {
-            save: jest.fn(),
-            getUserByFilter: jest.fn(),
+            sign: jest.fn().mockReturnValue("mocked_token"),
           },
         },
         {
@@ -74,7 +73,7 @@ describe("Refresh token use case", () => {
     }).compile();
 
     useCase = module.get<RefreshTokenUseCase>(RefreshTokenUseCase);
-    authService = module.get<AuthService>(AuthService);
+    authService = module.get<IAuthService>(IAuthService);
     userService = module.get<UserService>(UserService);
   });
 
@@ -93,7 +92,7 @@ describe("Refresh token use case", () => {
       refreshToken: "sometoken",
     };
     await expect(useCase.execute(loginUserDto)).rejects.toThrow(
-      new UnauthorizedException("Invalid refresh token")
+      new NotFoundException({ message: UseCaseErrorMessage.user_not_found })
     );
   });
 
@@ -124,19 +123,15 @@ describe("Refresh token use case", () => {
 
     const user = UserMapper.toDomain(userModel);
     (userService.findUserByRefreshToken as jest.Mock).mockResolvedValue(user);
-    jest.spyOn(authService, "generateAccessToken").mockReturnValue(accessToken);
-    jest
-      .spyOn(authService, "generateRefreshToken")
-      .mockReturnValue(refreshToken);
-
-    const payload = {
-      sub: "8524994a-58c6-4b12-a965-80693a7b9803",
-      phone: user.phone,
-    };
+    jest.spyOn(authService, "refreshToken").mockResolvedValue({
+      accessToken,
+      refreshToken,
+    });
     const result = await useCase.execute(tokenDto);
 
-    expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
-    expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
+    expect(authService.refreshToken).toHaveBeenCalledWith(
+      tokenDto.refreshToken
+    );
     user.setRefreshToken(refreshToken);
     expect(userService.save).toHaveBeenCalledWith(
       expect.objectContaining({

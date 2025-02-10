@@ -1,5 +1,4 @@
 import * as bcrypt from "bcrypt";
-import { IUserRepository } from "@/domain/user/user.repository";
 import { Test, TestingModule } from "@nestjs/testing";
 import { LoginUserDto } from "@/infrastructure/http/dto/user/loginUserDto";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
@@ -10,9 +9,11 @@ import {
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "@/application/coffee_shop/exception";
-import { AuthService } from "@/infrastructure/auth/auth.service";
 import { Roles } from "@/core/constants/roles";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
+import { IAuthService } from "@/application/coffee_shop/ports/IAuthService";
+import { UserService } from "@/domain/user/user.service";
+import { NotFoundException } from "@nestjs/common";
 
 jest.mock("bcrypt", () => ({
   compare: jest.fn(),
@@ -35,22 +36,23 @@ jest.mock("@/domain/user/user.entity", () => {
 
 describe("Login user use case", () => {
   let useCase: LoginUserUseCase;
-  let userRepository: IUserRepository;
-  let authService: AuthService;
+  let authService: IAuthService;
+  let userService: UserService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LoginUserUseCase,
         {
-          provide: IUserRepository,
+          provide: UserService,
           useValue: {
+            findOne: jest.fn(),
+            findUserByRefreshToken: jest.fn(),
             save: jest.fn(),
-            getUserByFilter: jest.fn(),
           },
         },
         {
-          provide: AuthService,
+          provide: IAuthService,
           useValue: {
             validateUser: jest.fn(),
             generateAccessToken: jest.fn(),
@@ -61,8 +63,8 @@ describe("Login user use case", () => {
     }).compile();
 
     useCase = module.get<LoginUserUseCase>(LoginUserUseCase);
-    userRepository = module.get<IUserRepository>(IUserRepository);
-    authService = module.get<AuthService>(AuthService);
+    authService = module.get<IAuthService>(IAuthService);
+    userService = module.get<UserService>(UserService);
   });
 
   beforeEach(() => {
@@ -74,7 +76,21 @@ describe("Login user use case", () => {
   });
 
   it("should throw error if user not found", async () => {
-    (authService.validateUser as jest.Mock).mockResolvedValue(null);
+    (userService.findOne as jest.Mock).mockResolvedValue(null);
+    const loginUserDto: LoginUserDto = {
+      password: "qwerty",
+      phone: "+99364123123",
+    };
+    await expect(useCase.execute(loginUserDto)).rejects.toThrow(
+      new NotFoundException({
+        message: UseCaseErrorMessage.user_not_found,
+      })
+    );
+  });
+
+  it("should throw error if password is wrong", async () => {
+    (userService.findOne as jest.Mock).mockResolvedValue(true);
+    (authService.validateUser as jest.Mock).mockResolvedValue(false);
     const loginUserDto: LoginUserDto = {
       password: "qwerty",
       phone: "+99364123123",
@@ -85,7 +101,6 @@ describe("Login user use case", () => {
         message: UseCaseErrorMessage.wrong_password,
       })
     );
-    expect(authService.validateUser).toHaveBeenCalled();
   });
 
   it("should login user", async () => {
@@ -115,7 +130,8 @@ describe("Login user use case", () => {
     };
 
     const user = UserMapper.toDomain(userModel);
-    (authService.validateUser as jest.Mock).mockResolvedValue(user);
+    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (authService.validateUser as jest.Mock).mockResolvedValue(true);
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
     (authService.generateAccessToken as jest.Mock).mockReturnValue(accessToken);
     (authService.generateRefreshToken as jest.Mock).mockReturnValue(
@@ -131,7 +147,7 @@ describe("Login user use case", () => {
     expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
     expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
     user.setRefreshToken(refreshToken);
-    expect(userRepository.save).toHaveBeenCalledWith(
+    expect(userService.save).toHaveBeenCalledWith(
       expect.objectContaining({
         password: hashedPassword,
         phone: userModel.phone,

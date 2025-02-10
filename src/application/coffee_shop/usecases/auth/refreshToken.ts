@@ -1,28 +1,41 @@
 import { UseCase } from "@/core/UseCase";
 import { UserTokenResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import {
   UseCaseError,
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "../../exception";
-import { AuthService } from "@/infrastructure/auth/auth.service";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
+import { IAuthService } from "../../ports/IAuthService";
+import { UserService } from "@/domain/user/user.service";
 
 @Injectable()
 export class RefreshTokenUseCase
   implements UseCase<UserTokenDto, UserTokenResponseDto>
 {
   constructor(
-    @Inject(AuthService)
-    private readonly authService: AuthService
+    @Inject(IAuthService)
+    private readonly authService: IAuthService,
+    private readonly userservice: UserService
   ) {}
 
   public async execute(request: UserTokenDto): Promise<UserTokenResponseDto> {
     try {
+      const user = await this.userservice.findUserByRefreshToken(
+        request.refreshToken
+      );
+
+      if (!user) {
+        throw new NotFoundException({
+          message: UseCaseErrorMessage.user_not_found,
+        });
+      }
       const newTokens = await this.authService.refreshToken(
         request.refreshToken
       );
+      user.setRefreshToken(newTokens.refreshToken);
+      this.userservice.save(user);
 
       return newTokens;
     } catch (error: any) {

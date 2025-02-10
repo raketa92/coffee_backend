@@ -3,7 +3,6 @@ import { JwtModule } from "@nestjs/jwt";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { RefreshTokenStrategy } from "./strategies/refreshToken.strategy";
 import { EnvModule, EnvService } from "../env";
-import { AuthService } from "./auth.service";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { PassportModule } from "@nestjs/passport";
 import { UserModule } from "@/domain/user/user.module";
@@ -14,6 +13,7 @@ import { LoginUserUseCase } from "@/application/coffee_shop/usecases/auth/loginU
 import { RegisterUserUseCase } from "@/application/coffee_shop/usecases/auth/registerUser";
 import { LogoutUserUseCase } from "@/application/coffee_shop/usecases/auth/logoutUser";
 import { RefreshTokenUseCase } from "@/application/coffee_shop/usecases/auth/refreshToken";
+import { AuthServiceImpl } from "./auth.service";
 
 @Module({
   imports: [
@@ -37,14 +37,14 @@ import { RefreshTokenUseCase } from "@/application/coffee_shop/usecases/auth/ref
     JwtStrategy,
     RefreshTokenStrategy,
     LocalStrategy,
-    AuthService,
     UserService,
     RegisterUserUseCase,
     LoginUserUseCase,
     LogoutUserUseCase,
     RefreshTokenUseCase,
+    AuthServiceImpl,
   ],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthServiceImpl],
 })
 export class AuthModule {}

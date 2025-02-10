@@ -1,11 +1,10 @@
 import { UseCase } from "@/core/UseCase";
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import {
   UseCaseError,
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "../../exception";
-import { IUserRepository } from "@/domain/user/user.repository";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
 import { UserService } from "@/domain/user/user.service";
 import { ResponseMessages } from "@/core/constants";
@@ -14,11 +13,7 @@ import { ResponseMessages } from "@/core/constants";
 export class LogoutUserUseCase
   implements UseCase<UserTokenDto, { message: string }>
 {
-  constructor(
-    @Inject(IUserRepository)
-    private readonly userRepository: IUserRepository,
-    private readonly userservice: UserService
-  ) {}
+  constructor(private readonly userservice: UserService) {}
 
   public async execute(request: UserTokenDto): Promise<{ message: string }> {
     try {
@@ -33,7 +28,7 @@ export class LogoutUserUseCase
       }
 
       user.removeRefreshToken();
-      await this.userRepository.save(user);
+      await this.userservice.save(user);
 
       return { message: ResponseMessages.success };
     } catch (error: any) {

@@ -7,13 +7,11 @@ import { NotFoundException } from "@nestjs/common";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
 import { UserMapper } from "@/infrastructure/persistence/kysely/mappers/userMapper";
-import { IUserRepository } from "@/domain/user/user.repository";
 import { ResponseMessages } from "@/core/constants";
 
 describe("Logout user use case", () => {
   let useCase: LogoutUserUseCase;
   let userService: UserService;
-  let userRepository: IUserRepository;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -23,11 +21,6 @@ describe("Logout user use case", () => {
           provide: UserService,
           useValue: {
             findUserByRefreshToken: jest.fn(),
-          },
-        },
-        {
-          provide: IUserRepository,
-          useValue: {
             save: jest.fn(),
           },
         },
@@ -36,7 +29,6 @@ describe("Logout user use case", () => {
 
     useCase = module.get<LogoutUserUseCase>(LogoutUserUseCase);
     userService = module.get<UserService>(UserService);
-    userRepository = module.get<IUserRepository>(IUserRepository);
   });
 
   beforeEach(() => {
@@ -90,7 +82,7 @@ describe("Logout user use case", () => {
 
     expect(userService.findUserByRefreshToken).toHaveBeenCalled();
     user.removeRefreshToken();
-    expect(userRepository.save).toHaveBeenCalledWith(
+    expect(userService.save).toHaveBeenCalledWith(
       expect.objectContaining({
         password: hashedPassword,
         phone: userModel.phone,

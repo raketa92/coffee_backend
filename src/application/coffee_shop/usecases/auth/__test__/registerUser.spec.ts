@@ -1,10 +1,8 @@
-import { IUserRepository } from "@/domain/user/user.repository";
 import { RegisterUserUseCase } from "../registerUser";
 import { Test, TestingModule } from "@nestjs/testing";
 import { CreateUserDto } from "@/infrastructure/http/dto/user/createUserDto";
 import { User } from "@/domain/user/user.entity";
 import { UserService } from "@/domain/user/user.service";
-import { AuthService } from "@/infrastructure/auth/auth.service";
 import {
   UseCaseError,
   UseCaseErrorCode,
@@ -12,6 +10,7 @@ import {
 } from "@/application/coffee_shop/exception";
 import { Roles } from "@/core/constants/roles";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
+import { IAuthService } from "@/application/coffee_shop/ports/IAuthService";
 
 jest.mock("bcrypt", () => ({
   hash: jest.fn(),
@@ -35,28 +34,22 @@ jest.mock("@/domain/user/user.entity", () => {
 
 describe("Register user use case", () => {
   let useCase: RegisterUserUseCase;
-  let userRepository: IUserRepository;
   let userService: UserService;
-  let authService: AuthService;
+  let authService: IAuthService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RegisterUserUseCase,
         {
-          provide: IUserRepository,
+          provide: UserService,
           useValue: {
+            findOne: jest.fn(),
             save: jest.fn(),
           },
         },
         {
-          provide: UserService,
-          useValue: {
-            findOne: jest.fn(),
-          },
-        },
-        {
-          provide: AuthService,
+          provide: IAuthService,
           useValue: {
             hashPassword: jest.fn(),
             generateAccessToken: jest.fn(),
@@ -67,9 +60,8 @@ describe("Register user use case", () => {
     }).compile();
 
     useCase = module.get<RegisterUserUseCase>(RegisterUserUseCase);
-    userRepository = module.get<IUserRepository>(IUserRepository);
     userService = module.get<UserService>(UserService);
-    authService = module.get<AuthService>(AuthService);
+    authService = module.get<IAuthService>(IAuthService);
   });
 
   beforeEach(() => {
@@ -149,7 +141,7 @@ describe("Register user use case", () => {
     expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
     expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
     user.setRefreshToken(refreshToken);
-    expect(userRepository.save).toHaveBeenCalledWith(
+    expect(userService.save).toHaveBeenCalledWith(
       expect.objectContaining({
         password: hashedPassword,
         phone: createUserDto.phone,

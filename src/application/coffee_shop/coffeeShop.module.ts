@@ -17,12 +17,21 @@ import { CheckOrderUseCase } from "./usecases/order/checkOrderStatus";
 import { LoginUserUseCase } from "./usecases/auth/loginUser";
 import { RegisterUserUseCase } from "./usecases/auth/registerUser";
 import { JwtService } from "@nestjs/jwt";
-import { AuthService } from "@/infrastructure/auth/auth.service";
+import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
 import { UserModule } from "@/domain/user/user.module";
 import { UserService } from "@/domain/user/user.service";
+import { IAuthService } from "./ports/IAuthService";
+import { AuthModule } from "@/infrastructure/auth/auth.module";
 
 @Module({
-  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, UserModule],
+  imports: [
+    RedisModule,
+    EnvModule,
+    DatabaseModule,
+    PaymentModule,
+    UserModule,
+    AuthModule,
+  ],
   providers: [
     RedisService,
     JwtService,
@@ -37,7 +46,10 @@ import { UserService } from "@/domain/user/user.service";
     LoginUserUseCase,
     RegisterUserUseCase,
     UserService,
-    AuthService,
+    {
+      provide: IAuthService,
+      useClass: AuthServiceImpl,
+    },
     {
       provide: IBankService,
       useClass: BankService,

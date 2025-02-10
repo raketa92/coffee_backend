@@ -3,34 +3,38 @@ import {
   AuthResponseDto,
   UserTokenResponseDto,
 } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import {
   UseCaseError,
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "../../exception";
-import { IUserRepository } from "@/domain/user/user.repository";
 import { LoginUserDto } from "@/infrastructure/http/dto/user/loginUserDto";
-import { AuthService } from "@/infrastructure/auth/auth.service";
+import { IAuthService } from "../../ports/IAuthService";
+import { UserService } from "@/domain/user/user.service";
 
 @Injectable()
 export class LoginUserUseCase
   implements UseCase<LoginUserDto, UserTokenResponseDto>
 {
   constructor(
-    @Inject(IUserRepository)
-    private readonly userRepository: IUserRepository,
-    private readonly authService: AuthService
+    private readonly userService: UserService,
+    private readonly authService: IAuthService
   ) {}
 
   public async execute(request: LoginUserDto): Promise<UserTokenResponseDto> {
     try {
-      const user = await this.authService.validateUser(
-        request.phone,
-        request.password
-      );
-
+      const user = await this.userService.findOne({ phone: request.phone });
       if (!user) {
+        throw new NotFoundException({
+          message: UseCaseErrorMessage.user_not_found,
+        });
+      }
+      const isValidPassword = await this.authService.validateUser({
+        password: request.password,
+        userPassword: user.password,
+      });
+      if (!isValidPassword) {
         throw new UseCaseError({
           code: UseCaseErrorCode.BAD_REQUEST,
           message: UseCaseErrorMessage.wrong_password,
@@ -41,7 +45,7 @@ export class LoginUserUseCase
       const accessToken = this.authService.generateAccessToken(payload);
       const refreshToken = this.authService.generateRefreshToken(payload);
       user.setRefreshToken(refreshToken);
-      await this.userRepository.save(user);
+      await this.userService.save(user);
 
       const userDetails: AuthResponseDto = {
         accessToken,

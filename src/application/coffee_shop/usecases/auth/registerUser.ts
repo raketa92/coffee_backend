@@ -4,27 +4,24 @@ import {
   AuthResponseDto,
   UserTokenResponseDto,
 } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import {
   UseCaseError,
   UseCaseErrorCode,
   UseCaseErrorMessage,
 } from "../../exception";
-import { IUserRepository } from "@/domain/user/user.repository";
 import { User } from "@/domain/user/user.entity";
-import { AuthService } from "@/infrastructure/auth/auth.service";
 import { UserService } from "@/domain/user/user.service";
 import { Roles } from "@/core/constants/roles";
+import { IAuthService } from "../../ports/IAuthService";
 
 @Injectable()
 export class RegisterUserUseCase
   implements UseCase<CreateUserDto, UserTokenResponseDto>
 {
   constructor(
-    @Inject(IUserRepository)
-    private readonly userRepository: IUserRepository,
     private readonly userService: UserService,
-    private readonly authService: AuthService
+    private readonly authService: IAuthService
   ) {}
 
   public async execute(request: CreateUserDto): Promise<AuthResponseDto> {
@@ -53,7 +50,7 @@ export class RegisterUserUseCase
       const accessToken = this.authService.generateAccessToken(payload);
       const refreshToken = this.authService.generateRefreshToken(payload);
       user.setRefreshToken(refreshToken);
-      await this.userRepository.save(user);
+      await this.userService.save(user);
 
       const userDetails: AuthResponseDto = {
         accessToken,
