@@ -1,5 +1,5 @@
 import { RedisService } from "@infrastructure/persistence/redis/redis.service";
-import { BankService } from "@application/coffee_shop/ports/IBankService";
+import { IBankService } from "@application/coffee_shop/ports/IBankService";
 import { IPaymentRepository } from "@/domain/payment/repository/IPaymentRepository";
 import { IOrderRepository } from "@/domain/order/repository/orderRepository";
 import { IProductRepository } from "@/domain/product/repository/IProductRepository";
@@ -26,7 +26,7 @@ describe("Create order use case", () => {
   let orderRepository: IOrderRepository;
   let paymentRepository: IPaymentRepository;
   let productRepository: IProductRepository;
-  let bankService: BankService;
+  let bankService: IBankService;
   let redisService: RedisService;
   let configService: EnvService;
   let kysely: Kysely<DatabaseSchema>;
@@ -54,7 +54,7 @@ describe("Create order use case", () => {
           },
         },
         {
-          provide: BankService,
+          provide: IBankService,
           useValue: {
             makePayment: jest.fn(),
           },
@@ -85,7 +85,7 @@ describe("Create order use case", () => {
     orderRepository = module.get<IOrderRepository>(IOrderRepository);
     paymentRepository = module.get<IPaymentRepository>(IPaymentRepository);
     productRepository = module.get<IProductRepository>(IProductRepository);
-    bankService = module.get<BankService>(BankService);
+    bankService = module.get<IBankService>(IBankService);
     redisService = module.get<RedisService>(RedisService);
     configService = module.get<EnvService>(EnvService);
     kysely = module.get("DB_CONNECTION");

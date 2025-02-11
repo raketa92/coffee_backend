@@ -4,7 +4,7 @@ import {
   AuthResponseDto,
   UserTokenResponseDto,
 } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import {
   UseCaseError,
   UseCaseErrorCode,
@@ -21,6 +21,7 @@ export class RegisterUserUseCase
 {
   constructor(
     private readonly userService: UserService,
+    @Inject(IAuthService)
     private readonly authService: IAuthService
   ) {}
 

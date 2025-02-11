@@ -10,7 +10,7 @@ import {
   PaymentStatus,
   PaytmentFor,
 } from "@core/constants";
-import { BankService } from "@application/coffee_shop/ports/IBankService";
+import { IBankService } from "@application/coffee_shop/ports/IBankService";
 import { Payment } from "@domain/payment/payment";
 import { IPaymentRepository } from "@domain/payment/repository/IPaymentRepository";
 import { RedisService } from "@infrastructure/persistence/redis/redis.service";
@@ -39,7 +39,7 @@ export class CreateOrderUseCase
     private readonly paymentRepository: IPaymentRepository,
     @Inject(IProductRepository)
     private readonly productRepository: IProductRepository,
-    private readonly bankService: BankService,
+    private readonly bankService: IBankService,
     private readonly configService: EnvService,
     private readonly redisService: RedisService,
     @Inject("DB_CONNECTION")

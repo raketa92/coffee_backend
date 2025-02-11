@@ -5,8 +5,8 @@ import { EnvModule } from "@infrastructure/env";
 import { DatabaseModule } from "@infrastructure/persistence/kysely/database.module";
 import { CreateOrderUseCase } from "@application/coffee_shop/usecases/order/createOrder";
 import { PaymentModule } from "@infrastructure/payment/payment.module";
-import { BankService as IBankService } from "./ports/IBankService";
-import { BankService } from "@infrastructure/payment/bankService/bank.service";
+import { IBankService } from "./ports/IBankService";
+import { BankServiceImpl } from "@infrastructure/payment/bankService/bank.service";
 import { GetCategoriesUseCase } from "./usecases/category/getCategories";
 import { GetProductsUseCase } from "./usecases/product/getProducts";
 import { GetShopsUseCase } from "./usecases/shop/getShops";
@@ -21,17 +21,11 @@ import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
 import { UserModule } from "@/domain/user/user.module";
 import { UserService } from "@/domain/user/user.service";
 import { IAuthService } from "./ports/IAuthService";
-import { AuthModule } from "@/infrastructure/auth/auth.module";
+import { LogoutUserUseCase } from "./usecases/auth/logoutUser";
+import { RefreshTokenUseCase } from "./usecases/auth/refreshToken";
 
 @Module({
-  imports: [
-    RedisModule,
-    EnvModule,
-    DatabaseModule,
-    PaymentModule,
-    UserModule,
-    AuthModule,
-  ],
+  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, UserModule],
   providers: [
     RedisService,
     JwtService,
@@ -45,6 +39,8 @@ import { AuthModule } from "@/infrastructure/auth/auth.module";
     GetShopUseCase,
     LoginUserUseCase,
     RegisterUserUseCase,
+    LogoutUserUseCase,
+    RefreshTokenUseCase,
     UserService,
     {
       provide: IAuthService,
@@ -52,7 +48,7 @@ import { AuthModule } from "@/infrastructure/auth/auth.module";
     },
     {
       provide: IBankService,
-      useClass: BankService,
+      useClass: BankServiceImpl,
     },
   ],
   exports: [
@@ -66,6 +62,8 @@ import { AuthModule } from "@/infrastructure/auth/auth.module";
     GetShopUseCase,
     LoginUserUseCase,
     RegisterUserUseCase,
+    LogoutUserUseCase,
+    RefreshTokenUseCase,
   ],
 })
 export class CoffeeShopModule {}

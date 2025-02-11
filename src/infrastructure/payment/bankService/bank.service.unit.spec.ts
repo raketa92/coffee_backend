@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { BankService } from "./bank.service";
+import { BankServiceImpl } from "./bank.service";
 import axios from "axios";
 import { EnvService } from "@infrastructure/env";
 import { IPaymentData, IPaymentPayload } from "./dto/paymentDto";
@@ -7,12 +7,12 @@ import { IPaymentData, IPaymentPayload } from "./dto/paymentDto";
 jest.mock("axios");
 
 describe("Bank service", () => {
-  let service: BankService;
+  let service: BankServiceImpl;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        BankService,
+        BankServiceImpl,
         {
           provide: EnvService,
           useValue: {
@@ -35,7 +35,7 @@ describe("Bank service", () => {
       ],
     }).compile();
 
-    service = module.get<BankService>(BankService);
+    service = module.get<BankServiceImpl>(BankServiceImpl);
   });
 
   it("should be defined", () => {

@@ -2,7 +2,7 @@ import { UseCase } from "@/core/UseCase";
 import { CheckOrderResponseDto } from "@/infrastructure/http/dto/order/orderResponseDto";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { IOrderRepository } from "@domain/order/repository/orderRepository";
-import { BankService } from "@application/coffee_shop/ports/IBankService";
+import { IBankService } from "@application/coffee_shop/ports/IBankService";
 import { IPaymentRepository } from "@domain/payment/repository/IPaymentRepository";
 import {
   UseCaseError,
@@ -26,7 +26,7 @@ export class CheckOrderUseCase
     private readonly orderRepisitory: IOrderRepository,
     @Inject(IPaymentRepository)
     private readonly paymentRepository: IPaymentRepository,
-    private readonly bankService: BankService,
+    private readonly bankService: IBankService,
     @Inject("DB_CONNECTION")
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}

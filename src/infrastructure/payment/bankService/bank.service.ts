@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import {
-  BankService as IBankService,
+  IBankService as IBankService,
   ICheckPaymentResponse,
   IPaymentReponse,
 } from "src/application/coffee_shop/ports/IBankService";
@@ -15,7 +15,7 @@ import { EnvService } from "@infrastructure/env";
 import { PaymentStatus } from "@/core/constants";
 
 @Injectable()
-export class BankService implements IBankService {
+export class BankServiceImpl implements IBankService {
   constructor(private configService: EnvService) {}
   public async checkPaymentStatus(
     payload: ICheckPaymentData

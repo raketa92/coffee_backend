@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
 import { EnvModule } from "@infrastructure/env";
-import { BankService } from "./bank.service";
+import { BankServiceImpl } from "./bank.service";
 
 @Module({
   imports: [EnvModule],
-  providers: [BankService],
-  exports: [BankService],
+  providers: [BankServiceImpl],
+  exports: [BankServiceImpl],
 })
 export class BankServiceModule {}

@@ -7,6 +7,7 @@ import { ProductController } from "./product.controller";
 import { ShopController } from "./shop.controller";
 import { UserController } from "./user.controller";
 import { AuthModule } from "../auth/auth.module";
+import { AuthController } from "./auth.controller";
 
 @Module({
   imports: [CoffeeShopModule, AuthModule],
@@ -16,6 +17,7 @@ import { AuthModule } from "../auth/auth.module";
     ProductController,
     ShopController,
     UserController,
+    AuthController,
   ],
   providers: [
     RedisService,
@@ -24,6 +26,7 @@ import { AuthModule } from "../auth/auth.module";
     ProductController,
     ShopController,
     UserController,
+    AuthController,
   ],
 })
 export class HttpModule {}

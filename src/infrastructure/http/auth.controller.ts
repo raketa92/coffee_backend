@@ -6,17 +6,14 @@ import {
   UnauthorizedException,
   UseGuards,
 } from "@nestjs/common";
-import {
-  CreateUserDto,
-  createUserSchema,
-} from "../http/dto/user/createUserDto";
-import { LoginUserDto, loginUserSchema } from "../http/dto/user/loginUserDto";
+import { CreateUserDto, createUserSchema } from "./dto/user/createUserDto";
+import { LoginUserDto, loginUserSchema } from "./dto/user/loginUserDto";
 import { LoginUserUseCase } from "@/application/coffee_shop/usecases/auth/loginUser";
 import { RegisterUserUseCase } from "@/application/coffee_shop/usecases/auth/registerUser";
 import { LogoutUserUseCase } from "@/application/coffee_shop/usecases/auth/logoutUser";
 import { RefreshTokenUseCase } from "@/application/coffee_shop/usecases/auth/refreshToken";
 import { Request } from "express";
-import { JwtRefreshAuthGuard } from "./guards/jwt-refresh-auth.guard";
+import { JwtRefreshAuthGuard } from "../auth/guards/jwt-refresh-auth.guard";
 
 @Controller("/auth")
 export class AuthController {

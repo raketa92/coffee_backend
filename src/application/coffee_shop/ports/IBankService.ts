@@ -28,7 +28,7 @@ export interface ICheckPaymentResponse {
   ];
 }
 
-export abstract class BankService {
+export abstract class IBankService {
   abstract makePayment: (payload: IPaymentData) => Promise<IPaymentReponse>;
   abstract mapStatus: (errorCode: number, orderStatus: number) => PaymentStatus;
   abstract checkPaymentStatus: (

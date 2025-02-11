@@ -11,7 +11,7 @@ import {
   PaymentStatus,
 } from "@/core/constants";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
-import { BankService } from "@/application/coffee_shop/ports/IBankService";
+import { IBankService } from "@/application/coffee_shop/ports/IBankService";
 import { ICheckPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
 import { IPaymentRepository } from "@/domain/payment/repository/IPaymentRepository";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
@@ -25,7 +25,7 @@ import { ProductCreateModel } from "@/infrastructure/persistence/kysely/models/p
 describe("Check order status use case", () => {
   let useCase: CheckOrderUseCase;
   let orderRepository: IOrderRepository;
-  let bankService: BankService;
+  let bankService: IBankService;
   let paymentRepository: IPaymentRepository;
   let kysely: Kysely<DatabaseSchema>;
 
@@ -41,7 +41,7 @@ describe("Check order status use case", () => {
           },
         },
         {
-          provide: BankService,
+          provide: IBankService,
           useValue: {
             checkPaymentStatus: jest.fn(),
             mapStatus: jest.fn(),
@@ -67,7 +67,7 @@ describe("Check order status use case", () => {
     useCase = module.get<CheckOrderUseCase>(CheckOrderUseCase);
     orderRepository = module.get<IOrderRepository>(IOrderRepository);
     paymentRepository = module.get<IPaymentRepository>(IPaymentRepository);
-    bankService = module.get<BankService>(BankService);
+    bankService = module.get<IBankService>(IBankService);
     kysely = module.get("DB_CONNECTION");
   });
 
