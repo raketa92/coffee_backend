@@ -22,18 +22,29 @@ import { UserRepositoryImpl } from "./repository/userRepositoryImpl";
     {
       provide: "DB_CONNECTION",
       useFactory: async (configService: EnvService) => {
+        const pool = new Pool({
+          host: configService.get("POSTGRES_HOST"),
+          port: configService.get("POSTGRES_PORT"),
+          user: configService.get("POSTGRES_USER"),
+          password: configService.get("POSTGRES_PASSWORD"),
+          database: configService.get("POSTGRES_DB"),
+        });
+
         const db = new Kysely<DatabaseSchema>({
           log: ["query", "error"],
           dialect: new PostgresDialect({
-            pool: new Pool({
-              host: configService.get("POSTGRES_HOST"),
-              port: configService.get("POSTGRES_PORT"),
-              user: configService.get("POSTGRES_USER"),
-              password: configService.get("POSTGRES_PASSWORD"),
-              database: configService.get("POSTGRES_DB"),
-            }),
+            pool,
           }),
         });
+
+        try {
+          await pool.query("SELECT 1");
+          console.log("Database connection is healthy.");
+        } catch (error) {
+          console.error("Database connection failed!", error);
+          process.exit(1);
+        }
+
         return db;
       },
       inject: [EnvService],

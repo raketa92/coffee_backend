@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpCode,
   Post,
   Req,
   UnauthorizedException,
@@ -32,6 +33,7 @@ export class AuthController {
   }
 
   @Post("/login")
+  @HttpCode(200)
   async login(@Body() loginUserDto: LoginUserDto) {
     const body = loginUserSchema.parse(loginUserDto);
     const response = await this.loginUserUseCase.execute(body);
@@ -40,6 +42,7 @@ export class AuthController {
 
   @Post("/logout")
   @UseGuards(JwtRefreshAuthGuard)
+  @HttpCode(200)
   async logout(@Req() req: Request) {
     const user = req.user;
     if (!user || !user.refreshToken) {
@@ -52,6 +55,7 @@ export class AuthController {
 
   @Post("/refresh-token")
   @UseGuards(JwtRefreshAuthGuard)
+  @HttpCode(200)
   async refreshToken(@Req() req: Request) {
     const user = req.user;
     if (!user || !user.refreshToken) {

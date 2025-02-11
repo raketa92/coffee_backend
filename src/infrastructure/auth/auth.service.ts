@@ -20,7 +20,10 @@ export class AuthServiceImpl implements IAuthService {
   }
 
   generateAccessToken(payload: { sub: string; phone: string }): string {
-    return this.jwtService.sign(payload);
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get("JWT_SECRET"),
+      expiresIn: "5m",
+    });
   }
 
   generateRefreshToken(payload: { sub: string; phone: string }): string {
