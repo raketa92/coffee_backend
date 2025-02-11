@@ -8,10 +8,10 @@ import {
 } from "@nestjs/common";
 import { CreateUserDto, createUserSchema } from "./dto/user/createUserDto";
 import { LoginUserDto, loginUserSchema } from "./dto/user/loginUserDto";
-import { LoginUserUseCase } from "@/application/coffee_shop/usecases/auth/loginUser";
-import { RegisterUserUseCase } from "@/application/coffee_shop/usecases/auth/registerUser";
-import { LogoutUserUseCase } from "@/application/coffee_shop/usecases/auth/logoutUser";
-import { RefreshTokenUseCase } from "@/application/coffee_shop/usecases/auth/refreshToken";
+import { LoginUserUseCase } from "@/application/auth/usecases/loginUser";
+import { RegisterUserUseCase } from "@/application/auth/usecases/registerUser";
+import { LogoutUserUseCase } from "@/application/auth/usecases/logoutUser";
+import { RefreshTokenUseCase } from "@/application/auth/usecases/refreshToken";
 import { Request } from "express";
 import { JwtRefreshAuthGuard } from "../auth/guards/jwt-refresh-auth.guard";
 

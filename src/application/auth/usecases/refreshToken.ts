@@ -1,14 +1,11 @@
 import { UseCase } from "@/core/UseCase";
 import { UserTokenResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import {
-  UseCaseError,
-  UseCaseErrorCode,
-  UseCaseErrorMessage,
-} from "../../exception";
+import { UseCaseErrorMessage } from "../../auth/exception";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
-import { IAuthService } from "../../ports/IAuthService";
+import { IAuthService } from "../ports/IAuthService";
 import { UserService } from "@/domain/user/user.service";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 
 @Injectable()
 export class RefreshTokenUseCase

@@ -1,19 +1,18 @@
-import { RegisterUserUseCase } from "../registerUser";
+import * as bcrypt from "bcrypt";
 import { Test, TestingModule } from "@nestjs/testing";
-import { CreateUserDto } from "@/infrastructure/http/dto/user/createUserDto";
-import { User } from "@/domain/user/user.entity";
-import { UserService } from "@/domain/user/user.service";
-import {
-  UseCaseError,
-  UseCaseErrorCode,
-  UseCaseErrorMessage,
-} from "@/application/coffee_shop/exception";
+import { LoginUserDto } from "@/infrastructure/http/dto/user/loginUserDto";
+import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
+import { UserMapper } from "@/infrastructure/persistence/kysely/mappers/userMapper";
 import { Roles } from "@/core/constants/roles";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { IAuthService } from "@/application/coffee_shop/ports/IAuthService";
+import { IAuthService } from "@/application/auth/ports/IAuthService";
+import { UserService } from "@/domain/user/user.service";
+import { NotFoundException } from "@nestjs/common";
+import { LoginUserUseCase } from "../loginUser";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseErrorMessage } from "@/application/auth/exception";
 
 jest.mock("bcrypt", () => ({
-  hash: jest.fn(),
   compare: jest.fn(),
 }));
 
@@ -32,26 +31,27 @@ jest.mock("@/domain/user/user.entity", () => {
   };
 });
 
-describe("Register user use case", () => {
-  let useCase: RegisterUserUseCase;
-  let userService: UserService;
+describe("Login user use case", () => {
+  let useCase: LoginUserUseCase;
   let authService: IAuthService;
+  let userService: UserService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        RegisterUserUseCase,
+        LoginUserUseCase,
         {
           provide: UserService,
           useValue: {
             findOne: jest.fn(),
+            findUserByRefreshToken: jest.fn(),
             save: jest.fn(),
           },
         },
         {
           provide: IAuthService,
           useValue: {
-            hashPassword: jest.fn(),
+            validateUser: jest.fn(),
             generateAccessToken: jest.fn(),
             generateRefreshToken: jest.fn(),
           },
@@ -59,9 +59,9 @@ describe("Register user use case", () => {
       ],
     }).compile();
 
-    useCase = module.get<RegisterUserUseCase>(RegisterUserUseCase);
-    userService = module.get<UserService>(UserService);
+    useCase = module.get<LoginUserUseCase>(LoginUserUseCase);
     authService = module.get<IAuthService>(IAuthService);
+    userService = module.get<UserService>(UserService);
   });
 
   beforeEach(() => {
@@ -72,84 +72,87 @@ describe("Register user use case", () => {
     expect(useCase).toBeDefined();
   });
 
-  it("should throw error if user exists already", async () => {
-    const createUserDto: CreateUserDto = {
+  it("should throw error if user not found", async () => {
+    (userService.findOne as jest.Mock).mockResolvedValue(null);
+    const loginUserDto: LoginUserDto = {
       password: "qwerty",
       phone: "+99364123123",
-      userName: "jackal",
-      gender: "male",
-      firstName: "Charles",
-      lastName: "Petzold",
-      email: "cp@kkk.com",
     };
-    const hashedPassword = "mocked_hashed_password";
-    const user = new User({
-      ...createUserDto,
-      roles: [Roles.user],
-      password: hashedPassword,
-      isActive: true,
-      isVerified: false,
-    });
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
-
-    await expect(useCase.execute(createUserDto)).rejects.toThrow(
-      new UseCaseError({
-        code: UseCaseErrorCode.BAD_REQUEST,
-        message: UseCaseErrorMessage.user_already_exists,
+    await expect(useCase.execute(loginUserDto)).rejects.toThrow(
+      new NotFoundException({
+        message: UseCaseErrorMessage.user_not_found,
       })
     );
-    expect(userService.findOne).toHaveBeenCalled();
   });
 
-  it("should create user", async () => {
-    const createUserDto: CreateUserDto = {
+  it("should throw error if password is wrong", async () => {
+    (userService.findOne as jest.Mock).mockResolvedValue(true);
+    (authService.validateUser as jest.Mock).mockResolvedValue(false);
+    const loginUserDto: LoginUserDto = {
       password: "qwerty",
       phone: "+99364123123",
-      userName: "jackal",
-      gender: "male",
-      firstName: "Charles",
-      lastName: "Petzold",
-      email: "cp@kkk.com",
     };
-    (userService.findOne as jest.Mock).mockResolvedValue(null);
-    const hashedPassword = "mocked_hashed_password";
-    (authService.hashPassword as jest.Mock).mockResolvedValue(hashedPassword);
+    await expect(useCase.execute(loginUserDto)).rejects.toThrow(
+      new UseCaseError({
+        code: UseCaseErrorCode.BAD_REQUEST,
+        message: UseCaseErrorMessage.wrong_password,
+      })
+    );
+  });
 
+  it("should login user", async () => {
+    const loginUserDto: LoginUserDto = {
+      password: "qwerty",
+      phone: "+99364123123",
+    };
+    const hashedPassword = "mocked_hashed_password";
     const accessToken = "mock_access_token";
     const refreshToken = "mock_refresh_token";
+
+    const userModel: UserModel = {
+      guid: "8524994a-58c6-4b12-a965-80693a7b9803",
+      password: hashedPassword,
+      phone: loginUserDto.phone,
+      email: null,
+      userName: "mocked_user_name",
+      firstName: "some_first_name",
+      lastName: "some_last_name",
+      gender: "male",
+      roles: [Roles.user],
+      refreshToken: "old_refreshToken",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isVerified: false,
+      isActive: false,
+    };
+
+    const user = UserMapper.toDomain(userModel);
+    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (authService.validateUser as jest.Mock).mockResolvedValue(true);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
     (authService.generateAccessToken as jest.Mock).mockReturnValue(accessToken);
     (authService.generateRefreshToken as jest.Mock).mockReturnValue(
       refreshToken
     );
 
-    const user = new User({
-      ...createUserDto,
-      roles: [Roles.user],
-      password: hashedPassword,
-      isActive: true,
-      isVerified: false,
-    });
     const payload = {
       sub: "8524994a-58c6-4b12-a965-80693a7b9803",
       phone: user.phone,
     };
-    const result = await useCase.execute(createUserDto);
+    const result = await useCase.execute(loginUserDto);
 
-    expect(authService.hashPassword).toHaveBeenCalledWith(
-      createUserDto.password
-    );
     expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
     expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
     user.setRefreshToken(refreshToken);
     expect(userService.save).toHaveBeenCalledWith(
       expect.objectContaining({
         password: hashedPassword,
-        phone: createUserDto.phone,
-        userName: createUserDto.userName,
-        gender: createUserDto.gender,
-        firstName: createUserDto.firstName,
-        lastName: createUserDto.lastName,
-        email: createUserDto.email,
+        phone: userModel.phone,
+        userName: userModel.userName,
+        gender: userModel.gender,
+        firstName: userModel.firstName,
+        lastName: userModel.lastName,
+        email: userModel.email,
         refreshToken,
       })
     );

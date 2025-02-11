@@ -20,13 +20,10 @@ import { EnvService } from "@infrastructure/env";
 import { DatabaseSchema } from "src/infrastructure/persistence/kysely/database.schema";
 import { Kysely, Transaction } from "kysely";
 import { CreateOrderResponseDto } from "@/infrastructure/http/dto/order/orderResponseDto";
-import {
-  UseCaseError,
-  UseCaseErrorCode,
-  UseCaseErrorMessage,
-} from "@application/coffee_shop/exception";
+import { UseCaseErrorMessage } from "@application/coffee_shop/exception";
 import { IProductRepository } from "@domain/product/repository/IProductRepository";
 import { IPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 
 @Injectable()
 export class CreateOrderUseCase

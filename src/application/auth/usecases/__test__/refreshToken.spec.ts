@@ -8,7 +8,7 @@ import { NotFoundException } from "@nestjs/common";
 import { UserService } from "@/domain/user/user.service";
 import { JwtService } from "@nestjs/jwt";
 import { EnvService } from "@/infrastructure/env";
-import { IAuthService } from "@/application/coffee_shop/ports/IAuthService";
+import { IAuthService } from "@/application/auth/ports/IAuthService";
 import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
 
 jest.mock("@/domain/user/user.entity", () => {

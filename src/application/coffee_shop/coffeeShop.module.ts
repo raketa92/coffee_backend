@@ -14,21 +14,13 @@ import { GetOrdersUseCase } from "./usecases/order/getOrders";
 import { GetProductUseCase } from "./usecases/product/getProduct";
 import { GetShopUseCase } from "./usecases/shop/getShop";
 import { CheckOrderUseCase } from "./usecases/order/checkOrderStatus";
-import { LoginUserUseCase } from "./usecases/auth/loginUser";
-import { RegisterUserUseCase } from "./usecases/auth/registerUser";
-import { JwtService } from "@nestjs/jwt";
-import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
 import { UserModule } from "@/domain/user/user.module";
 import { UserService } from "@/domain/user/user.service";
-import { IAuthService } from "./ports/IAuthService";
-import { LogoutUserUseCase } from "./usecases/auth/logoutUser";
-import { RefreshTokenUseCase } from "./usecases/auth/refreshToken";
 
 @Module({
   imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, UserModule],
   providers: [
     RedisService,
-    JwtService,
     CreateOrderUseCase,
     CheckOrderUseCase,
     GetOrdersUseCase,
@@ -37,15 +29,7 @@ import { RefreshTokenUseCase } from "./usecases/auth/refreshToken";
     GetProductUseCase,
     GetShopsUseCase,
     GetShopUseCase,
-    LoginUserUseCase,
-    RegisterUserUseCase,
-    LogoutUserUseCase,
-    RefreshTokenUseCase,
     UserService,
-    {
-      provide: IAuthService,
-      useClass: AuthServiceImpl,
-    },
     {
       provide: IBankService,
       useClass: BankServiceImpl,
@@ -60,10 +44,6 @@ import { RefreshTokenUseCase } from "./usecases/auth/refreshToken";
     GetProductUseCase,
     GetShopsUseCase,
     GetShopUseCase,
-    LoginUserUseCase,
-    RegisterUserUseCase,
-    LogoutUserUseCase,
-    RefreshTokenUseCase,
   ],
 })
 export class CoffeeShopModule {}

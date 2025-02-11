@@ -5,15 +5,12 @@ import {
   UserTokenResponseDto,
 } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { Inject, Injectable } from "@nestjs/common";
-import {
-  UseCaseError,
-  UseCaseErrorCode,
-  UseCaseErrorMessage,
-} from "../../exception";
+import { UseCaseErrorMessage } from "../../auth/exception";
 import { User } from "@/domain/user/user.entity";
 import { UserService } from "@/domain/user/user.service";
 import { Roles } from "@/core/constants/roles";
-import { IAuthService } from "../../ports/IAuthService";
+import { IAuthService } from "../ports/IAuthService";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 
 @Injectable()
 export class RegisterUserUseCase

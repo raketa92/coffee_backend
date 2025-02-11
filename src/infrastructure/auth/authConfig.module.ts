@@ -31,4 +31,4 @@ import { AuthServiceImpl } from "./auth.service";
   ],
   exports: [AuthServiceImpl],
 })
-export class AuthModule {}
+export class AuthConfigModule {}

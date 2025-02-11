@@ -10,7 +10,8 @@ import { LoggerModule } from "@infrastructure/logger/logger.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { HttpModule } from "./infrastructure/http/http.module";
-import { AuthModule } from "./infrastructure/auth/auth.module";
+import { AuthConfigModule } from "./infrastructure/auth/authConfig.module";
+import { AuthModule } from "./application/auth/auth.module";
 
 @Module({
   imports: [
@@ -22,11 +23,12 @@ import { AuthModule } from "./infrastructure/auth/auth.module";
       serveRoot: "/images",
     }),
     CoffeeShopModule,
+    AuthModule,
     RedisModule,
     EnvModule,
     LoggerModule,
     HttpModule,
-    AuthModule,
+    AuthConfigModule,
   ],
   providers: [
     RedisService,

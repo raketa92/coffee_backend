@@ -1,13 +1,10 @@
 import { UseCase } from "@/core/UseCase";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import {
-  UseCaseError,
-  UseCaseErrorCode,
-  UseCaseErrorMessage,
-} from "../../exception";
+import { UseCaseErrorMessage } from "../../auth/exception";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
 import { UserService } from "@/domain/user/user.service";
 import { ResponseMessages } from "@/core/constants";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 
 @Injectable()
 export class LogoutUserUseCase

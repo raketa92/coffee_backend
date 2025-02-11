@@ -4,11 +4,7 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { IOrderRepository } from "@domain/order/repository/orderRepository";
 import { IBankService } from "@application/coffee_shop/ports/IBankService";
 import { IPaymentRepository } from "@domain/payment/repository/IPaymentRepository";
-import {
-  UseCaseError,
-  UseCaseErrorCode,
-  UseCaseErrorMessage,
-} from "@application/coffee_shop/exception";
+import { UseCaseErrorMessage } from "@application/coffee_shop/exception";
 import { ICheckPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
 import { OrderStatus, PaymentMethods } from "@/core/constants";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
@@ -16,6 +12,7 @@ import { Kysely } from "kysely";
 import { OrderMapper } from "@/infrastructure/persistence/kysely/mappers/orderMapper";
 import { PaymentMapper } from "@/infrastructure/persistence/kysely/mappers/paymentMapper";
 import { OrderDomainService } from "@/domain/order/service/OrderDomainService";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 
 @Injectable()
 export class CheckOrderUseCase

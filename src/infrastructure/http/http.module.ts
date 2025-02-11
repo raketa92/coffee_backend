@@ -5,18 +5,17 @@ import { CoffeeShopModule } from "@application/coffee_shop/coffeeShop.module";
 import { CategoryController } from "./category.controller";
 import { ProductController } from "./product.controller";
 import { ShopController } from "./shop.controller";
-import { UserController } from "./user.controller";
-import { AuthModule } from "../auth/auth.module";
+import { AuthConfigModule } from "../auth/authConfig.module";
 import { AuthController } from "./auth.controller";
+import { AuthModule } from "@/application/auth/auth.module";
 
 @Module({
-  imports: [CoffeeShopModule, AuthModule],
+  imports: [CoffeeShopModule, AuthConfigModule, AuthModule],
   controllers: [
     OrderController,
     CategoryController,
     ProductController,
     ShopController,
-    UserController,
     AuthController,
   ],
   providers: [
@@ -25,7 +24,6 @@ import { AuthController } from "./auth.controller";
     CategoryController,
     ProductController,
     ShopController,
-    UserController,
     AuthController,
   ],
 })
