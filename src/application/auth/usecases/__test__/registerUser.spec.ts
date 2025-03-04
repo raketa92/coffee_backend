@@ -86,6 +86,7 @@ describe("Register user use case", () => {
       password: hashedPassword,
       isActive: true,
       isVerified: false,
+      lastLogin: new Date(),
     });
     (userService.findOne as jest.Mock).mockResolvedValue(user);
 
@@ -125,6 +126,7 @@ describe("Register user use case", () => {
       password: hashedPassword,
       isActive: true,
       isVerified: false,
+      lastLogin: new Date(),
     });
     const payload = {
       sub: "8524994a-58c6-4b12-a965-80693a7b9803",
@@ -164,6 +166,7 @@ describe("Register user use case", () => {
         userName: user.userName,
         firstName: user.firstName,
         lastName: user.lastName,
+        lastLogin: user.lastLogin,
       },
     };
     expect(result).toEqual(userDetails);

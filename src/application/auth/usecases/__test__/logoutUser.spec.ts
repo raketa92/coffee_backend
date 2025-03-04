@@ -73,6 +73,7 @@ describe("Logout user use case", () => {
       updatedAt: new Date(),
       isVerified: false,
       isActive: false,
+      lastLogin: new Date(),
     };
 
     const user = UserMapper.toDomain(userModel);

@@ -124,6 +124,7 @@ const users = [
     roles: [Roles.user],
     isActive: true,
     isVerified: true,
+    lastLogin: new Date(),
   },
 ];
 

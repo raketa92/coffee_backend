@@ -6,12 +6,13 @@ export interface UserTable {
   email?: string | null;
   phone: string;
   userName?: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  gender: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  gender?: string | null;
   roles: string[];
   isVerified: boolean;
   isActive: boolean;
+  lastLogin: Date;
   refreshToken: string | null;
   createdAt: Generated<Date>;
   updatedAt: Generated<Date>;

@@ -10,10 +10,11 @@ type UserDetails = {
   firstName: string | null;
   lastName: string | null;
   phone: string;
-  gender: string;
+  gender: string | null;
   role: string;
   isVerified: boolean;
   isActive: boolean;
+  lastLogin: Date;
 };
 
 export type AuthResponseDto = UserTokenResponseDto & {

@@ -16,6 +16,7 @@ export class UserMapper {
         roles: userModel.roles,
         isActive: userModel.isActive,
         isVerified: userModel.isVerified,
+        lastLogin: userModel.lastLogin,
       },
       new UniqueEntityID(userModel.guid)
     );
@@ -33,6 +34,7 @@ export class UserMapper {
       email: user.email,
       roles: user.roles,
       isActive: user.isActive,
+      lastLogin: user.lastLogin,
       isVerified: user.isVerified,
       refreshToken: user.refreshToken,
     };

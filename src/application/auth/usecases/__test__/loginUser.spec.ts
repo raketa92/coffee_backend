@@ -124,6 +124,7 @@ describe("Login user use case", () => {
       updatedAt: new Date(),
       isVerified: false,
       isActive: false,
+      lastLogin: new Date(),
     };
 
     const user = UserMapper.toDomain(userModel);
@@ -170,6 +171,7 @@ describe("Login user use case", () => {
         userName: user.userName,
         firstName: user.firstName,
         lastName: user.lastName,
+        lastLogin: user.lastLogin,
       },
     };
     expect(result).toEqual(userDetails);

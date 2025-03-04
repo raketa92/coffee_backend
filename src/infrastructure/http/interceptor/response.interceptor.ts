@@ -49,17 +49,26 @@ export class ResponseInterceptor implements NestInterceptor {
 
     this.logger.error(`Error: ${request.method} ${request.url}`, exception);
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    let status = exception.code || HttpStatus.INTERNAL_SERVER_ERROR;
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+    }
 
+    let zodErrorMessages: string[] = [];
+    if (exception.hasOwnProperty("issues")) {
+      zodErrorMessages = exception.issues.map(
+        (item: { message: string }) => item.message
+      );
+      status = 403;
+    }
     response.status(status).json({
       status: false,
       statusCode: status,
       path: request.url,
-      message: exception?.response?.message || exception.message,
-      result: exception,
+      message: zodErrorMessages.length
+        ? zodErrorMessages
+        : exception?.response?.message || exception.message,
+      result: null,
     });
     return exception;
   }

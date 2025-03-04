@@ -42,6 +42,7 @@ export class LoginUserUseCase
       const accessToken = this.authService.generateAccessToken(payload);
       const refreshToken = this.authService.generateRefreshToken(payload);
       user.setRefreshToken(refreshToken);
+      user.setLastLogin(new Date());
       await this.userService.save(user);
 
       const userDetails: AuthResponseDto = {
@@ -58,6 +59,7 @@ export class LoginUserUseCase
           userName: user.userName,
           firstName: user.firstName,
           lastName: user.lastName,
+          lastLogin: user.lastLogin,
         },
       };
 

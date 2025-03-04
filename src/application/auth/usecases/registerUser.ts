@@ -29,7 +29,7 @@ export class RegisterUserUseCase
       });
       if (userExist) {
         throw new UseCaseError({
-          code: UseCaseErrorCode.BAD_REQUEST,
+          code: UseCaseErrorCode.CONFLICT,
           message: UseCaseErrorMessage.user_already_exists,
         });
       }
@@ -42,6 +42,7 @@ export class RegisterUserUseCase
         password: hashedPassword,
         isActive: true,
         isVerified: false,
+        lastLogin: new Date(),
       });
 
       const payload = { sub: user.guid.toValue(), phone: user.phone };
@@ -64,13 +65,14 @@ export class RegisterUserUseCase
           userName: user.userName,
           firstName: user.firstName,
           lastName: user.lastName,
+          lastLogin: user.lastLogin,
         },
       };
 
       return userDetails;
     } catch (error: any) {
       throw new UseCaseError({
-        code: UseCaseErrorCode.BAD_REQUEST,
+        code: error.code || UseCaseErrorCode.BAD_REQUEST,
         message: error.message || UseCaseErrorMessage.register_user_error,
       });
     }

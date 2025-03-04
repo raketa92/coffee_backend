@@ -13,10 +13,11 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("userName", "varchar(30)")
     .addColumn("firstName", "varchar(30)")
     .addColumn("lastName", "varchar(30)")
-    .addColumn("gender", "varchar(20)", (col) => col.notNull())
+    .addColumn("gender", "varchar(20)")
     .addColumn("roles", sql`text[]`, (col) => col.notNull())
     .addColumn("isVerified", "boolean", (col) => col.defaultTo(false).notNull())
     .addColumn("isActive", "boolean", (col) => col.defaultTo(false).notNull())
+    .addColumn("lastLogin", "timestamptz", (col) => col.notNull())
     .addColumn("refreshToken", "text")
     .$call(withTimestamps)
     .execute();
