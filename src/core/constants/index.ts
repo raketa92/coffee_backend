@@ -40,4 +40,6 @@ export enum Stages {
 
 export const ResponseMessages = {
   success: "success",
+  userDeleteSuccess: "User successfully deleted",
+  userDeleteFail: "User not deleted, DB exception",
 };

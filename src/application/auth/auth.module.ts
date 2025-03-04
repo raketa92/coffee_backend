@@ -10,6 +10,7 @@ import { UserService } from "@/domain/user/user.service";
 import { LogoutUserUseCase } from "../auth/usecases/logoutUser";
 import { RefreshTokenUseCase } from "../auth/usecases/refreshToken";
 import { IAuthService } from "./ports/IAuthService";
+import { DeleteUserUseCase } from "./usecases/deleteUser";
 
 @Module({
   imports: [EnvModule, DatabaseModule, UserModule],
@@ -19,6 +20,7 @@ import { IAuthService } from "./ports/IAuthService";
     RegisterUserUseCase,
     LogoutUserUseCase,
     RefreshTokenUseCase,
+    DeleteUserUseCase,
     UserService,
     {
       provide: IAuthService,
@@ -30,6 +32,7 @@ import { IAuthService } from "./ports/IAuthService";
     RegisterUserUseCase,
     LogoutUserUseCase,
     RefreshTokenUseCase,
+    DeleteUserUseCase,
   ],
 })
 export class AuthModule {}

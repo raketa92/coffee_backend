@@ -38,4 +38,12 @@ export class UserService {
   ): Promise<void> {
     await this.userRepository.save(user, transaction);
   }
+
+  async delete(
+    userGuid: string,
+    transaction?: Transaction<DatabaseSchema>
+  ): Promise<boolean> {
+    const result = await this.userRepository.delete(userGuid, transaction);
+    return !!Number(result.numDeletedRows);
+  }
 }

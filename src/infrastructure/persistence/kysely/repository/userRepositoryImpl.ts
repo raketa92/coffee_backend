@@ -1,6 +1,6 @@
 import { IUserRepository } from "@/domain/user/user.repository";
 import { Inject, Injectable } from "@nestjs/common";
-import { Kysely, Transaction } from "kysely";
+import { DeleteResult, Kysely, Transaction } from "kysely";
 import { DatabaseSchema } from "../database.schema";
 import { UserFiltersDto } from "@/infrastructure/http/dto/user/filters";
 import { UserCreateModel, UserModel, UserUpdateModel } from "../models/user";
@@ -13,6 +13,18 @@ export class UserRepositoryImpl implements IUserRepository {
     @Inject("DB_CONNECTION")
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}
+
+  async delete(
+    userGuid: string,
+    transaction?: Transaction<DatabaseSchema>
+  ): Promise<DeleteResult> {
+    const query = transaction || this.kysely;
+    return await query
+      .deleteFrom("User")
+      .where("User.guid", "=", userGuid)
+      .executeTakeFirst();
+  }
+
   private async saveUser(
     user: User,
     transaction?: Transaction<DatabaseSchema>

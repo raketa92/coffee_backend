@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpCode,
+  Param,
   Post,
   Req,
   UnauthorizedException,
@@ -15,6 +17,8 @@ import { LogoutUserUseCase } from "@/application/auth/usecases/logoutUser";
 import { RefreshTokenUseCase } from "@/application/auth/usecases/refreshToken";
 import { Request } from "express";
 import { JwtRefreshAuthGuard } from "../auth/guards/jwt-refresh-auth.guard";
+import { DeleteUserUseCase } from "@/application/auth/usecases/deleteUser";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Controller("/auth")
 export class AuthController {
@@ -22,7 +26,8 @@ export class AuthController {
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly loginUserUseCase: LoginUserUseCase,
     private readonly logoutUserUseCase: LogoutUserUseCase,
-    private readonly refreshTokenUseCase: RefreshTokenUseCase
+    private readonly refreshTokenUseCase: RefreshTokenUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase
   ) {}
 
   @Post("/register")
@@ -63,6 +68,14 @@ export class AuthController {
     }
     const refreshToken = user.refreshToken;
     const response = await this.refreshTokenUseCase.execute({ refreshToken });
+    return response;
+  }
+
+  @Delete("/delete/:userGuid")
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  async deleteUser(@Param("userGuid") userGuid: string) {
+    const response = await this.deleteUserUseCase.execute(userGuid);
     return response;
   }
 }
