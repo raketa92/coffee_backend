@@ -1,6 +1,6 @@
 import { UniqueEntityID } from "@/core/UniqueEntityID";
-import { ShopModel } from "../models/shop";
 import { Shop } from "@/domain/shop/shop";
+import { ShopModel } from "../persistence/kysely/models/shop";
 
 export class ShopMapper {
   static toDomain(shopModel: ShopModel): Shop {

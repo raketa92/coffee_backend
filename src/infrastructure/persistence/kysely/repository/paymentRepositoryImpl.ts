@@ -8,7 +8,7 @@ import {
   PaymentModel,
   PaymentUpdateModel,
 } from "@infrastructure/persistence/kysely/models/payment";
-import { PaymentMapper } from "../mappers/paymentMapper";
+import { PaymentMapper } from "@/infrastructure/dataMappers/paymentMapper";
 
 @Injectable()
 export class PaymentRepositoryImpl implements IPaymentRepository {

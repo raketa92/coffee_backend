@@ -3,8 +3,8 @@ import { Kysely } from "kysely";
 import { DatabaseSchema } from "../database.schema";
 import { Shop } from "@/domain/shop/shop";
 import { IShopRepository } from "@/domain/shop/repository/IShopRepository";
-import { ShopMapper } from "../mappers/shopMapper";
 import { ShopModel } from "../models/shop";
+import { ShopMapper } from "@/infrastructure/dataMappers/shopMapper";
 
 @Injectable()
 export class ShopRepositoryImpl implements IShopRepository {

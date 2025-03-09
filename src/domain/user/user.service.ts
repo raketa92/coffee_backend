@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { User } from "./user.entity";
 import { IUserRepository } from "./user.repository";
-import { UserMapper } from "@/infrastructure/persistence/kysely/mappers/userMapper";
 import { UserFiltersDto } from "@/infrastructure/http/dto/user/filters";
 import { Transaction } from "kysely";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
+import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 
 @Injectable()
 export class UserService {

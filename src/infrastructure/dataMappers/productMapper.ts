@@ -1,6 +1,6 @@
 import { Product } from "@/domain/product/product";
-import { ProductModel } from "../models/product";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
+import { ProductModel } from "../persistence/kysely/models/product";
 
 export class ProductMapper {
   static toDomain(productModel: ProductModel): Product {

@@ -5,7 +5,7 @@ import { DatabaseSchema } from "../database.schema";
 import { UserFiltersDto } from "@/infrastructure/http/dto/user/filters";
 import { UserCreateModel, UserModel, UserUpdateModel } from "../models/user";
 import { User } from "@/domain/user/user.entity";
-import { UserMapper } from "../mappers/userMapper";
+import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {

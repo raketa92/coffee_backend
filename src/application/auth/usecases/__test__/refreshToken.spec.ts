@@ -1,6 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
-import { UserMapper } from "@/infrastructure/persistence/kysely/mappers/userMapper";
 import { Roles } from "@/core/constants/roles";
 import { RefreshTokenUseCase } from "../refreshToken";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
@@ -10,6 +9,7 @@ import { JwtService } from "@nestjs/jwt";
 import { EnvService } from "@/infrastructure/env";
 import { IAuthService } from "@/application/auth/ports/IAuthService";
 import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
+import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 
 jest.mock("@/domain/user/user.entity", () => {
   const ActualUser = jest.requireActual("@/domain/user/user.entity").User;

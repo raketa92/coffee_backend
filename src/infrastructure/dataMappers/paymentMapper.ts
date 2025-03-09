@@ -1,7 +1,10 @@
 import { UniqueEntityID } from "@/core/UniqueEntityID";
-import { PaymentCreateModel, PaymentModel } from "../models/payment";
 import { Payment } from "@/domain/payment/payment";
 import { PaymentStatus } from "@/core/constants";
+import {
+  PaymentCreateModel,
+  PaymentModel,
+} from "../persistence/kysely/models/payment";
 
 export class PaymentMapper {
   static toDomain(paymentModel: PaymentModel): Payment {

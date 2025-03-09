@@ -1,48 +1,34 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
+import { UserDetails } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { UserService } from "@/domain/user/user.service";
 import { NotFoundException } from "@nestjs/common";
-import { DeleteUserUseCase } from "../deleteUser";
+import { UpdateProfileUseCase } from "../updateProfile";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
-import { ResponseMessages } from "@/core/constants";
+import { UpdateProfileDto } from "../dto";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 
-jest.mock("@/domain/user/user.entity", () => {
-  const ActualUser = jest.requireActual("@/domain/user/user.entity").User;
-  return {
-    User: jest.fn().mockImplementation((props) => {
-      const userInstance = new ActualUser(props);
-      Object.defineProperty(userInstance, "guid", {
-        get: jest.fn(() => ({
-          toValue: jest.fn(() => "8524994a-58c6-4b12-a965-80693a7b9803"),
-        })),
-      });
-      return userInstance;
-    }),
-  };
-});
-
-describe("Delete user use case", () => {
-  let useCase: DeleteUserUseCase;
+describe("Update profile user use case", () => {
+  let useCase: UpdateProfileUseCase;
   let userService: UserService;
   const userGuid = "8524994a-58c6-4b12-a965-80693a7b9803";
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        DeleteUserUseCase,
+        UpdateProfileUseCase,
         {
           provide: UserService,
           useValue: {
             findOne: jest.fn(),
-            delete: jest.fn(),
+            save: jest.fn(),
           },
         },
       ],
     }).compile();
 
-    useCase = module.get<DeleteUserUseCase>(DeleteUserUseCase);
+    useCase = module.get<UpdateProfileUseCase>(UpdateProfileUseCase);
     userService = module.get<UserService>(UserService);
   });
 
@@ -56,20 +42,30 @@ describe("Delete user use case", () => {
 
   it("should throw error if user not found", async () => {
     (userService.findOne as jest.Mock).mockResolvedValue(null);
-    await expect(useCase.execute(userGuid)).rejects.toThrow(
+    const updateProfileDto: UpdateProfileDto = {
+      userGuid,
+    };
+    await expect(useCase.execute(updateProfileDto)).rejects.toThrow(
       new NotFoundException({
         message: UseCaseErrorMessage.user_not_found,
       })
     );
   });
 
-  it("should delete user", async () => {
+  it("should update profile", async () => {
+    const updateProfileDto: UpdateProfileDto = {
+      userGuid,
+      userName: "usname",
+      firstName: "fsname",
+      lastName: "lsname",
+      gender: "female",
+    };
     const hashedPassword = "mocked_hashed_password";
 
     const userModel: UserModel = {
       guid: userGuid,
       password: hashedPassword,
-      phone: "99364123123",
+      phone: "+99344333322",
       email: null,
       userName: "mocked_user_name",
       firstName: "some_first_name",
@@ -86,11 +82,25 @@ describe("Delete user use case", () => {
 
     const user = UserMapper.toDomain(userModel);
     (userService.findOne as jest.Mock).mockResolvedValue(user);
-    (userService.delete as jest.Mock).mockResolvedValue(true);
+    const udpatedUser = UserMapper.toDomainFromDto(updateProfileDto, user);
+    (userService.save as jest.Mock).mockResolvedValue(udpatedUser);
 
-    const result = await useCase.execute(userGuid);
+    const result = await useCase.execute(updateProfileDto);
 
-    expect(userService.delete).toHaveBeenCalledWith(userGuid);
-    expect(result).toEqual(ResponseMessages.userDeleteSuccess);
+    expect(userService.save).toHaveBeenCalledWith(udpatedUser);
+    const userDetails: UserDetails = {
+      guid: udpatedUser.guid.toValue(),
+      email: udpatedUser.email,
+      phone: udpatedUser.phone,
+      gender: udpatedUser.gender,
+      role: udpatedUser.roles[0],
+      isVerified: udpatedUser.isVerified,
+      isActive: udpatedUser.isActive,
+      userName: udpatedUser.userName,
+      firstName: udpatedUser.firstName,
+      lastName: udpatedUser.lastName,
+      lastLogin: udpatedUser.lastLogin,
+    };
+    expect(result).toEqual(userDetails);
   });
 });

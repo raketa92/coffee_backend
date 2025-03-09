@@ -16,6 +16,7 @@ import { GetShopUseCase } from "./usecases/shop/getShop";
 import { CheckOrderUseCase } from "./usecases/order/checkOrderStatus";
 import { UserModule } from "@/domain/user/user.module";
 import { UserService } from "@/domain/user/user.service";
+import { UpdateProfileUseCase } from "./usecases/user/updateProfile";
 
 @Module({
   imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, UserModule],
@@ -29,6 +30,7 @@ import { UserService } from "@/domain/user/user.service";
     GetProductUseCase,
     GetShopsUseCase,
     GetShopUseCase,
+    UpdateProfileUseCase,
     UserService,
     {
       provide: IBankService,
@@ -44,6 +46,7 @@ import { UserService } from "@/domain/user/user.service";
     GetProductUseCase,
     GetShopsUseCase,
     GetShopUseCase,
+    UpdateProfileUseCase,
   ],
 })
 export class CoffeeShopModule {}

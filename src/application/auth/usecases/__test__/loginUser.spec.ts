@@ -2,7 +2,6 @@ import * as bcrypt from "bcrypt";
 import { Test, TestingModule } from "@nestjs/testing";
 import { LoginUserDto } from "@/infrastructure/http/dto/user/loginUserDto";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
-import { UserMapper } from "@/infrastructure/persistence/kysely/mappers/userMapper";
 import { Roles } from "@/core/constants/roles";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { IAuthService } from "@/application/auth/ports/IAuthService";
@@ -11,6 +10,7 @@ import { NotFoundException } from "@nestjs/common";
 import { LoginUserUseCase } from "../loginUser";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
+import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 
 jest.mock("bcrypt", () => ({
   compare: jest.fn(),

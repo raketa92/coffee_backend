@@ -3,7 +3,7 @@ export type UserTokenResponseDto = {
   refreshToken: string;
 };
 
-type UserDetails = {
+export type UserDetails = {
   guid: string;
   email: string | null;
   userName: string | null;
@@ -14,7 +14,7 @@ type UserDetails = {
   role: string;
   isVerified: boolean;
   isActive: boolean;
-  lastLogin: Date;
+  lastLogin: Date | null;
 };
 
 export type AuthResponseDto = UserTokenResponseDto & {

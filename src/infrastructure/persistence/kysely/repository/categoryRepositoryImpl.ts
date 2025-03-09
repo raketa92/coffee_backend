@@ -2,7 +2,7 @@ import { ICategoryRepository } from "@/domain/category/repository/ICategoryRepos
 import { Inject, Injectable } from "@nestjs/common";
 import { Kysely } from "kysely";
 import { DatabaseSchema } from "../database.schema";
-import { CategoryMapper } from "../mappers/categoryMapper";
+import { CategoryMapper } from "../../../dataMappers/categoryMapper";
 import { Category } from "@/domain/category/category";
 
 @Injectable()

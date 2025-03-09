@@ -1,6 +1,7 @@
 import { UniqueEntityID } from "@/core/UniqueEntityID";
-import { UserCreateModel, UserModel } from "../models/user";
 import { User } from "@/domain/user/user.entity";
+import { UserCreateModel, UserModel } from "../persistence/kysely/models/user";
+import { UpdateProfileDto } from "@/application/coffee_shop/usecases/user/dto";
 
 export class UserMapper {
   static toDomain(userModel: UserModel): User {
@@ -16,9 +17,26 @@ export class UserMapper {
         roles: userModel.roles,
         isActive: userModel.isActive,
         isVerified: userModel.isVerified,
-        lastLogin: userModel.lastLogin,
       },
       new UniqueEntityID(userModel.guid)
+    );
+  }
+
+  static toDomainFromDto(request: UpdateProfileDto, existingUser: User): User {
+    return User.create(
+      {
+        password: existingUser.password,
+        email: existingUser.email,
+        phone: existingUser.phone,
+        userName: request.userName ?? existingUser.userName,
+        firstName: request.firstName ?? existingUser.firstName,
+        lastName: request.lastName ?? existingUser.lastName,
+        gender: request.gender ?? existingUser.gender,
+        roles: existingUser.roles,
+        isVerified: existingUser.isVerified,
+        isActive: existingUser.isActive,
+      },
+      existingUser.guid
     );
   }
 

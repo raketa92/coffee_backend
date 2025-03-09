@@ -6,8 +6,8 @@ import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
 import { NotFoundException } from "@nestjs/common";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
-import { UserMapper } from "@/infrastructure/persistence/kysely/mappers/userMapper";
 import { ResponseMessages } from "@/core/constants";
+import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 
 describe("Logout user use case", () => {
   let useCase: LogoutUserUseCase;

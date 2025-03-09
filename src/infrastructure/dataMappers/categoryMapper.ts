@@ -1,5 +1,5 @@
 import { Category } from "@/domain/category/category";
-import { CategoryModel } from "../models/category";
+import { CategoryModel } from "../persistence/kysely/models/category";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
 
 export class CategoryMapper {

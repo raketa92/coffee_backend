@@ -13,7 +13,7 @@ import {
 import { OrderItemCreateModel } from "@infrastructure/persistence/kysely/models/orderItem";
 import { OrderItem } from "@domain/order/orderItem";
 import { OrderFilterDto } from "@/infrastructure/http/dto/order/filters";
-import { OrderMapper } from "../mappers/orderMapper";
+import { OrderMapper } from "@/infrastructure/dataMappers/orderMapper";
 
 @Injectable()
 export class OrderRepositoryImpl implements IOrderRepository {

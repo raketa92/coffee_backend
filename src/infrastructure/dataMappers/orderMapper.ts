@@ -6,7 +6,10 @@ import {
 import { Card } from "@domain/order/card";
 import { OrderItem } from "@domain/order/orderItem";
 import { UniqueEntityID } from "@core/UniqueEntityID";
-import { OrderItemModel, OrderItemModelFull } from "../models/orderItem";
+import {
+  OrderItemModel,
+  OrderItemModelFull,
+} from "../persistence/kysely/models/orderItem";
 
 export class OrderMapper {
   static toDomain(orderModel: OrderModelFull): Order {
