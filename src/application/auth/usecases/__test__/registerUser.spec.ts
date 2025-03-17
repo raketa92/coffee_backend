@@ -8,6 +8,9 @@ import { Roles } from "@/core/constants/roles";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { IAuthService } from "@/application/auth/ports/IAuthService";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { KafkaService } from "@/infrastructure/kafka/kafka.service";
+import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
+import { AppEvents } from "@/core/constants";
 
 jest.mock("bcrypt", () => ({
   hash: jest.fn(),
@@ -33,6 +36,7 @@ describe("Register user use case", () => {
   let useCase: RegisterUserUseCase;
   let userService: UserService;
   let authService: IAuthService;
+  let kafkaService: KafkaService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -43,6 +47,12 @@ describe("Register user use case", () => {
           useValue: {
             findOne: jest.fn(),
             save: jest.fn(),
+          },
+        },
+        {
+          provide: KafkaService,
+          useValue: {
+            publishEvent: jest.fn(),
           },
         },
         {
@@ -59,6 +69,24 @@ describe("Register user use case", () => {
     useCase = module.get<RegisterUserUseCase>(RegisterUserUseCase);
     userService = module.get<UserService>(UserService);
     authService = module.get<IAuthService>(IAuthService);
+    kafkaService = module.get<KafkaService>(KafkaService);
+
+    jest
+      .useFakeTimers({
+        doNotFake: [
+          "nextTick",
+          "setImmediate",
+          "setInterval",
+          "setTimeout",
+          "queueMicrotask",
+        ],
+        advanceTimers: true,
+      })
+      .setSystemTime(new Date(2025, 2, 17));
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
   });
 
   beforeEach(() => {
@@ -151,6 +179,14 @@ describe("Register user use case", () => {
         email: createUserDto.email,
         refreshToken,
       })
+    );
+    const otpEvent = new OTPRequestedEvent({
+      phone: user.phone,
+      purpose: "user_register",
+    });
+    expect(kafkaService.publishEvent).toHaveBeenCalledWith(
+      AppEvents.otpRequested,
+      otpEvent
     );
     const userDetails: AuthResponseDto = {
       accessToken,

@@ -11,6 +11,9 @@ import { UserService } from "@/domain/user/user.service";
 import { Roles } from "@/core/constants/roles";
 import { IAuthService } from "../ports/IAuthService";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { KafkaService } from "@/infrastructure/kafka/kafka.service";
+import { AppEvents } from "@/core/constants";
+import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 
 @Injectable()
 export class RegisterUserUseCase
@@ -19,7 +22,8 @@ export class RegisterUserUseCase
   constructor(
     private readonly userService: UserService,
     @Inject(IAuthService)
-    private readonly authService: IAuthService
+    private readonly authService: IAuthService,
+    private readonly kafkaService: KafkaService
   ) {}
 
   public async execute(request: CreateUserDto): Promise<AuthResponseDto> {
@@ -50,6 +54,15 @@ export class RegisterUserUseCase
       const refreshToken = this.authService.generateRefreshToken(payload);
       user.setRefreshToken(refreshToken);
       await this.userService.save(user);
+
+      const otpEvent = new OTPRequestedEvent({
+        phone: user.phone,
+        purpose: "user_register",
+      });
+      await this.kafkaService.publishEvent<OTPRequestedEvent>(
+        AppEvents.otpRequested,
+        otpEvent
+      );
 
       const userDetails: AuthResponseDto = {
         accessToken,

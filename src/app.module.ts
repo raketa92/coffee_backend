@@ -12,6 +12,7 @@ import { join } from "path";
 import { HttpModule } from "./infrastructure/http/http.module";
 import { AuthConfigModule } from "./infrastructure/auth/authConfig.module";
 import { AuthModule } from "./application/auth/auth.module";
+import { KafkaModule } from "./infrastructure/kafka/kafka.module";
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AuthModule } from "./application/auth/auth.module";
     LoggerModule,
     HttpModule,
     AuthConfigModule,
+    KafkaModule,
   ],
   providers: [
     RedisService,

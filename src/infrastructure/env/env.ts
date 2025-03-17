@@ -28,6 +28,7 @@ export const evnSchema = z.object({
   RYSGAL_BANK_PASSWORD: z.coerce.string(),
   JWT_SECRET: z.coerce.string(),
   REFRESH_TOKEN_SECRET: z.coerce.string(),
+  KAFKA_BROKER: z.coerce.string(),
 });
 
 export type Env = z.infer<typeof evnSchema>;

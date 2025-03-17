@@ -43,3 +43,7 @@ export const ResponseMessages = {
   userDeleteSuccess: "User successfully deleted",
   userDeleteFail: "User not deleted, DB exception",
 };
+
+export enum AppEvents {
+  otpRequested = "otpRequested",
+}

@@ -11,9 +11,11 @@ import { LogoutUserUseCase } from "../auth/usecases/logoutUser";
 import { RefreshTokenUseCase } from "../auth/usecases/refreshToken";
 import { IAuthService } from "./ports/IAuthService";
 import { DeleteUserUseCase } from "./usecases/deleteUser";
+import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
+import { KafkaService } from "@/infrastructure/kafka/kafka.service";
 
 @Module({
-  imports: [EnvModule, DatabaseModule, UserModule],
+  imports: [EnvModule, DatabaseModule, UserModule, KafkaModule],
   providers: [
     JwtService,
     LoginUserUseCase,
@@ -26,6 +28,7 @@ import { DeleteUserUseCase } from "./usecases/deleteUser";
       provide: IAuthService,
       useClass: AuthServiceImpl,
     },
+    KafkaService,
   ],
   exports: [
     LoginUserUseCase,
