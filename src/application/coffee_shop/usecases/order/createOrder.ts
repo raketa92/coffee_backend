@@ -73,6 +73,7 @@ export class CreateOrderUseCase
         status: createdOrder.status,
         totalPrice: createdOrder.totalPrice,
         formUrl,
+        deliveryDateTime: request.deliveryDateTime,
       };
 
       return response;
@@ -151,6 +152,14 @@ export class CreateOrderUseCase
       });
     });
 
+    const today = new Date();
+    if (request.deliveryDateTime < today) {
+      throw new UseCaseError({
+        code: UseCaseErrorCode.BAD_REQUEST,
+        message: UseCaseErrorMessage.invalid_date,
+      });
+    }
+
     const newOrder = new Order(
       {
         orderNumber,
@@ -162,6 +171,7 @@ export class CreateOrderUseCase
         status,
         paymentMethod: request.paymentMethod,
         orderItems: orderProducts,
+        deliveryDateTime: request.deliveryDateTime,
       },
       new UniqueEntityID(orderGuid)
     );

@@ -9,4 +9,5 @@ export const UseCaseErrorMessage = {
   payment_not_found: "Payment not found",
   user_not_found: "User not found",
   profile_update_error: "Profile update error",
+  invalid_date: "Invalid date",
 };

@@ -20,6 +20,7 @@ export type OrderResponseDto = {
   shopRating: number;
   totalPrice: number;
   date: Date;
+  deliveryDateTime: Date;
   OrderItems: OrderItem[];
 };
 

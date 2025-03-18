@@ -110,6 +110,7 @@ describe("Create order use case", () => {
       paymentMethod: PaymentMethods.card,
       phone: "1123",
       address: "mir",
+      deliveryDateTime: new Date(),
     };
 
     const orderProducts = createOrderDto.orderItems.map((item) => {
@@ -131,6 +132,7 @@ describe("Create order use case", () => {
       status: OrderStatus.waitingClientApproval,
       paymentMethod: createOrderDto.paymentMethod,
       orderItems: orderProducts,
+      deliveryDateTime: createOrderDto.deliveryDateTime,
     });
     const bankResponse = { orderId: "bank123", formUrl: "testUrl" };
     const hostApi = configService.get("HOST_API");
@@ -224,6 +226,7 @@ describe("Create order use case", () => {
       paymentMethod: PaymentMethods.cash,
       phone: "1112",
       address: "kemine",
+      deliveryDateTime: new Date(),
     };
 
     const orderProducts = createOrderDto.orderItems.map((item) => {
@@ -245,6 +248,7 @@ describe("Create order use case", () => {
       status: OrderStatus.pending,
       paymentMethod: createOrderDto.paymentMethod,
       orderItems: orderProducts,
+      deliveryDateTime: createOrderDto.deliveryDateTime,
     });
 
     const productsInDb = [
