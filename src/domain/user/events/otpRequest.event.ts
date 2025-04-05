@@ -1,10 +1,11 @@
 import { IUserData } from "@/application/coffee_shop/usecases/user/dto";
-import { IEvent, Purpose } from "@/core/events/IEvent";
+import { OtpPurpose } from "@/core/constants";
+import { IEvent } from "@/core/events/IEvent";
 
 export class OTPRequestedEvent implements IEvent {
   constructor(
     public readonly props: {
-      purpose: Purpose;
+      purpose: OtpPurpose;
       phone: string;
       payload?: string;
     }
@@ -15,7 +16,7 @@ export class OTPRequestedEvent implements IEvent {
     this.payload = props.payload;
   }
   public readonly dateTimeOccurred: Date;
-  public readonly purpose: Purpose;
+  public readonly purpose: OtpPurpose;
   public readonly phone: string;
   public readonly payload?: string;
 }

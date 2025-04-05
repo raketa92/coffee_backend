@@ -3,9 +3,9 @@ import { UserTokenResponseDto } from "@/infrastructure/http/dto/user/userTokenRe
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "../../auth/exception";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
-import { IAuthService } from "../ports/IAuthService";
-import { UserService } from "@/domain/user/user.service";
+import { IAuthService } from "../../shared/ports/IAuthService";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 @Injectable()
 export class RefreshTokenUseCase
@@ -14,7 +14,7 @@ export class RefreshTokenUseCase
   constructor(
     @Inject(IAuthService)
     private readonly authService: IAuthService,
-    private readonly userservice: UserService
+    private readonly userservice: IUserService
   ) {}
 
   public async execute(request: UserTokenDto): Promise<UserTokenResponseDto> {

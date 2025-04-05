@@ -5,17 +5,17 @@ import { LoginUserUseCase } from "../auth/usecases/loginUser";
 import { RegisterUserUseCase } from "../auth/usecases/registerUser";
 import { JwtService } from "@nestjs/jwt";
 import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
-import { UserModule } from "@/domain/user/user.module";
 import { UserService } from "@/domain/user/user.service";
 import { LogoutUserUseCase } from "../auth/usecases/logoutUser";
 import { RefreshTokenUseCase } from "../auth/usecases/refreshToken";
-import { IAuthService } from "./ports/IAuthService";
+import { IAuthService } from "../shared/ports/IAuthService";
 import { DeleteUserUseCase } from "./usecases/deleteUser";
 import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
 import { KafkaService } from "@/infrastructure/kafka/kafka.service";
+import { IUserService } from "../shared/ports/IUserService";
 
 @Module({
-  imports: [EnvModule, DatabaseModule, UserModule, KafkaModule],
+  imports: [EnvModule, DatabaseModule, KafkaModule],
   providers: [
     JwtService,
     LoginUserUseCase,
@@ -23,7 +23,10 @@ import { KafkaService } from "@/infrastructure/kafka/kafka.service";
     LogoutUserUseCase,
     RefreshTokenUseCase,
     DeleteUserUseCase,
-    UserService,
+    {
+      provide: IUserService,
+      useClass: UserService,
+    },
     {
       provide: IAuthService,
       useClass: AuthServiceImpl,

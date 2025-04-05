@@ -6,16 +6,16 @@ import {
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "../../auth/exception";
 import { LoginUserDto } from "@/infrastructure/http/dto/user/loginUserDto";
-import { IAuthService } from "../ports/IAuthService";
-import { UserService } from "@/domain/user/user.service";
+import { IAuthService } from "../../shared/ports/IAuthService";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 @Injectable()
 export class LoginUserUseCase
   implements UseCase<LoginUserDto, UserTokenResponseDto>
 {
   constructor(
-    private readonly userService: UserService,
+    private readonly userService: IUserService,
     private readonly authService: IAuthService
   ) {}
 

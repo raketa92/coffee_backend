@@ -5,7 +5,7 @@ import { EnvModule } from "@infrastructure/env";
 import { DatabaseModule } from "@infrastructure/persistence/kysely/database.module";
 import { CreateOrderUseCase } from "@application/coffee_shop/usecases/order/createOrder";
 import { PaymentModule } from "@infrastructure/payment/payment.module";
-import { IBankService } from "./ports/IBankService";
+import { IBankService } from "../shared/ports/IBankService";
 import { BankServiceImpl } from "@infrastructure/payment/bankService/bank.service";
 import { GetCategoriesUseCase } from "./usecases/category/getCategories";
 import { GetProductsUseCase } from "./usecases/product/getProducts";
@@ -14,12 +14,13 @@ import { GetOrdersUseCase } from "./usecases/order/getOrders";
 import { GetProductUseCase } from "./usecases/product/getProduct";
 import { GetShopUseCase } from "./usecases/shop/getShop";
 import { CheckOrderUseCase } from "./usecases/order/checkOrderStatus";
-import { UserModule } from "@/domain/user/user.module";
 import { UserService } from "@/domain/user/user.service";
 import { UpdateProfileUseCase } from "./usecases/user/updateProfile";
+import { IUserService } from "../shared/ports/IUserService";
+import { ChangePhoneUseCase } from "./usecases/user/changePhone";
 
 @Module({
-  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, UserModule],
+  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule],
   providers: [
     RedisService,
     CreateOrderUseCase,
@@ -31,7 +32,11 @@ import { UpdateProfileUseCase } from "./usecases/user/updateProfile";
     GetShopsUseCase,
     GetShopUseCase,
     UpdateProfileUseCase,
-    UserService,
+    ChangePhoneUseCase,
+    {
+      provide: IUserService,
+      useClass: UserService,
+    },
     {
       provide: IBankService,
       useClass: BankServiceImpl,
@@ -47,6 +52,7 @@ import { UpdateProfileUseCase } from "./usecases/user/updateProfile";
     GetShopsUseCase,
     GetShopUseCase,
     UpdateProfileUseCase,
+    ChangePhoneUseCase,
   ],
 })
 export class CoffeeShopModule {}

@@ -1,13 +1,13 @@
 import { UseCase } from "@/core/UseCase";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "../exception";
-import { UserService } from "@/domain/user/user.service";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 import { ResponseMessages } from "@/core/constants";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 @Injectable()
 export class DeleteUserUseCase implements UseCase<string, string> {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: IUserService) {}
 
   public async execute(userGuid: string): Promise<string> {
     try {

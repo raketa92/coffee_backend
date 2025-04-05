@@ -48,3 +48,9 @@ export enum AppEvents {
   otpRequested = "otpRequested",
   changePhoneOtpRequested = "changePhoneOtpRequested",
 }
+
+export enum OtpPurpose {
+  userRegister = "userRegister",
+  userChangePassword = "userChangePassword",
+  userChangePhone = "userChangePhone",
+}

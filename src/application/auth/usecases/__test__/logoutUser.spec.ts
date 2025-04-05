@@ -1,4 +1,3 @@
-import { UserService } from "@/domain/user/user.service";
 import { LogoutUserUseCase } from "../logoutUser";
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
@@ -8,17 +7,18 @@ import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
 import { ResponseMessages } from "@/core/constants";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 describe("Logout user use case", () => {
   let useCase: LogoutUserUseCase;
-  let userService: UserService;
+  let userService: IUserService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LogoutUserUseCase,
         {
-          provide: UserService,
+          provide: IUserService,
           useValue: {
             findUserByRefreshToken: jest.fn(),
             save: jest.fn(),
@@ -28,7 +28,7 @@ describe("Logout user use case", () => {
     }).compile();
 
     useCase = module.get<LogoutUserUseCase>(LogoutUserUseCase);
-    userService = module.get<UserService>(UserService);
+    userService = module.get<IUserService>(IUserService);
   });
 
   beforeEach(() => {

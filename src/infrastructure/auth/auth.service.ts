@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { EnvService } from "../env";
 import { UserTokenResponseDto } from "../http/dto/user/userTokenResponseDto";
-import { IAuthService } from "@/application/auth/ports/IAuthService";
+import { IAuthService } from "@/application/shared/ports/IAuthService";
 
 @Injectable()
 export class AuthServiceImpl implements IAuthService {

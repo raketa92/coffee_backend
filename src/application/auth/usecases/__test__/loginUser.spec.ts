@@ -4,13 +4,13 @@ import { LoginUserDto } from "@/infrastructure/http/dto/user/loginUserDto";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { IAuthService } from "@/application/auth/ports/IAuthService";
-import { UserService } from "@/domain/user/user.service";
+import { IAuthService } from "@/application/shared/ports/IAuthService";
 import { NotFoundException } from "@nestjs/common";
 import { LoginUserUseCase } from "../loginUser";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 jest.mock("bcrypt", () => ({
   compare: jest.fn(),
@@ -34,14 +34,14 @@ jest.mock("@/domain/user/user.entity", () => {
 describe("Login user use case", () => {
   let useCase: LoginUserUseCase;
   let authService: IAuthService;
-  let userService: UserService;
+  let userService: IUserService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LoginUserUseCase,
         {
-          provide: UserService,
+          provide: IUserService,
           useValue: {
             findOne: jest.fn(),
             findUserByRefreshToken: jest.fn(),
@@ -61,7 +61,7 @@ describe("Login user use case", () => {
 
     useCase = module.get<LoginUserUseCase>(LoginUserUseCase);
     authService = module.get<IAuthService>(IAuthService);
-    userService = module.get<UserService>(UserService);
+    userService = module.get<IUserService>(IUserService);
   });
 
   beforeEach(() => {

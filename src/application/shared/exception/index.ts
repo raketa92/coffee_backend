@@ -26,3 +26,7 @@ export class UseCaseError extends Error {
     this.info = params.info || undefined;
   }
 }
+
+export const UseCaseCommonErrorMessage = {
+  user_not_found: "User not found",
+};

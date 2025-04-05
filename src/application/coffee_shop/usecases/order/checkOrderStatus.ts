@@ -2,7 +2,7 @@ import { UseCase } from "@/core/UseCase";
 import { CheckOrderResponseDto } from "@/infrastructure/http/dto/order/orderResponseDto";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { IOrderRepository } from "@domain/order/repository/orderRepository";
-import { IBankService } from "@application/coffee_shop/ports/IBankService";
+import { IBankService } from "@/application/shared/ports/IBankService";
 import { IPaymentRepository } from "@domain/payment/repository/IPaymentRepository";
 import { UseCaseErrorMessage } from "@application/coffee_shop/exception";
 import { ICheckPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";

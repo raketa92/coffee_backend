@@ -2,15 +2,15 @@ import { UseCase } from "@/core/UseCase";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "../../auth/exception";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
-import { UserService } from "@/domain/user/user.service";
 import { ResponseMessages } from "@/core/constants";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 @Injectable()
 export class LogoutUserUseCase
   implements UseCase<UserTokenDto, { message: string }>
 {
-  constructor(private readonly userservice: UserService) {}
+  constructor(private readonly userservice: IUserService) {}
 
   public async execute(request: UserTokenDto): Promise<{ message: string }> {
     try {

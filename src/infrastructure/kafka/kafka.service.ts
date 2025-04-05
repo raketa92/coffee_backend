@@ -1,10 +1,11 @@
+import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 import { AppEvents } from "@/core/constants";
 import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { ClientKafka } from "@nestjs/microservices";
 import { lastValueFrom } from "rxjs";
 
 @Injectable()
-export class KafkaService implements OnModuleInit {
+export class KafkaService implements OnModuleInit, IKafkaService {
   constructor(
     @Inject("KAFKA_SERVICE") private readonly kafkaClient: ClientKafka
   ) {}

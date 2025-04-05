@@ -5,9 +5,12 @@ import { UserFiltersDto } from "@/infrastructure/http/dto/user/filters";
 import { Transaction } from "kysely";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
+import { IUserService } from "@/application/shared/ports/IUserService";
+import { OTP } from "../otp/otp";
+import { OtpPurpose } from "@/core/constants";
 
 @Injectable()
-export class UserService {
+export class UserService implements IUserService {
   constructor(
     @Inject(IUserRepository)
     private readonly userRepository: IUserRepository
@@ -45,5 +48,23 @@ export class UserService {
   ): Promise<boolean> {
     const result = await this.userRepository.delete(userGuid, transaction);
     return !!Number(result.numDeletedRows);
+  }
+
+  async processOtp(otp: OTP, user: User): Promise<User> {
+    switch (otp.purpose) {
+      case OtpPurpose.userChangePassword:
+        user.changePassword(otp.payload);
+        break;
+      case OtpPurpose.userChangePhone:
+        user.changePhone(otp.payload);
+        break;
+      case OtpPurpose.userRegister:
+        user.verify();
+        break;
+
+      default:
+        break;
+    }
+    return user;
   }
 }

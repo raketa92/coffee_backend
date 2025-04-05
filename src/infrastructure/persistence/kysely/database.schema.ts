@@ -2,6 +2,7 @@ import { BankResponseTable } from "./models/bankResponse";
 import { CategoryTable } from "./models/category";
 import { OrderTable } from "./models/order";
 import { OrderItemTable } from "./models/orderItem";
+import { OtpTable } from "./models/otp";
 import { PaymentTable } from "./models/payment";
 import { ProductTable } from "./models/product";
 import { ShopTable } from "./models/shop";
@@ -16,4 +17,5 @@ export interface DatabaseSchema {
   Category: CategoryTable;
   Shop: ShopTable;
   User: UserTable;
+  Otp: OtpTable;
 }

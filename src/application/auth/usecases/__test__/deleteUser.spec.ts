@@ -1,12 +1,12 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
-import { UserService } from "@/domain/user/user.service";
 import { NotFoundException } from "@nestjs/common";
 import { DeleteUserUseCase } from "../deleteUser";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { ResponseMessages } from "@/core/constants";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 jest.mock("@/domain/user/user.entity", () => {
   const ActualUser = jest.requireActual("@/domain/user/user.entity").User;
@@ -25,7 +25,7 @@ jest.mock("@/domain/user/user.entity", () => {
 
 describe("Delete user use case", () => {
   let useCase: DeleteUserUseCase;
-  let userService: UserService;
+  let userService: IUserService;
   const userGuid = "8524994a-58c6-4b12-a965-80693a7b9803";
 
   beforeAll(async () => {
@@ -33,7 +33,7 @@ describe("Delete user use case", () => {
       providers: [
         DeleteUserUseCase,
         {
-          provide: UserService,
+          provide: IUserService,
           useValue: {
             findOne: jest.fn(),
             delete: jest.fn(),
@@ -43,7 +43,7 @@ describe("Delete user use case", () => {
     }).compile();
 
     useCase = module.get<DeleteUserUseCase>(DeleteUserUseCase);
-    userService = module.get<UserService>(UserService);
+    userService = module.get<IUserService>(IUserService);
   });
 
   beforeEach(() => {

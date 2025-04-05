@@ -2,15 +2,15 @@ import { RegisterUserUseCase } from "../registerUser";
 import { Test, TestingModule } from "@nestjs/testing";
 import { CreateUserDto } from "@/infrastructure/http/dto/user/createUserDto";
 import { User } from "@/domain/user/user.entity";
-import { UserService } from "@/domain/user/user.service";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { Roles } from "@/core/constants/roles";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { IAuthService } from "@/application/auth/ports/IAuthService";
+import { IAuthService } from "@/application/shared/ports/IAuthService";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
-import { KafkaService } from "@/infrastructure/kafka/kafka.service";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
-import { AppEvents } from "@/core/constants";
+import { AppEvents, OtpPurpose } from "@/core/constants";
+import { IKafkaService } from "../../../shared/ports/IkafkaService";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 jest.mock("bcrypt", () => ({
   hash: jest.fn(),
@@ -34,23 +34,23 @@ jest.mock("@/domain/user/user.entity", () => {
 
 describe("Register user use case", () => {
   let useCase: RegisterUserUseCase;
-  let userService: UserService;
+  let userService: IUserService;
   let authService: IAuthService;
-  let kafkaService: KafkaService;
+  let kafkaService: IKafkaService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RegisterUserUseCase,
         {
-          provide: UserService,
+          provide: IUserService,
           useValue: {
             findOne: jest.fn(),
             save: jest.fn(),
           },
         },
         {
-          provide: KafkaService,
+          provide: IKafkaService,
           useValue: {
             publishEvent: jest.fn(),
           },
@@ -67,9 +67,9 @@ describe("Register user use case", () => {
     }).compile();
 
     useCase = module.get<RegisterUserUseCase>(RegisterUserUseCase);
-    userService = module.get<UserService>(UserService);
+    userService = module.get<IUserService>(IUserService);
     authService = module.get<IAuthService>(IAuthService);
-    kafkaService = module.get<KafkaService>(KafkaService);
+    kafkaService = module.get<IKafkaService>(IKafkaService);
 
     jest
       .useFakeTimers({
@@ -182,7 +182,7 @@ describe("Register user use case", () => {
     );
     const otpEvent = new OTPRequestedEvent({
       phone: user.phone,
-      purpose: "user_register",
+      purpose: OtpPurpose.userRegister,
     });
     expect(kafkaService.publishEvent).toHaveBeenCalledWith(
       AppEvents.otpRequested,

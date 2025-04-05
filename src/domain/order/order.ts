@@ -62,7 +62,7 @@ export class Order extends AggregateRoot<IOrderProps> {
     }
   }
 
-  private addChangedFields(field: keyof Order) {
+  private addChangedFields(field: keyof IOrderProps) {
     this._changedFields.add(field);
   }
 

@@ -45,7 +45,7 @@ export class User extends AggregateRoot<IUserProps> {
     this._lastLogin = props.lastLogin ?? new Date();
   }
 
-  addChangedFields(field: keyof User) {
+  addChangedFields(field: keyof IUserProps) {
     this._changedFields.add(field);
   }
 
@@ -55,6 +55,21 @@ export class User extends AggregateRoot<IUserProps> {
 
   setRefreshToken(token: string) {
     this._refreshToken = token;
+  }
+
+  changePassword(password: string) {
+    this._password = password;
+    this.addChangedFields("password");
+  }
+
+  changePhone(phone: string) {
+    this._phone = phone;
+    this.addChangedFields("phone");
+  }
+
+  verify() {
+    this._isVerified = true;
+    this.addChangedFields("isVerified");
   }
 
   setLastLogin(payload: Date): void {
@@ -82,22 +97,7 @@ export class User extends AggregateRoot<IUserProps> {
   }
 
   static create(props: IUserProps, guid?: UniqueEntityID): User {
-    return new User(
-      {
-        password: props.password,
-        email: props.email,
-        phone: props.phone,
-        userName: props.userName,
-        firstName: props.firstName,
-        lastName: props.lastName,
-        gender: props.gender,
-        roles: props.roles,
-        isVerified: props.isVerified,
-        isActive: props.isActive,
-        lastLogin: props.lastLogin,
-      },
-      guid
-    );
+    return new User(props, guid);
   }
 
   toJSON() {

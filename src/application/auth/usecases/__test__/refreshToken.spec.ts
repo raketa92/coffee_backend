@@ -4,12 +4,12 @@ import { Roles } from "@/core/constants/roles";
 import { RefreshTokenUseCase } from "../refreshToken";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
 import { NotFoundException } from "@nestjs/common";
-import { UserService } from "@/domain/user/user.service";
 import { JwtService } from "@nestjs/jwt";
 import { EnvService } from "@/infrastructure/env";
-import { IAuthService } from "@/application/auth/ports/IAuthService";
+import { IAuthService } from "@/application/shared/ports/IAuthService";
 import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 jest.mock("@/domain/user/user.entity", () => {
   const ActualUser = jest.requireActual("@/domain/user/user.entity").User;
@@ -29,7 +29,7 @@ jest.mock("@/domain/user/user.entity", () => {
 describe("Refresh token use case", () => {
   let useCase: RefreshTokenUseCase;
   let authService: IAuthService;
-  let userService: UserService;
+  let userService: IUserService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -63,7 +63,7 @@ describe("Refresh token use case", () => {
           },
         },
         {
-          provide: UserService,
+          provide: IUserService,
           useValue: {
             findUserByRefreshToken: jest.fn(),
             save: jest.fn(),
@@ -74,7 +74,7 @@ describe("Refresh token use case", () => {
 
     useCase = module.get<RefreshTokenUseCase>(RefreshTokenUseCase);
     authService = module.get<IAuthService>(IAuthService);
-    userService = module.get<UserService>(UserService);
+    userService = module.get<IUserService>(IUserService);
   });
 
   beforeEach(() => {

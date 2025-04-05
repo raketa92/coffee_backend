@@ -3,7 +3,7 @@ import {
   IBankService as IBankService,
   ICheckPaymentResponse,
   IPaymentReponse,
-} from "src/application/coffee_shop/ports/IBankService";
+} from "@/application/shared/ports/IBankService";
 import {
   IPaymentPayload,
   IPaymentData,

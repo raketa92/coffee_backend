@@ -10,7 +10,7 @@ import {
   PaymentStatus,
   PaytmentFor,
 } from "@core/constants";
-import { IBankService } from "@application/coffee_shop/ports/IBankService";
+import { IBankService } from "@/application/shared/ports/IBankService";
 import { Payment } from "@domain/payment/payment";
 import { IPaymentRepository } from "@domain/payment/repository/IPaymentRepository";
 import { RedisService } from "@infrastructure/persistence/redis/redis.service";

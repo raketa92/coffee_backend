@@ -1,5 +1,5 @@
 import { RedisService } from "@infrastructure/persistence/redis/redis.service";
-import { IBankService } from "@application/coffee_shop/ports/IBankService";
+import { IBankService } from "@/application/shared/ports/IBankService";
 import { IPaymentRepository } from "@/domain/payment/repository/IPaymentRepository";
 import { IOrderRepository } from "@/domain/order/repository/orderRepository";
 import { IProductRepository } from "@/domain/product/repository/IProductRepository";

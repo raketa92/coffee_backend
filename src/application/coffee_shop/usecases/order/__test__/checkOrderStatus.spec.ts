@@ -11,7 +11,7 @@ import {
   PaymentStatus,
 } from "@/core/constants";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
-import { IBankService } from "@/application/coffee_shop/ports/IBankService";
+import { IBankService } from "@/application/shared/ports/IBankService";
 import { ICheckPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
 import { IPaymentRepository } from "@/domain/payment/repository/IPaymentRepository";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";

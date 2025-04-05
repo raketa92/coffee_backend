@@ -40,7 +40,7 @@ export class ChangePhoneUseCase
     } catch (error: any) {
       throw new UseCaseError({
         code: error.code || UseCaseErrorCode.BAD_REQUEST,
-        message: error.message || UseCaseErrorMessage.profile_update_error,
+        message: error.message || UseCaseErrorMessage.phone_change_error,
       });
     }
   }

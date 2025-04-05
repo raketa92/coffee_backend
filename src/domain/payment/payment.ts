@@ -50,7 +50,7 @@ export class Payment extends AggregateRoot<IPaymentProps> {
     };
   }
 
-  private addChangedFields(field: keyof Payment) {
+  private addChangedFields(field: keyof IPaymentProps) {
     this._changedFields.add(field);
   }
 
