@@ -4,6 +4,7 @@ import { EnvModule, EnvService } from "../env";
 import { KafkaConsumer } from "./kafka.consumer";
 import { KafkaService } from "./kafka.service";
 import { IKafkaService } from "@/application/shared/ports/IkafkaService";
+import { OtpModule } from "@/application/otp/otp.module";
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { IKafkaService } from "@/application/shared/ports/IkafkaService";
         inject: [EnvService],
       },
     ]),
+    OtpModule,
   ],
   providers: [
     {

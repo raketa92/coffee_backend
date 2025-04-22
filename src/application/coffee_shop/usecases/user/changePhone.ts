@@ -1,20 +1,20 @@
 import { UseCase } from "@/core/UseCase";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ChangePhoneDto } from "./dto";
-import { KafkaService } from "@/infrastructure/kafka/kafka.service";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 import { UseCaseErrorMessage } from "../../exception";
-import { UserService } from "@/domain/user/user.service";
 import { ChangePhoneOtpRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { AppEvents } from "@/core/constants";
+import { IUserService } from "@/application/shared/ports/IUserService";
+import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 
 @Injectable()
 export class ChangePhoneUseCase
   implements UseCase<ChangePhoneDto, { message: string }>
 {
   constructor(
-    private readonly userService: UserService,
-    private readonly kafkaService: KafkaService
+    private readonly userService: IUserService,
+    private readonly kafkaService: IKafkaService
   ) {}
 
   public async execute(request: ChangePhoneDto): Promise<{ message: string }> {

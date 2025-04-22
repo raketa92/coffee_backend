@@ -1,20 +1,20 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
-import { UserService } from "@/domain/user/user.service";
 import { NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { ChangePhoneDto } from "../dto";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { ChangePhoneUseCase } from "../changePhone";
-import { KafkaService } from "@/infrastructure/kafka/kafka.service";
 import { ChangePhoneOtpRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { AppEvents } from "@/core/constants";
+import { IUserService } from "@/application/shared/ports/IUserService";
+import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 
 describe("Change phone use case", () => {
   let useCase: ChangePhoneUseCase;
-  let userService: UserService;
-  let kafkaService: KafkaService;
+  let userService: IUserService;
+  let kafkaService: IKafkaService;
   const userGuid = "8524994a-58c6-4b12-a965-80693a7b9803";
 
   beforeAll(async () => {
@@ -22,13 +22,13 @@ describe("Change phone use case", () => {
       providers: [
         ChangePhoneUseCase,
         {
-          provide: UserService,
+          provide: IUserService,
           useValue: {
             findOne: jest.fn(),
           },
         },
         {
-          provide: KafkaService,
+          provide: IKafkaService,
           useValue: {
             publishEvent: jest.fn(),
           },
@@ -37,8 +37,8 @@ describe("Change phone use case", () => {
     }).compile();
 
     useCase = module.get<ChangePhoneUseCase>(ChangePhoneUseCase);
-    userService = module.get<UserService>(UserService);
-    kafkaService = module.get<KafkaService>(KafkaService);
+    userService = module.get<IUserService>(IUserService);
+    kafkaService = module.get<IKafkaService>(IKafkaService);
   });
 
   beforeEach(() => {

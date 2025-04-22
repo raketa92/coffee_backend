@@ -1,17 +1,17 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { UpdateProfileDto } from "./dto";
 import { UserDetails } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { UserService } from "@/domain/user/user.service";
 import { UseCase } from "@/core/UseCase";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 import { UseCaseErrorMessage } from "../../exception";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 @Injectable()
 export class UpdateProfileUseCase
   implements UseCase<UpdateProfileDto, UserDetails>
 {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: IUserService) {}
 
   public async execute(request: UpdateProfileDto): Promise<UserDetails> {
     try {

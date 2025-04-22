@@ -5,17 +5,16 @@ import { UniqueEntityID } from "@/core/UniqueEntityID";
 export interface IOtpProps {
   otp: string;
   userGuid: UniqueEntityID;
-  payload: string;
+  payload?: string;
   purpose: OtpPurpose;
-  expiresAt: Date;
+  expiresAt?: Date;
 }
-
 export class OTP extends Entity<IOtpProps> {
   private readonly _otp: string;
   private readonly _userGuid: UniqueEntityID;
-  private readonly _payload: string;
+  private readonly _payload?: string;
   private readonly _purpose: OtpPurpose;
-  private readonly _expiresAt: Date;
+  private _expiresAt: Date;
   private _changedFields: Set<keyof OTP> = new Set();
 
   private constructor(props: IOtpProps, guid?: UniqueEntityID) {
@@ -24,11 +23,17 @@ export class OTP extends Entity<IOtpProps> {
     this._userGuid = props.userGuid;
     this._payload = props.payload;
     this._purpose = props.purpose;
-    this._expiresAt = props.expiresAt;
+    this._expiresAt = this.setExpireDate(props.expiresAt);
   }
 
   static create(props: IOtpProps, guid?: UniqueEntityID): OTP {
     return new OTP(props, guid);
+  }
+
+  setExpireDate(date?: Date): Date {
+    const currentDate = new Date();
+    const newDate = new Date().setDate(currentDate.getDate() + 1);
+    return date || new Date(newDate);
   }
 
   get guid(): UniqueEntityID {
@@ -47,7 +52,7 @@ export class OTP extends Entity<IOtpProps> {
     return this._userGuid;
   }
 
-  get payload(): string {
+  get payload(): string | undefined {
     return this._payload;
   }
 

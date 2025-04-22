@@ -13,6 +13,7 @@ import { HttpModule } from "./infrastructure/http/http.module";
 import { AuthConfigModule } from "./infrastructure/auth/authConfig.module";
 import { AuthModule } from "./application/auth/auth.module";
 import { KafkaModule } from "./infrastructure/kafka/kafka.module";
+import { OtpModule } from "./application/otp/otp.module";
 
 @Module({
   imports: [
@@ -23,7 +24,6 @@ import { KafkaModule } from "./infrastructure/kafka/kafka.module";
       rootPath: join(__dirname, "..", "uploads/images"),
       serveRoot: "/images",
     }),
-    CoffeeShopModule,
     AuthModule,
     RedisModule,
     EnvModule,
@@ -31,6 +31,8 @@ import { KafkaModule } from "./infrastructure/kafka/kafka.module";
     HttpModule,
     AuthConfigModule,
     KafkaModule,
+    CoffeeShopModule,
+    OtpModule,
   ],
   providers: [
     RedisService,

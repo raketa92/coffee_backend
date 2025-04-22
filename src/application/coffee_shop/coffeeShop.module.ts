@@ -18,9 +18,12 @@ import { UserService } from "@/domain/user/user.service";
 import { UpdateProfileUseCase } from "./usecases/user/updateProfile";
 import { IUserService } from "../shared/ports/IUserService";
 import { ChangePhoneUseCase } from "./usecases/user/changePhone";
+import { IKafkaService } from "../shared/ports/IkafkaService";
+import { KafkaService } from "@/infrastructure/kafka/kafka.service";
+import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
 
 @Module({
-  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule],
+  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, KafkaModule],
   providers: [
     RedisService,
     CreateOrderUseCase,
@@ -40,6 +43,10 @@ import { ChangePhoneUseCase } from "./usecases/user/changePhone";
     {
       provide: IBankService,
       useClass: BankServiceImpl,
+    },
+    {
+      provide: IKafkaService,
+      useClass: KafkaService,
     },
   ],
   exports: [

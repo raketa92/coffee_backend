@@ -2,16 +2,16 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
 import { UserDetails } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { UserService } from "@/domain/user/user.service";
 import { NotFoundException } from "@nestjs/common";
 import { UpdateProfileUseCase } from "../updateProfile";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { UpdateProfileDto } from "../dto";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
+import { IUserService } from "@/application/shared/ports/IUserService";
 
 describe("Update profile user use case", () => {
   let useCase: UpdateProfileUseCase;
-  let userService: UserService;
+  let userService: IUserService;
   const userGuid = "8524994a-58c6-4b12-a965-80693a7b9803";
 
   beforeAll(async () => {
@@ -19,7 +19,7 @@ describe("Update profile user use case", () => {
       providers: [
         UpdateProfileUseCase,
         {
-          provide: UserService,
+          provide: IUserService,
           useValue: {
             findOne: jest.fn(),
             save: jest.fn(),
@@ -29,7 +29,7 @@ describe("Update profile user use case", () => {
     }).compile();
 
     useCase = module.get<UpdateProfileUseCase>(UpdateProfileUseCase);
-    userService = module.get<UserService>(UserService);
+    userService = module.get<IUserService>(IUserService);
   });
 
   beforeEach(() => {

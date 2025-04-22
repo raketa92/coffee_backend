@@ -53,10 +53,14 @@ export class UserService implements IUserService {
   async processOtp(otp: OTP, user: User): Promise<User> {
     switch (otp.purpose) {
       case OtpPurpose.userChangePassword:
-        user.changePassword(otp.payload);
+        if (otp.payload) {
+          user.changePassword(otp.payload);
+        }
         break;
       case OtpPurpose.userChangePhone:
-        user.changePhone(otp.payload);
+        if (otp.payload) {
+          user.changePhone(otp.payload);
+        }
         break;
       case OtpPurpose.userRegister:
         user.verify();

@@ -5,7 +5,7 @@ export interface OtpTable {
   guid: string;
   otp: string;
   userGuid: string;
-  payload: string;
+  payload?: string;
   purpose: OtpPurpose;
   expiresAt: Date;
   createdAt: Generated<Date>;
