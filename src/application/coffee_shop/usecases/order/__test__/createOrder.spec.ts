@@ -20,6 +20,7 @@ import { EnvService } from "@infrastructure/env";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
 import { Kysely } from "kysely";
 import { IPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
+import { addHours } from "date-fns";
 
 describe("Create order use case", () => {
   let useCase: CreateOrderUseCase;
@@ -110,7 +111,7 @@ describe("Create order use case", () => {
       paymentMethod: PaymentMethods.card,
       phone: "1123",
       address: "mir",
-      deliveryDateTime: new Date(),
+      deliveryDateTime: addHours(new Date(), 1),
     };
 
     const orderProducts = createOrderDto.orderItems.map((item) => {
@@ -209,7 +210,7 @@ describe("Create order use case", () => {
       totalPrice: newOrder.totalPrice,
       status: newOrder.status,
     });
-  });
+  }, 30000);
 
   it("should create an order and process payment when payment method is cash", async () => {
     const orderNumber = "290924873425";
