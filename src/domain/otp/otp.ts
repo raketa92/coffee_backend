@@ -32,7 +32,7 @@ export class OTP extends Entity<IOtpProps> {
 
   setExpireDate(date?: Date): Date {
     const currentDate = new Date();
-    const newDate = new Date().setDate(currentDate.getDate() + 1);
+    const newDate = new Date().setMinutes(currentDate.getMinutes() + 10);
     return date || new Date(newDate);
   }
 
