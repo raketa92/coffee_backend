@@ -4,14 +4,14 @@ import { UniqueEntityID } from "@/core/UniqueEntityID";
 
 export interface IOtpProps {
   otp: string;
-  userGuid: UniqueEntityID;
+  phone: string;
   payload?: string;
   purpose: OtpPurpose;
   expiresAt?: Date;
 }
 export class OTP extends Entity<IOtpProps> {
   private readonly _otp: string;
-  private readonly _userGuid: UniqueEntityID;
+  private readonly _phone: string;
   private readonly _payload?: string;
   private readonly _purpose: OtpPurpose;
   private _expiresAt: Date;
@@ -20,7 +20,7 @@ export class OTP extends Entity<IOtpProps> {
   private constructor(props: IOtpProps, guid?: UniqueEntityID) {
     super(guid);
     this._otp = props.otp;
-    this._userGuid = props.userGuid;
+    this._phone = props.phone;
     this._payload = props.payload;
     this._purpose = props.purpose;
     this._expiresAt = this.setExpireDate(props.expiresAt);
@@ -48,8 +48,8 @@ export class OTP extends Entity<IOtpProps> {
     return this._purpose;
   }
 
-  get userGuid(): UniqueEntityID {
-    return this._userGuid;
+  get phone(): string {
+    return this._phone;
   }
 
   get payload(): string | undefined {
@@ -76,7 +76,7 @@ export class OTP extends Entity<IOtpProps> {
     return {
       guid: this._guid.toString(),
       otp: this._otp,
-      userGuid: this._userGuid,
+      userGuid: this._phone,
       payload: this._payload,
       expiresAt: this._expiresAt,
     };

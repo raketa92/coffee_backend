@@ -4,7 +4,7 @@ import { IEvent } from "@/core/events/IEvent";
 
 export class OTPRequestedEvent implements IEvent {
   constructor(
-    public readonly props: {
+    readonly props: {
       purpose: OtpPurpose;
       phone: string;
       payload?: string;
@@ -15,7 +15,7 @@ export class OTPRequestedEvent implements IEvent {
     this.phone = props.phone;
     this.payload = props.payload;
   }
-  public readonly dateTimeOccurred: Date;
+  readonly dateTimeOccurred: Date;
   public readonly purpose: OtpPurpose;
   public readonly phone: string;
   public readonly payload?: string;
@@ -23,7 +23,7 @@ export class OTPRequestedEvent implements IEvent {
 
 export class ChangePhoneOtpRequestedEvent implements IEvent {
   constructor(
-    public readonly props: {
+    readonly props: {
       phone: string;
       payload: IUserData;
     }

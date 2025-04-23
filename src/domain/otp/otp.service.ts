@@ -1,7 +1,7 @@
-import { OtpRequestDto } from "@/application/otp/usecases/dto";
+import { IOtpFilter } from "@/application/otp/usecases/dto";
 import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { Inject, Injectable } from "@nestjs/common";
-import { OTP } from "./otp";
+import { IOtpProps, OTP } from "./otp";
 import { IOtpRepository } from "./otp.repository";
 import { OtpMapper } from "@/infrastructure/dataMappers/otpMapper";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
@@ -13,7 +13,20 @@ export class OtpService implements IOtpService {
     @Inject(IOtpRepository)
     private readonly otpRepository: IOtpRepository
   ) {}
-  async findOne(filter: OtpRequestDto): Promise<OTP | null> {
+  async create(
+    data: IOtpProps,
+    transaction?: Transaction<DatabaseSchema>
+  ): Promise<OTP> {
+    const otp = OTP.create({
+      otp: data.otp,
+      phone: data.phone,
+      payload: data.payload,
+      purpose: data.purpose,
+    });
+    await this.otpRepository.save(otp, transaction);
+    return otp;
+  }
+  async findOne(filter: IOtpFilter): Promise<OTP | null> {
     const otpModel = await this.otpRepository.getOtpByFilter(filter);
     if (!otpModel) {
       return null;

@@ -4,7 +4,7 @@ import { Generated, Insertable, Selectable, Updateable } from "kysely";
 export interface OtpTable {
   guid: string;
   otp: string;
-  userGuid: string;
+  phone: string;
   payload?: string;
   purpose: OtpPurpose;
   expiresAt: Date;

@@ -1,4 +1,4 @@
-import { AppEvents } from "@/core/constants";
+import { AppEvents, OtpPurpose } from "@/core/constants";
 import {
   ChangePhoneOtpRequestedEvent,
   OTPRequestedEvent,
@@ -12,19 +12,32 @@ import {
   otpRequestSchema,
 } from "@/application/otp/usecases/dto";
 import { ProcessOtpResponseUseCase } from "@/application/otp/usecases/processOtpResponse";
+import { IOtpService } from "@/application/shared/ports/IOtpService";
+import { RedisService } from "../persistence/redis/redis.service";
 
 @Controller()
 export class KafkaConsumer {
   constructor(
     private readonly logger: LoggerService,
-    private readonly processOtpResponseUseCase: ProcessOtpResponseUseCase
+    private readonly processOtpResponseUseCase: ProcessOtpResponseUseCase,
+    private readonly otpService: IOtpService,
+    private readonly redisService: RedisService
   ) {}
   @MessagePattern(AppEvents.otpRequested)
   async handleOtpRequested(@Payload() event: OTPRequestedEvent): Promise<void> {
     this.logger.info(
       `OTP requested for phone: ${event.phone}, purpose: ${event.purpose}`
     );
-    // create otp record
+
+    const smsCode = await this.redisService.generateShortSmsCode();
+    this.logger.info(`Generated OTP: ${smsCode}`);
+
+    await this.otpService.create({
+      otp: smsCode,
+      phone: event.phone,
+      purpose: event.purpose,
+      payload: event.payload,
+    });
     // send sms
   }
 
@@ -33,10 +46,21 @@ export class KafkaConsumer {
     @Payload() event: ChangePhoneOtpRequestedEvent
   ): Promise<void> {
     this.logger.info(`OTP requested to change phone: ${event.phone}`);
-    // create otp record
+    // generate sms code
+    const smsCode = await this.redisService.generateShortSmsCode();
+    this.logger.info(`Generated OTP: ${smsCode}`);
+
+    await this.otpService.create({
+      otp: smsCode,
+      phone: event.phone,
+      purpose: OtpPurpose.userChangePhone,
+    });
     // send sms
   }
 
+  /* 
+    users send otp data to this endpoint
+  */
   @Post("/otp-response")
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)

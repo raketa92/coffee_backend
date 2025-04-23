@@ -53,4 +53,5 @@ export enum OtpPurpose {
   userRegister = "userRegister",
   userChangePassword = "userChangePassword",
   userChangePhone = "userChangePhone",
+  register = "register",
 }

@@ -7,7 +7,7 @@ export class OtpMapper {
     return OTP.create(
       {
         otp: model.otp,
-        userGuid: new UniqueEntityID(model.userGuid),
+        phone: model.phone,
         payload: model.payload,
         purpose: model.purpose,
         expiresAt: model.expiresAt,
@@ -20,7 +20,7 @@ export class OtpMapper {
     const dbModel: OtpCreateModel = {
       guid: otp.guid.toValue(),
       otp: otp.otp,
-      userGuid: otp.userGuid.toValue(),
+      phone: otp.phone,
       payload: otp.payload,
       purpose: otp.purpose,
       expiresAt: otp.expiresAt,

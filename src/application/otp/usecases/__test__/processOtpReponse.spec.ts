@@ -7,7 +7,6 @@ import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { ProcessOtpResponseUseCase } from "../processOtpResponse";
 import { OtpRequestDto } from "../dto";
 import { OTP } from "@/domain/otp/otp";
-import { UniqueEntityID } from "@/core/UniqueEntityID";
 import { OtpPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IOtpService } from "@/application/shared/ports/IOtpService";
@@ -96,7 +95,7 @@ describe("Process otp use case", () => {
 
     const otp = OTP.create({
       otp: dto.otp,
-      userGuid: new UniqueEntityID(dto.userGuid),
+      phone: user.phone,
       purpose: OtpPurpose.userRegister,
     });
 
@@ -109,6 +108,7 @@ describe("Process otp use case", () => {
     const result = await useCase.execute(dto);
 
     expect(userService.save).toHaveBeenCalledWith(user);
+    expect(otpService.delete).toHaveBeenCalledWith(otp.guid.toValue());
     expect(user).toHaveProperty("isVerified", true);
     expect(result).toEqual({
       message: "OTP verified successfully",
@@ -147,7 +147,7 @@ describe("Process otp use case", () => {
 
     const otp = OTP.create({
       otp: dto.otp,
-      userGuid: new UniqueEntityID(dto.userGuid),
+      phone: user.phone,
       payload: newPassword,
       purpose: OtpPurpose.userRegister,
     });
@@ -161,6 +161,7 @@ describe("Process otp use case", () => {
     const result = await useCase.execute(dto);
 
     expect(userService.save).toHaveBeenCalledWith(user);
+    expect(otpService.delete).toHaveBeenCalledWith(otp.guid.toValue());
     expect(user).toHaveProperty("password", newPassword);
     expect(result).toEqual({
       message: "OTP verified successfully",
@@ -199,7 +200,7 @@ describe("Process otp use case", () => {
 
     const otp = OTP.create({
       otp: dto.otp,
-      userGuid: new UniqueEntityID(dto.userGuid),
+      phone: user.phone,
       payload: newPhone,
       purpose: OtpPurpose.userRegister,
     });
@@ -213,6 +214,7 @@ describe("Process otp use case", () => {
     const result = await useCase.execute(dto);
 
     expect(userService.save).toHaveBeenCalledWith(user);
+    expect(otpService.delete).toHaveBeenCalledWith(otp.guid.toValue());
     expect(user).toHaveProperty("phone", newPhone);
     expect(result).toEqual({
       message: "OTP verified successfully",

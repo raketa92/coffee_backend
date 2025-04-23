@@ -6,3 +6,8 @@ export const otpRequestSchema = z.object({
 });
 
 export type OtpRequestDto = z.infer<typeof otpRequestSchema>;
+
+export interface IOtpFilter {
+  otp: string;
+  phone: string;
+}

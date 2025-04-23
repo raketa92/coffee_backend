@@ -1,4 +1,4 @@
-import { OtpRequestDto } from "@/application/otp/usecases/dto";
+import { IOtpFilter } from "@/application/otp/usecases/dto";
 import { OTP } from "@/domain/otp/otp";
 import { IOtpRepository } from "@/domain/otp/otp.repository";
 import { Inject, Injectable } from "@nestjs/common";
@@ -14,12 +14,12 @@ export class OtpRepositoryImpl implements IOtpRepository {
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}
 
-  async getOtpByFilter(filter: OtpRequestDto): Promise<OtpModel | null> {
+  async getOtpByFilter(filter: IOtpFilter): Promise<OtpModel | null> {
     const query = this.kysely
       .selectFrom("Otp")
       .selectAll()
       .where("Otp.otp", "=", filter.otp)
-      .where("Otp.userGuid", "=", filter.userGuid);
+      .where("Otp.phone", "=", filter.phone);
 
     const otpModel = await query.executeTakeFirst();
     if (!otpModel) {

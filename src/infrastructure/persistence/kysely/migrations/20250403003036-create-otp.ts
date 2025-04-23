@@ -12,7 +12,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable(tableName)
     .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
-    .addColumn("userGuid", "uuid", (col) => col.notNull())
+    .addColumn("phone", "varchar(20)", (col) => col.notNull())
     .addColumn("otp", "varchar(20)", (col) => col.notNull())
     .addColumn("payload", "varchar(100)", (col) => col.notNull())
     .addColumn("purpose", sql`otp_purpose_enum`, (col) => col.notNull())

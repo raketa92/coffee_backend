@@ -38,4 +38,19 @@ export class RedisService {
   async set(key: string, value: string, ttl: number): Promise<void> {
     await this.redisClient.set(key, value, "EX", ttl);
   }
+
+  async generateShortSmsCode(): Promise<string> {
+    const client = this.redisClient;
+
+    let randomPart: string;
+    let smsCode: string;
+    do {
+      randomPart = Math.floor(1000 + Math.random() * 9000).toString();
+      smsCode = randomPart;
+    } while (await client.exists(smsCode));
+
+    await client.set(smsCode, "1", "EX", 5 * 60);
+
+    return smsCode;
+  }
 }

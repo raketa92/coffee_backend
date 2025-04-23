@@ -30,7 +30,10 @@ export class ProcessOtpResponseUseCase
         });
       }
 
-      const otp = await this.otpService.findOne(request);
+      const otp = await this.otpService.findOne({
+        otp: request.otp,
+        phone: existingUser.phone,
+      });
       if (!otp) {
         throw new NotFoundException({
           message: UseCaseErrorMessage.wrong_otp,
