@@ -122,7 +122,7 @@ describe("Check order status use case", () => {
             Product: product,
           },
         ],
-        deliveryDateTime: new Date(),
+        deliveryTime: "",
       },
       {
         guid: new UniqueEntityID().toString(),
@@ -150,7 +150,7 @@ describe("Check order status use case", () => {
             Product: product,
           },
         ],
-        deliveryDateTime: new Date(),
+        deliveryTime: "",
       },
     ];
 
@@ -204,7 +204,7 @@ describe("Check order status use case", () => {
               new UniqueEntityID(item.guid)
             )
         ),
-        deliveryDateTime: new Date(),
+        deliveryTime: "",
       },
       new UniqueEntityID(mockOrders[1].guid)
     );
@@ -406,7 +406,7 @@ describe("Check order status use case", () => {
               new UniqueEntityID(item.guid)
             )
         ),
-        deliveryDateTime: new Date(),
+        deliveryTime: "",
       },
       new UniqueEntityID(mockOrders[1].guid)
     );

@@ -4,7 +4,10 @@ import { IPaymentRepository } from "@/domain/payment/repository/IPaymentReposito
 import { IOrderRepository } from "@/domain/order/repository/orderRepository";
 import { IProductRepository } from "@/domain/product/repository/IProductRepository";
 import { Test, TestingModule } from "@nestjs/testing";
-import { CreateOrderDto } from "@/infrastructure/http/dto/order/createOrderDto";
+import {
+  CreateOrderDto,
+  createOrderSchema,
+} from "@/infrastructure/http/dto/order/createOrderDto";
 import {
   OrderStatus,
   PaymentMethods,
@@ -20,7 +23,6 @@ import { EnvService } from "@infrastructure/env";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
 import { Kysely } from "kysely";
 import { IPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
-import { addHours } from "date-fns";
 
 describe("Create order use case", () => {
   let useCase: CreateOrderUseCase;
@@ -98,7 +100,7 @@ describe("Create order use case", () => {
 
   it("should create an order and process payment when payment method is card", async () => {
     const orderNumber = "290924873425";
-    const createOrderDto: CreateOrderDto = {
+    const body: CreateOrderDto = {
       userGuid: new UniqueEntityID().toString(),
       shopGuid: new UniqueEntityID().toString(),
       orderItems: [
@@ -111,8 +113,10 @@ describe("Create order use case", () => {
       paymentMethod: PaymentMethods.card,
       phone: "1123",
       address: "mir",
-      deliveryDateTime: addHours(new Date(), 1),
+      deliveryTime: "06:00-23:02",
     };
+
+    const createOrderDto = createOrderSchema.parse(body);
 
     const orderProducts = createOrderDto.orderItems.map((item) => {
       return new OrderItem({
@@ -133,7 +137,7 @@ describe("Create order use case", () => {
       status: OrderStatus.waitingClientApproval,
       paymentMethod: createOrderDto.paymentMethod,
       orderItems: orderProducts,
-      deliveryDateTime: createOrderDto.deliveryDateTime,
+      deliveryTime: createOrderDto.deliveryTime,
     });
     const bankResponse = { orderId: "bank123", formUrl: "testUrl" };
     const hostApi = configService.get("HOST_API");
@@ -214,9 +218,9 @@ describe("Create order use case", () => {
 
   it("should create an order and process payment when payment method is cash", async () => {
     const orderNumber = "290924873425";
-    const createOrderDto: CreateOrderDto = {
-      userGuid: "1",
-      shopGuid: "2",
+    const body: CreateOrderDto = {
+      userGuid: new UniqueEntityID().toString(),
+      shopGuid: new UniqueEntityID().toString(),
       orderItems: [
         {
           productGuid: "c1f0012a-d013-4969-b440-5864e53c8778",
@@ -227,8 +231,10 @@ describe("Create order use case", () => {
       paymentMethod: PaymentMethods.cash,
       phone: "1112",
       address: "kemine",
-      deliveryDateTime: new Date(),
+      deliveryTime: "09:04-23:07",
     };
+
+    const createOrderDto = createOrderSchema.parse(body);
 
     const orderProducts = createOrderDto.orderItems.map((item) => {
       return new OrderItem({
@@ -249,7 +255,7 @@ describe("Create order use case", () => {
       status: OrderStatus.pending,
       paymentMethod: createOrderDto.paymentMethod,
       orderItems: orderProducts,
-      deliveryDateTime: createOrderDto.deliveryDateTime,
+      deliveryTime: createOrderDto.deliveryTime,
     });
 
     const productsInDb = [

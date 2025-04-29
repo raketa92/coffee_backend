@@ -12,12 +12,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("shopGuid", "uuid", (col) => col.notNull())
     .addColumn("phone", "varchar(15)", (col) => col.notNull())
     .addColumn("address", "text", (col) => col.notNull())
+    .addColumn("deliveryTime", "varchar(20)", (col) => col.notNull())
     .addColumn("totalPrice", "decimal", (col) => col.notNull())
     .addColumn("status", "varchar(50)", (col) => col.notNull())
     .addColumn("paymentGuid", "uuid")
     .addColumn("paymentMethod", "varchar(50)")
     .addColumn("card", "json")
-    .addColumn("deliveryDateTime", "timestamptz")
     .$call(withTimestamps)
     .execute();
 }

@@ -14,7 +14,7 @@ export interface OrderTable {
   paymentGuid?: string | null;
   paymentMethod: PaymentMethods;
   card?: CardModel | null;
-  deliveryDateTime: Date;
+  deliveryTime: string;
   createdAt: Generated<Date>;
   updatedAt: Generated<Date>;
 }

@@ -21,7 +21,7 @@ export interface IOrderProps {
   paymentMethod: PaymentMethods;
   card?: Card | null;
   orderItems: OrderItem[];
-  deliveryDateTime: Date;
+  deliveryTime: string;
 }
 
 export class Order extends AggregateRoot<IOrderProps> {
@@ -36,7 +36,7 @@ export class Order extends AggregateRoot<IOrderProps> {
   private readonly _paymentMethod: PaymentMethods;
   private readonly _card?: Card | null;
   private readonly _orderItems: OrderItem[];
-  private readonly _deliveryDateTime: Date;
+  private readonly _deliveryTime: string;
   private _changedFields: Set<keyof Order> = new Set();
 
   constructor(props: IOrderProps, guid?: UniqueEntityID) {
@@ -52,7 +52,7 @@ export class Order extends AggregateRoot<IOrderProps> {
     this._paymentMethod = props.paymentMethod;
     this._card = props.card || null;
     this._orderItems = props.orderItems;
-    this._deliveryDateTime = props.deliveryDateTime;
+    this._deliveryTime = props.deliveryTime;
 
     if (this._totalPrice < 0) {
       throw new DomainError({
@@ -106,7 +106,7 @@ export class Order extends AggregateRoot<IOrderProps> {
       card: this._card,
       orderItems: this._orderItems,
       changedFields: this._changedFields,
-      deliveryDateTime: this._deliveryDateTime,
+      deliveryTime: this._deliveryTime,
     };
   }
 
@@ -158,8 +158,8 @@ export class Order extends AggregateRoot<IOrderProps> {
     return this._orderItems;
   }
 
-  get deliveryDateTime(): Date {
-    return this._deliveryDateTime;
+  get deliveryTime(): string {
+    return this._deliveryTime;
   }
 
   get changedFields(): string[] {

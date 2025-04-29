@@ -28,7 +28,7 @@ export class GetOrdersUseCase
       shopRating: item.shopRating,
       totalPrice: item.totalPrice,
       date: item.createdAt,
-      deliveryDateTime: item.deliveryDateTime,
+      deliveryTime: item.deliveryTime,
       OrderItems: item.OrderItems.map((item) => ({
         quantity: item.quantity,
         Product: {

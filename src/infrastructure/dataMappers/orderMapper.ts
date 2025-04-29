@@ -44,7 +44,7 @@ export class OrderMapper {
         paymentMethod: orderModel.paymentMethod,
         card,
         orderItems,
-        deliveryDateTime: orderModel.deliveryDateTime,
+        deliveryTime: orderModel.deliveryTime,
       },
       new UniqueEntityID(orderModel.guid)
     );
@@ -64,7 +64,7 @@ export class OrderMapper {
       paymentGuid: order.paymentGuid?.toValue(),
       paymentMethod: order.paymentMethod,
       card: order.card,
-      deliveryDateTime: order.deliveryDateTime,
+      deliveryTime: order.deliveryTime,
     };
 
     return orderDbModel;
