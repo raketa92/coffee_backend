@@ -3,6 +3,7 @@ export const UseCaseErrorCode = {
   INTERNAL_SERVER_ERROR: 500,
   NOT_FOUND: 404,
   CONFLICT: 409,
+  VALIDATION_ERROR: 422,
 } as const;
 
 export type UseCaseErrorCode =

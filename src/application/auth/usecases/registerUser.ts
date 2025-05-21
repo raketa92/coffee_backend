@@ -1,9 +1,6 @@
 import { UseCase } from "@/core/UseCase";
 import { CreateUserDto } from "@/infrastructure/http/dto/user/createUserDto";
-import {
-  AuthResponseDto,
-  UserTokenResponseDto,
-} from "@/infrastructure/http/dto/user/userTokenResponseDto";
+import { UserDetails } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { Inject, Injectable } from "@nestjs/common";
 import { UseCaseErrorMessage } from "../../auth/exception";
 import { User } from "@/domain/user/user.entity";
@@ -17,7 +14,7 @@ import { IUserService } from "@/application/shared/ports/IUserService";
 
 @Injectable()
 export class RegisterUserUseCase
-  implements UseCase<CreateUserDto, UserTokenResponseDto>
+  implements UseCase<CreateUserDto, UserDetails>
 {
   constructor(
     private readonly userService: IUserService,
@@ -26,7 +23,7 @@ export class RegisterUserUseCase
     private readonly kafkaService: IKafkaService
   ) {}
 
-  public async execute(request: CreateUserDto): Promise<AuthResponseDto> {
+  public async execute(request: CreateUserDto): Promise<UserDetails> {
     try {
       const userExist = await this.userService.findOne({
         phone: request.phone,
@@ -49,10 +46,6 @@ export class RegisterUserUseCase
         lastLogin: new Date(),
       });
 
-      const payload = { sub: user.guid.toValue(), phone: user.phone };
-      const accessToken = this.authService.generateAccessToken(payload);
-      const refreshToken = this.authService.generateRefreshToken(payload);
-      user.setRefreshToken(refreshToken);
       await this.userService.save(user);
 
       const otpEvent = new OTPRequestedEvent({
@@ -64,22 +57,18 @@ export class RegisterUserUseCase
         otpEvent
       );
 
-      const userDetails: AuthResponseDto = {
-        accessToken,
-        refreshToken,
-        user: {
-          guid: user.guid.toValue(),
-          email: user.email,
-          phone: user.phone,
-          gender: user.gender,
-          role: user.roles[0],
-          isVerified: user.isVerified,
-          isActive: user.isActive,
-          userName: user.userName,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          lastLogin: user.lastLogin,
-        },
+      const userDetails: UserDetails = {
+        guid: user.guid.toValue(),
+        email: user.email,
+        phone: user.phone,
+        gender: user.gender,
+        role: user.roles[0],
+        isVerified: user.isVerified,
+        isActive: user.isActive,
+        userName: user.userName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        lastLogin: user.lastLogin,
       };
 
       return userDetails;

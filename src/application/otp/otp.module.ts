@@ -5,6 +5,8 @@ import { OtpService } from "@/domain/otp/otp.service";
 import { ProcessOtpResponseUseCase } from "./usecases/processOtpResponse";
 import { IUserService } from "../shared/ports/IUserService";
 import { UserService } from "@/domain/user/user.service";
+import { IAuthService } from "../shared/ports/IAuthService";
+import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
 @Module({
   imports: [DatabaseModule],
   providers: [
@@ -15,6 +17,10 @@ import { UserService } from "@/domain/user/user.service";
     {
       provide: IUserService,
       useClass: UserService,
+    },
+    {
+      provide: IAuthService,
+      useClass: AuthServiceImpl,
     },
     ProcessOtpResponseUseCase,
   ],

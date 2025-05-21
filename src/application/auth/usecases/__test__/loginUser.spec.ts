@@ -100,6 +100,41 @@ describe("Login user use case", () => {
     );
   });
 
+  it("should throw error if user not verified", async () => {
+    (userService.findOne as jest.Mock).mockResolvedValue(true);
+    (authService.validateUser as jest.Mock).mockResolvedValue(true);
+    const loginUserDto: LoginUserDto = {
+      password: "qwerty",
+      phone: "+99364123123",
+    };
+    const userModel: UserModel = {
+      guid: "8524994a-58c6-4b12-a965-80693a7b9803",
+      password: "hashedPassword",
+      phone: loginUserDto.phone,
+      email: null,
+      userName: "mocked_user_name",
+      firstName: "some_first_name",
+      lastName: "some_last_name",
+      gender: "male",
+      roles: [Roles.user],
+      refreshToken: "old_refreshToken",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isVerified: false,
+      isActive: false,
+      lastLogin: new Date(),
+    };
+
+    const user = UserMapper.toDomain(userModel);
+    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    await expect(useCase.execute(loginUserDto)).rejects.toThrow(
+      new UseCaseError({
+        code: UseCaseErrorCode.BAD_REQUEST,
+        message: UseCaseErrorMessage.user_not_verified,
+      })
+    );
+  });
+
   it("should login user", async () => {
     const loginUserDto: LoginUserDto = {
       password: "qwerty",
@@ -122,7 +157,7 @@ describe("Login user use case", () => {
       refreshToken: "old_refreshToken",
       createdAt: new Date(),
       updatedAt: new Date(),
-      isVerified: false,
+      isVerified: true,
       isActive: false,
       lastLogin: new Date(),
     };

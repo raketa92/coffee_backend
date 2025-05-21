@@ -33,8 +33,14 @@ export class LoginUserUseCase
       });
       if (!isValidPassword) {
         throw new UseCaseError({
-          code: UseCaseErrorCode.BAD_REQUEST,
+          code: UseCaseErrorCode.VALIDATION_ERROR,
           message: UseCaseErrorMessage.wrong_password,
+        });
+      }
+      if (!user.isVerified) {
+        throw new UseCaseError({
+          code: UseCaseErrorCode.VALIDATION_ERROR,
+          message: UseCaseErrorMessage.user_not_verified,
         });
       }
 

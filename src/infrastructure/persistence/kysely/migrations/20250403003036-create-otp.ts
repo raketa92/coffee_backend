@@ -14,7 +14,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
     .addColumn("phone", "varchar(20)", (col) => col.notNull())
     .addColumn("otp", "varchar(20)", (col) => col.notNull())
-    .addColumn("payload", "varchar(100)", (col) => col.notNull())
+    .addColumn("payload", "varchar(100)")
     .addColumn("purpose", sql`otp_purpose_enum`, (col) => col.notNull())
     .addColumn("expiresAt", "timestamptz", (col) => col.notNull())
     .execute();

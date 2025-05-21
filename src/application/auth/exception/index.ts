@@ -6,4 +6,5 @@ export const UseCaseErrorMessage = {
   delete_user_error: "Delete user error",
   refresh_token_error: "Refresh token error",
   user_already_exists: "User already exists",
+  user_not_verified: "User not verified",
 };

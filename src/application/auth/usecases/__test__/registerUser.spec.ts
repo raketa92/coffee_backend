@@ -4,7 +4,7 @@ import { CreateUserDto } from "@/infrastructure/http/dto/user/createUserDto";
 import { User } from "@/domain/user/user.entity";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { Roles } from "@/core/constants/roles";
-import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
+import { UserDetails } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
@@ -156,18 +156,12 @@ describe("Register user use case", () => {
       isVerified: false,
       lastLogin: new Date(),
     });
-    const payload = {
-      sub: "8524994a-58c6-4b12-a965-80693a7b9803",
-      phone: user.phone,
-    };
     const result = await useCase.execute(createUserDto);
 
     expect(authService.hashPassword).toHaveBeenCalledWith(
       createUserDto.password
     );
-    expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
-    expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
-    user.setRefreshToken(refreshToken);
+
     expect(userService.save).toHaveBeenCalledWith(
       expect.objectContaining({
         password: hashedPassword,
@@ -177,7 +171,6 @@ describe("Register user use case", () => {
         firstName: createUserDto.firstName,
         lastName: createUserDto.lastName,
         email: createUserDto.email,
-        refreshToken,
       })
     );
     const otpEvent = new OTPRequestedEvent({
@@ -188,22 +181,18 @@ describe("Register user use case", () => {
       AppEvents.otpRequested,
       otpEvent
     );
-    const userDetails: AuthResponseDto = {
-      accessToken,
-      refreshToken,
-      user: {
-        guid: user.guid.toValue(),
-        email: user.email,
-        phone: user.phone,
-        gender: user.gender,
-        role: user.roles[0],
-        isVerified: user.isVerified,
-        isActive: user.isActive,
-        userName: user.userName,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        lastLogin: user.lastLogin,
-      },
+    const userDetails: UserDetails = {
+      guid: user.guid.toValue(),
+      email: user.email,
+      phone: user.phone,
+      gender: user.gender,
+      role: user.roles[0],
+      isVerified: user.isVerified,
+      isActive: user.isActive,
+      userName: user.userName,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      lastLogin: user.lastLogin,
     };
     expect(result).toEqual(userDetails);
   });

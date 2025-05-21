@@ -5,14 +5,14 @@ import { UniqueEntityID } from "@/core/UniqueEntityID";
 export interface IOtpProps {
   otp: string;
   phone: string;
-  payload?: string;
+  payload?: string | null;
   purpose: OtpPurpose;
   expiresAt?: Date;
 }
 export class OTP extends Entity<IOtpProps> {
   private readonly _otp: string;
   private readonly _phone: string;
-  private readonly _payload?: string;
+  private readonly _payload?: string | null;
   private readonly _purpose: OtpPurpose;
   private _expiresAt: Date;
   private _changedFields: Set<keyof OTP> = new Set();
@@ -52,7 +52,7 @@ export class OTP extends Entity<IOtpProps> {
     return this._phone;
   }
 
-  get payload(): string | undefined {
+  get payload(): string | undefined | null {
     return this._payload;
   }
 

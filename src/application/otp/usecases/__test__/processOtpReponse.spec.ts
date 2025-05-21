@@ -10,11 +10,13 @@ import { OTP } from "@/domain/otp/otp";
 import { OtpPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IOtpService } from "@/application/shared/ports/IOtpService";
+import { IAuthService } from "@/application/shared/ports/IAuthService";
 
 describe("Process otp use case", () => {
   let useCase: ProcessOtpResponseUseCase;
   let userService: IUserService;
   let otpService: IOtpService;
+  let authService: IAuthService;
   const userGuid = "8524994a-58c6-4b12-a965-80693a7b9803";
 
   beforeAll(async () => {
@@ -36,12 +38,21 @@ describe("Process otp use case", () => {
             delete: jest.fn(),
           },
         },
+        {
+          provide: IAuthService,
+          useValue: {
+            validateUser: jest.fn(),
+            generateAccessToken: jest.fn(),
+            generateRefreshToken: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     useCase = module.get<ProcessOtpResponseUseCase>(ProcessOtpResponseUseCase);
     userService = module.get<IUserService>(IUserService);
     otpService = module.get<IOtpService>(IOtpService);
+    authService = module.get<IAuthService>(IAuthService);
   });
 
   beforeEach(() => {
@@ -105,13 +116,28 @@ describe("Process otp use case", () => {
       return user;
     });
 
-    const result = await useCase.execute(dto);
+    const accessToken = "mock_access_token";
+    const refreshToken = "mock_refresh_token";
+    (authService.generateAccessToken as jest.Mock).mockReturnValue(accessToken);
+    (authService.generateRefreshToken as jest.Mock).mockReturnValue(
+      refreshToken
+    );
 
+    const payload = {
+      sub: "8524994a-58c6-4b12-a965-80693a7b9803",
+      phone: user.phone,
+    };
+    const result = await useCase.execute(dto);
     expect(userService.save).toHaveBeenCalledWith(user);
     expect(otpService.delete).toHaveBeenCalledWith(otp.guid.toValue());
     expect(user).toHaveProperty("isVerified", true);
+    expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
+    expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
+
     expect(result).toEqual({
       message: "OTP verified successfully",
+      accessToken,
+      refreshToken,
     });
   });
 
@@ -158,13 +184,29 @@ describe("Process otp use case", () => {
       return user;
     });
 
+    const accessToken = "mock_access_token";
+    const refreshToken = "mock_refresh_token";
+    (authService.generateAccessToken as jest.Mock).mockReturnValue(accessToken);
+    (authService.generateRefreshToken as jest.Mock).mockReturnValue(
+      refreshToken
+    );
+
+    const payload = {
+      sub: "8524994a-58c6-4b12-a965-80693a7b9803",
+      phone: user.phone,
+    };
+
     const result = await useCase.execute(dto);
 
     expect(userService.save).toHaveBeenCalledWith(user);
     expect(otpService.delete).toHaveBeenCalledWith(otp.guid.toValue());
     expect(user).toHaveProperty("password", newPassword);
+    expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
+    expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
     expect(result).toEqual({
       message: "OTP verified successfully",
+      accessToken,
+      refreshToken,
     });
   });
 
@@ -211,13 +253,29 @@ describe("Process otp use case", () => {
       return user;
     });
 
+    const accessToken = "mock_access_token";
+    const refreshToken = "mock_refresh_token";
+    (authService.generateAccessToken as jest.Mock).mockReturnValue(accessToken);
+    (authService.generateRefreshToken as jest.Mock).mockReturnValue(
+      refreshToken
+    );
+
+    const payload = {
+      sub: "8524994a-58c6-4b12-a965-80693a7b9803",
+      phone: newPhone,
+    };
+
     const result = await useCase.execute(dto);
 
     expect(userService.save).toHaveBeenCalledWith(user);
     expect(otpService.delete).toHaveBeenCalledWith(otp.guid.toValue());
     expect(user).toHaveProperty("phone", newPhone);
+    expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
+    expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
     expect(result).toEqual({
       message: "OTP verified successfully",
+      accessToken,
+      refreshToken,
     });
   });
 });

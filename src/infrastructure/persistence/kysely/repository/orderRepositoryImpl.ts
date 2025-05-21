@@ -71,7 +71,8 @@ export class OrderRepositoryImpl implements IOrderRepository {
               ).as("Product")
             )
         ).as("OrderItems")
-      );
+      )
+      .orderBy("Order.createdAt desc");
 
     if (filter?.orderNumbers) {
       query = query.where("orderNumber", "in", filter.orderNumbers);
