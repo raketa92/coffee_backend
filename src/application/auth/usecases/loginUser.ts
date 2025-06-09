@@ -9,6 +9,9 @@ import { LoginUserDto } from "@/infrastructure/http/dto/user/loginUserDto";
 import { IAuthService } from "../../shared/ports/IAuthService";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 import { IUserService } from "@/application/shared/ports/IUserService";
+import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
+import { AppEvents, OtpPurpose } from "@/core/constants";
+import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 
 @Injectable()
 export class LoginUserUseCase
@@ -16,7 +19,8 @@ export class LoginUserUseCase
 {
   constructor(
     private readonly userService: IUserService,
-    private readonly authService: IAuthService
+    private readonly authService: IAuthService,
+    private readonly kafkaService: IKafkaService
   ) {}
 
   public async execute(request: LoginUserDto): Promise<UserTokenResponseDto> {
@@ -38,6 +42,14 @@ export class LoginUserUseCase
         });
       }
       if (!user.isVerified) {
+        const otpEvent = new OTPRequestedEvent({
+          phone: user.phone,
+          purpose: OtpPurpose.userRegister,
+        });
+        await this.kafkaService.publishEvent<OTPRequestedEvent>(
+          AppEvents.otpRequested,
+          otpEvent
+        );
         throw new UseCaseError({
           code: UseCaseErrorCode.VALIDATION_ERROR,
           message: UseCaseErrorMessage.user_not_verified,

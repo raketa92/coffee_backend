@@ -104,6 +104,9 @@ export class UserRepositoryImpl implements IUserRepository {
     if (filter.userName) {
       query = query.where("User.userName", "=", filter.userName);
     }
+    if (filter.guid) {
+      query = query.where("User.guid", "=", filter.guid);
+    }
 
     const userModel = await query.executeTakeFirst();
 

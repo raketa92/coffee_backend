@@ -5,12 +5,13 @@ import { NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { ProcessOtpResponseUseCase } from "../processOtpResponse";
-import { OtpRequestDto } from "../dto";
+import { OtpResponseDto } from "../dto";
 import { OTP } from "@/domain/otp/otp";
 import { OtpPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
+import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 
 describe("Process otp use case", () => {
   let useCase: ProcessOtpResponseUseCase;
@@ -65,8 +66,8 @@ describe("Process otp use case", () => {
 
   it("should throw error if user not found", async () => {
     (userService.findOne as jest.Mock).mockResolvedValue(null);
-    const dto: OtpRequestDto = {
-      userGuid,
+    const dto: OtpResponseDto = {
+      phone: userGuid,
       otp: "1122",
     };
     await expect(useCase.execute(dto)).rejects.toThrow(
@@ -77,8 +78,8 @@ describe("Process otp use case", () => {
   });
 
   it("should process userRegister otp", async () => {
-    const dto: OtpRequestDto = {
-      userGuid,
+    const dto: OtpResponseDto = {
+      phone: userGuid,
       otp: "1122",
     };
     const hashedPassword = "mocked_hashed_password";
@@ -132,18 +133,29 @@ describe("Process otp use case", () => {
     expect(otpService.delete).toHaveBeenCalledWith(otp.guid.toValue());
     expect(user).toHaveProperty("isVerified", true);
     expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
-    expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
-
-    expect(result).toEqual({
-      message: "OTP verified successfully",
+    const userDetails: AuthResponseDto = {
       accessToken,
       refreshToken,
-    });
+      user: {
+        guid: user.guid.toValue(),
+        email: user.email,
+        phone: user.phone,
+        gender: user.gender,
+        role: user.roles[0],
+        isVerified: user.isVerified,
+        isActive: user.isActive,
+        userName: user.userName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        lastLogin: user.lastLogin,
+      },
+    };
+    expect(result).toEqual(userDetails);
   });
 
   it("should process userChangePassword otp", async () => {
-    const dto: OtpRequestDto = {
-      userGuid,
+    const dto: OtpResponseDto = {
+      phone: userGuid,
       otp: "1122",
     };
     const hashedPassword = "mocked_hashed_password";
@@ -203,16 +215,29 @@ describe("Process otp use case", () => {
     expect(user).toHaveProperty("password", newPassword);
     expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
     expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
-    expect(result).toEqual({
-      message: "OTP verified successfully",
+    const userDetails: AuthResponseDto = {
       accessToken,
       refreshToken,
-    });
+      user: {
+        guid: user.guid.toValue(),
+        email: user.email,
+        phone: user.phone,
+        gender: user.gender,
+        role: user.roles[0],
+        isVerified: user.isVerified,
+        isActive: user.isActive,
+        userName: user.userName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        lastLogin: user.lastLogin,
+      },
+    };
+    expect(result).toEqual(userDetails);
   });
 
   it("should process userChangePhone otp", async () => {
-    const dto: OtpRequestDto = {
-      userGuid,
+    const dto: OtpResponseDto = {
+      phone: userGuid,
       otp: "1122",
     };
     const hashedPassword = "mocked_hashed_password";
@@ -272,10 +297,24 @@ describe("Process otp use case", () => {
     expect(user).toHaveProperty("phone", newPhone);
     expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
     expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
-    expect(result).toEqual({
-      message: "OTP verified successfully",
+
+    const userDetails: AuthResponseDto = {
       accessToken,
       refreshToken,
-    });
+      user: {
+        guid: user.guid.toValue(),
+        email: user.email,
+        phone: user.phone,
+        gender: user.gender,
+        role: user.roles[0],
+        isVerified: user.isVerified,
+        isActive: user.isActive,
+        userName: user.userName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        lastLogin: user.lastLogin,
+      },
+    };
+    expect(result).toEqual(userDetails);
   });
 });

@@ -7,9 +7,12 @@ import { IUserService } from "../shared/ports/IUserService";
 import { UserService } from "@/domain/user/user.service";
 import { IAuthService } from "../shared/ports/IAuthService";
 import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
+import { JwtService } from "@nestjs/jwt";
+import { EnvModule } from "@/infrastructure/env";
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, EnvModule],
   providers: [
+    JwtService,
     {
       provide: IOtpService,
       useClass: OtpService,

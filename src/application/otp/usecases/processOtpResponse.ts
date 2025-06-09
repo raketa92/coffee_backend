@@ -5,20 +5,16 @@ import {
   UseCaseError,
   UseCaseErrorCode,
 } from "@/application/shared/exception";
-import { OtpRequestDto } from "./dto";
+import { OtpResponseDto } from "./dto";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { UseCaseErrorMessage } from "../exception";
-import { UserTokenResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
+import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
-
-export interface OtpResponse extends UserTokenResponseDto {
-  message: string;
-}
 
 @Injectable()
 export class ProcessOtpResponseUseCase
-  implements UseCase<OtpRequestDto, { message: string }>
+  implements UseCase<OtpResponseDto, AuthResponseDto>
 {
   constructor(
     private readonly userService: IUserService,
@@ -26,10 +22,10 @@ export class ProcessOtpResponseUseCase
     private readonly authService: IAuthService
   ) {}
 
-  public async execute(request: OtpRequestDto): Promise<OtpResponse> {
+  public async execute(request: OtpResponseDto): Promise<AuthResponseDto> {
     try {
       const existingUser = await this.userService.findOne({
-        guid: request.userGuid,
+        phone: request.phone,
       });
       if (!existingUser) {
         throw new NotFoundException({
@@ -39,7 +35,7 @@ export class ProcessOtpResponseUseCase
 
       const otp = await this.otpService.findOne({
         otp: request.otp,
-        phone: existingUser.phone,
+        phone: request.phone,
       });
       if (!otp) {
         throw new NotFoundException({
@@ -56,11 +52,25 @@ export class ProcessOtpResponseUseCase
       user.setRefreshToken(refreshToken);
       await this.userService.save(user);
 
-      return {
-        message: "OTP verified successfully",
+      const userDetails: AuthResponseDto = {
         accessToken,
         refreshToken,
+        user: {
+          guid: user.guid.toValue(),
+          email: user.email,
+          phone: user.phone,
+          gender: user.gender,
+          role: user.roles[0],
+          isVerified: user.isVerified,
+          isActive: user.isActive,
+          userName: user.userName,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          lastLogin: user.lastLogin,
+        },
       };
+
+      return userDetails;
     } catch (error: any) {
       throw new UseCaseError({
         code: error.code || UseCaseErrorCode.BAD_REQUEST,

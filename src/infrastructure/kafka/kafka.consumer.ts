@@ -3,23 +3,26 @@ import {
   ChangePhoneOtpRequestedEvent,
   OTPRequestedEvent,
 } from "@/domain/user/events/otpRequest.event";
-import { Body, Controller, HttpCode, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, HttpCode, Post } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 import { LoggerService } from "../logger/logger";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import {
   OtpRequestDto,
   otpRequestSchema,
+  OtpResponseDto,
+  otpResponseSchema,
 } from "@/application/otp/usecases/dto";
 import { ProcessOtpResponseUseCase } from "@/application/otp/usecases/processOtpResponse";
 import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { RedisService } from "../persistence/redis/redis.service";
+import { RequestOtpUseCase } from "@/application/otp/usecases/requestOtp";
 
 @Controller()
 export class KafkaConsumer {
   constructor(
     private readonly logger: LoggerService,
     private readonly processOtpResponseUseCase: ProcessOtpResponseUseCase,
+    private readonly requestOtpUseCase: RequestOtpUseCase,
     private readonly otpService: IOtpService,
     private readonly redisService: RedisService
   ) {}
@@ -62,12 +65,19 @@ export class KafkaConsumer {
     users send otp data to this endpoint
   */
   @Post("/otp-response")
-  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  async handleOtpResponse(@Body() otpRequestDto: OtpRequestDto) {
+  async handleOtpResponse(@Body() otpRequestDto: OtpResponseDto) {
     this.logger.info("OTP response received");
-    const body = otpRequestSchema.parse(otpRequestDto);
+    const body = otpResponseSchema.parse(otpRequestDto);
     const response = await this.processOtpResponseUseCase.execute(body);
+    return response;
+  }
+
+  @Post("/otp-request")
+  @HttpCode(201)
+  async otpRequest(@Body() otpRequestDto: OtpRequestDto) {
+    const body = otpRequestSchema.parse(otpRequestDto);
+    const response = await this.requestOtpUseCase.execute(body);
     return response;
   }
 }

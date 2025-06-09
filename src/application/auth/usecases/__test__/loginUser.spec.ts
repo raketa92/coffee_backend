@@ -11,6 +11,9 @@ import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { IUserService } from "@/application/shared/ports/IUserService";
+import { IKafkaService } from "@/application/shared/ports/IkafkaService";
+import { AppEvents, OtpPurpose } from "@/core/constants";
+import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 
 jest.mock("bcrypt", () => ({
   compare: jest.fn(),
@@ -35,6 +38,7 @@ describe("Login user use case", () => {
   let useCase: LoginUserUseCase;
   let authService: IAuthService;
   let userService: IUserService;
+  let kafkaService: IKafkaService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -46,6 +50,12 @@ describe("Login user use case", () => {
             findOne: jest.fn(),
             findUserByRefreshToken: jest.fn(),
             save: jest.fn(),
+          },
+        },
+        {
+          provide: IKafkaService,
+          useValue: {
+            publishEvent: jest.fn(),
           },
         },
         {
@@ -62,6 +72,7 @@ describe("Login user use case", () => {
     useCase = module.get<LoginUserUseCase>(LoginUserUseCase);
     authService = module.get<IAuthService>(IAuthService);
     userService = module.get<IUserService>(IUserService);
+    kafkaService = module.get<IKafkaService>(IKafkaService);
   });
 
   beforeEach(() => {
@@ -132,6 +143,14 @@ describe("Login user use case", () => {
         code: UseCaseErrorCode.BAD_REQUEST,
         message: UseCaseErrorMessage.user_not_verified,
       })
+    );
+    const otpEvent = new OTPRequestedEvent({
+      phone: user.phone,
+      purpose: OtpPurpose.userRegister,
+    });
+    expect(kafkaService.publishEvent).toHaveBeenCalledWith(
+      AppEvents.otpRequested,
+      otpEvent
     );
   });
 
