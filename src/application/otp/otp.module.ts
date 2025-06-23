@@ -9,10 +9,18 @@ import { IAuthService } from "../shared/ports/IAuthService";
 import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
 import { JwtService } from "@nestjs/jwt";
 import { EnvModule } from "@/infrastructure/env";
+import { RequestOtpUseCase } from "./usecases/requestOtp";
+import { OtpEventHandler } from "@/domain/otp/events/otp.eventHandler";
+import { RedisService } from "@/infrastructure/persistence/redis/redis.service";
+import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
 @Module({
-  imports: [DatabaseModule, EnvModule],
+  imports: [DatabaseModule, EnvModule, KafkaModule],
   providers: [
     JwtService,
+    RedisService,
+    ProcessOtpResponseUseCase,
+    RequestOtpUseCase,
+    OtpEventHandler,
     {
       provide: IOtpService,
       useClass: OtpService,
@@ -25,8 +33,7 @@ import { EnvModule } from "@/infrastructure/env";
       provide: IAuthService,
       useClass: AuthServiceImpl,
     },
-    ProcessOtpResponseUseCase,
   ],
-  exports: [ProcessOtpResponseUseCase],
+  exports: [ProcessOtpResponseUseCase, RequestOtpUseCase, OtpEventHandler],
 })
 export class OtpModule {}

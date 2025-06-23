@@ -4,11 +4,11 @@ import { EnvModule, EnvService } from "../env";
 import { KafkaConsumer } from "./kafka.consumer";
 import { KafkaService } from "./kafka.service";
 import { IKafkaService } from "@/application/shared/ports/IkafkaService";
-import { OtpModule } from "@/application/otp/otp.module";
 import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { OtpService } from "@/domain/otp/otp.service";
 import { DatabaseModule } from "../persistence/kysely/database.module";
 import { RedisService } from "../persistence/redis/redis.service";
+import { OtpEventHandler } from "@/domain/otp/events/otp.eventHandler";
 
 @Module({
   imports: [
@@ -32,7 +32,6 @@ import { RedisService } from "../persistence/redis/redis.service";
         inject: [EnvService],
       },
     ]),
-    OtpModule,
     DatabaseModule,
   ],
   providers: [
@@ -45,6 +44,7 @@ import { RedisService } from "../persistence/redis/redis.service";
       provide: IOtpService,
       useClass: OtpService,
     },
+    OtpEventHandler,
   ],
   controllers: [KafkaConsumer],
   exports: [ClientsModule, IKafkaService],

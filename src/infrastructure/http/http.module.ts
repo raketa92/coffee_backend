@@ -9,9 +9,11 @@ import { AuthConfigModule } from "../auth/authConfig.module";
 import { AuthController } from "./auth.controller";
 import { AuthModule } from "@/application/auth/auth.module";
 import { UserController } from "./user.controller";
+import { OtpController } from "./otp.controller";
+import { OtpModule } from "@/application/otp/otp.module";
 
 @Module({
-  imports: [CoffeeShopModule, AuthConfigModule, AuthModule],
+  imports: [CoffeeShopModule, AuthConfigModule, AuthModule, OtpModule],
   controllers: [
     OrderController,
     CategoryController,
@@ -19,6 +21,7 @@ import { UserController } from "./user.controller";
     ShopController,
     AuthController,
     UserController,
+    OtpController,
   ],
   providers: [
     RedisService,
@@ -28,6 +31,7 @@ import { UserController } from "./user.controller";
     ShopController,
     AuthController,
     UserController,
+    OtpController,
   ],
 })
 export class HttpModule {}

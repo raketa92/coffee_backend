@@ -13,6 +13,7 @@ import { DeleteUserUseCase } from "./usecases/deleteUser";
 import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
 import { KafkaService } from "@/infrastructure/kafka/kafka.service";
 import { IUserService } from "../shared/ports/IUserService";
+import { IKafkaService } from "../shared/ports/IkafkaService";
 
 @Module({
   imports: [EnvModule, DatabaseModule, KafkaModule],
@@ -31,7 +32,10 @@ import { IUserService } from "../shared/ports/IUserService";
       provide: IAuthService,
       useClass: AuthServiceImpl,
     },
-    KafkaService,
+    {
+      provide: IKafkaService,
+      useClass: KafkaService,
+    },
   ],
   exports: [
     LoginUserUseCase,
