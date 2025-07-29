@@ -17,6 +17,10 @@ export const changePhoneSchema = z.object({
 
 export type ChangePhoneDto = z.infer<typeof changePhoneSchema>;
 
-export interface IUserData {
-  userGuid: string;
-}
+export const changePasswordSchema = z.object({
+  userGuid: z.string().uuid(),
+  password: z.string(),
+  oldPassword: z.string(),
+});
+
+export type ChangePasswordDto = z.infer<typeof changePasswordSchema>;

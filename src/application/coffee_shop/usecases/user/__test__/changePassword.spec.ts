@@ -3,28 +3,36 @@ import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
 import { NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
-import { ChangePhoneDto } from "../dto";
+import { ChangePasswordDto, ChangePhoneDto } from "../dto";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
-import { ChangePhoneUseCase } from "../changePhone";
 import { AppEvents, OtpPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
+import { ChangePasswordUseCase } from "../changePassword";
+import { IAuthService } from "@/application/shared/ports/IAuthService";
 
 describe("Change phone use case", () => {
-  let useCase: ChangePhoneUseCase;
+  let useCase: ChangePasswordUseCase;
   let userService: IUserService;
   let kafkaService: IKafkaService;
+  let authService: IAuthService;
   const userGuid = "8524994a-58c6-4b12-a965-80693a7b9803";
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ChangePhoneUseCase,
+        ChangePasswordUseCase,
         {
           provide: IUserService,
           useValue: {
             findOne: jest.fn(),
+          },
+        },
+        {
+          provide: IAuthService,
+          useValue: {
+            validateUser: jest.fn(),
           },
         },
         {
@@ -36,9 +44,10 @@ describe("Change phone use case", () => {
       ],
     }).compile();
 
-    useCase = module.get<ChangePhoneUseCase>(ChangePhoneUseCase);
+    useCase = module.get<ChangePasswordUseCase>(ChangePasswordUseCase);
     userService = module.get<IUserService>(IUserService);
     kafkaService = module.get<IKafkaService>(IKafkaService);
+    authService = module.get<IAuthService>(IAuthService);
 
     jest
       .useFakeTimers({
@@ -68,23 +77,26 @@ describe("Change phone use case", () => {
 
   it("should throw error if user not found", async () => {
     (userService.findOne as jest.Mock).mockResolvedValue(null);
-    const changePhoneDto: ChangePhoneDto = {
+    const dto: ChangePasswordDto = {
       userGuid,
-      phone: "111",
+      password: "new_password",
+      oldPassword: "old_password",
     };
-    await expect(useCase.execute(changePhoneDto)).rejects.toThrow(
+    await expect(useCase.execute(dto)).rejects.toThrow(
       new NotFoundException({
         message: UseCaseErrorMessage.user_not_found,
       })
     );
   });
 
-  it("should fire event changePhoneOtpRequested", async () => {
-    const changePhoneDto: ChangePhoneDto = {
-      userGuid,
-      phone: "111",
-    };
+  it("should fire event changePasswordOtpRequested", async () => {
     const hashedPassword = "mocked_hashed_password";
+    const newHashedPassword = "new_mocked_hashed_password";
+    const dto: ChangePasswordDto = {
+      userGuid,
+      password: newHashedPassword,
+      oldPassword: hashedPassword,
+    };
 
     const userModel: UserModel = {
       guid: userGuid,
@@ -106,18 +118,19 @@ describe("Change phone use case", () => {
 
     const user = UserMapper.toDomain(userModel);
     (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (authService.validateUser as jest.Mock).mockResolvedValue(true);
 
-    const result = await useCase.execute(changePhoneDto);
+    const result = await useCase.execute(dto);
     const otpEvent = new OTPRequestedEvent({
-      phone: changePhoneDto.phone,
-      payload: changePhoneDto.phone,
-      purpose: OtpPurpose.userChangePhone,
+      phone: user.phone,
+      payload: dto.password,
+      purpose: OtpPurpose.userChangePassword,
     });
     expect(kafkaService.publishEvent).toHaveBeenCalledWith(
-      AppEvents.changePhoneOtpRequested,
+      AppEvents.changePasswordOtpRequested,
       otpEvent
     );
 
-    expect(result).toEqual({ message: "Otp sent to change phone number" });
+    expect(result).toEqual({ message: "Otp sent to change password" });
   });
 });

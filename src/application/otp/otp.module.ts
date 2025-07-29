@@ -2,7 +2,7 @@ import { DatabaseModule } from "@/infrastructure/persistence/kysely/database.mod
 import { Module } from "@nestjs/common";
 import { IOtpService } from "../shared/ports/IOtpService";
 import { OtpService } from "@/domain/otp/otp.service";
-import { ProcessOtpResponseUseCase } from "./usecases/processOtpResponse";
+import { ProcessInitialOtpResponseUseCase } from "./usecases/processInitialOtpResponse";
 import { IUserService } from "../shared/ports/IUserService";
 import { UserService } from "@/domain/user/user.service";
 import { IAuthService } from "../shared/ports/IAuthService";
@@ -13,12 +13,16 @@ import { RequestOtpUseCase } from "./usecases/requestOtp";
 import { OtpEventHandler } from "@/domain/otp/events/otp.eventHandler";
 import { RedisService } from "@/infrastructure/persistence/redis/redis.service";
 import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
+import { ProcessChangePasswordOtpResponseUseCase } from "./usecases/processChangePasswordOtpResponse";
+import { ProcessChangePhoneOtpResponseUseCase } from "./usecases/processChangePhoneOtpResponse";
 @Module({
   imports: [DatabaseModule, EnvModule, KafkaModule],
   providers: [
     JwtService,
     RedisService,
-    ProcessOtpResponseUseCase,
+    ProcessInitialOtpResponseUseCase,
+    ProcessChangePasswordOtpResponseUseCase,
+    ProcessChangePhoneOtpResponseUseCase,
     RequestOtpUseCase,
     OtpEventHandler,
     {
@@ -34,6 +38,12 @@ import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
       useClass: AuthServiceImpl,
     },
   ],
-  exports: [ProcessOtpResponseUseCase, RequestOtpUseCase, OtpEventHandler],
+  exports: [
+    ProcessInitialOtpResponseUseCase,
+    ProcessChangePasswordOtpResponseUseCase,
+    ProcessChangePhoneOtpResponseUseCase,
+    RequestOtpUseCase,
+    OtpEventHandler,
+  ],
 })
 export class OtpModule {}

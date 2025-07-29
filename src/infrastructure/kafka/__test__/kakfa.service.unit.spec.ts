@@ -4,10 +4,7 @@ import { RedisService } from "@/infrastructure/persistence/redis/redis.service";
 import { TestingModule, Test } from "@nestjs/testing";
 import { KafkaConsumer } from "../kafka.consumer";
 import { OtpPurpose } from "@/core/constants";
-import {
-  ChangePhoneOtpRequestedEvent,
-  OTPRequestedEvent,
-} from "@/domain/user/events/otpRequest.event";
+import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { OtpEventHandler } from "@/domain/otp/events/otp.eventHandler";
 
 describe("Kafka consumer tests", () => {
@@ -61,20 +58,21 @@ describe("Kafka consumer tests", () => {
   });
 
   it("should handle change phone OTP requested event", async () => {
-    const event = new ChangePhoneOtpRequestedEvent({
-      phone: "9876543210",
-      payload: {
-        userGuid,
-      },
+    const phone = "9876543210";
+    const event = new OTPRequestedEvent({
+      phone,
+      payload: phone,
+      purpose: OtpPurpose.userChangePhone
     });
 
-    await kafkaConsumer.handleChangePhoneOtpRequested(event);
+    await kafkaConsumer.handleOtpRequested(event);
 
     expect(redisService.generateShortSmsCode).toHaveBeenCalled();
     expect(otpService.create).toHaveBeenCalledWith({
       otp: "12345",
       phone: event.phone,
       purpose: OtpPurpose.userChangePhone,
+      payload: phone,
     });
   });
 });

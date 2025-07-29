@@ -47,6 +47,7 @@ export const ResponseMessages = {
 export enum AppEvents {
   otpRequested = "otpRequested",
   changePhoneOtpRequested = "changePhoneOtpRequested",
+  changePasswordOtpRequested = "changePasswordOtpRequested",
 }
 
 export enum OtpPurpose {

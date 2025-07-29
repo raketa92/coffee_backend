@@ -7,6 +7,14 @@ export const otpResponseSchema = z.object({
 
 export type OtpResponseDto = z.infer<typeof otpResponseSchema>;
 
+export const otpChangePhoneResponseSchema = z.object({
+  phone: z.string(),
+  oldPhone: z.string(),
+  otp: z.string(),
+});
+
+export type OtpChangePhoneResponseDto = z.infer<typeof otpChangePhoneResponseSchema>;
+
 export const otpRequestSchema = z.object({
   phone: z.string(),
 });

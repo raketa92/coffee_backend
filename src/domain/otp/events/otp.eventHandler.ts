@@ -1,7 +1,6 @@
 import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { OtpPurpose } from "@/core/constants";
 import {
-  ChangePhoneOtpRequestedEvent,
   OTPRequestedEvent,
 } from "@/domain/user/events/otpRequest.event";
 import { LoggerService } from "@/infrastructure/logger/logger";
@@ -27,18 +26,5 @@ export class OtpEventHandler {
       payload: event.payload,
     });
     // Send SMS logic here
-  }
-
-  async handleChangePhoneOtpRequested(
-    event: ChangePhoneOtpRequestedEvent
-  ): Promise<void> {
-    this.logger.info(`OTP for phone change: ${event.phone}`);
-    const smsCode = await this.redisService.generateShortSmsCode();
-    this.logger.info(`Generated OTP: ${smsCode}`);
-    await this.otpService.create({
-      otp: smsCode,
-      phone: event.phone,
-      purpose: OtpPurpose.userChangePhone,
-    });
   }
 }

@@ -5,7 +5,7 @@ import {
   UseCaseError,
   UseCaseErrorCode,
 } from "@/application/shared/exception";
-import { OtpResponseDto } from "./dto";
+import { OtpChangePhoneResponseDto, OtpResponseDto } from "./dto";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { UseCaseErrorMessage } from "../exception";
@@ -13,7 +13,7 @@ import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenRespons
 import { IAuthService } from "@/application/shared/ports/IAuthService";
 
 @Injectable()
-export class ProcessOtpResponseUseCase
+export class ProcessChangePasswordOtpResponseUseCase
   implements UseCase<OtpResponseDto, AuthResponseDto>
 {
   constructor(

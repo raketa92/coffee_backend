@@ -21,11 +21,16 @@ import { ChangePhoneUseCase } from "./usecases/user/changePhone";
 import { IKafkaService } from "../shared/ports/IkafkaService";
 import { KafkaService } from "@/infrastructure/kafka/kafka.service";
 import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
+import { ChangePasswordUseCase } from "./usecases/user/changePassword";
+import { IAuthService } from "../shared/ports/IAuthService";
+import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
+import { JwtService } from "@nestjs/jwt";
 
 @Module({
   imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, KafkaModule],
   providers: [
     RedisService,
+    JwtService,
     CreateOrderUseCase,
     CheckOrderUseCase,
     GetOrdersUseCase,
@@ -36,9 +41,14 @@ import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
     GetShopUseCase,
     UpdateProfileUseCase,
     ChangePhoneUseCase,
+    ChangePasswordUseCase,
     {
       provide: IUserService,
       useClass: UserService,
+    },
+    {
+      provide: IAuthService,
+      useClass: AuthServiceImpl,
     },
     {
       provide: IBankService,
@@ -60,6 +70,7 @@ import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
     GetShopUseCase,
     UpdateProfileUseCase,
     ChangePhoneUseCase,
+    ChangePasswordUseCase,
   ],
 })
 export class CoffeeShopModule {}

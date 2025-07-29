@@ -1,23 +1,27 @@
 import { UseCase } from "@/core/UseCase";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { ChangePhoneDto } from "./dto";
+import { ChangePasswordDto, ChangePhoneDto } from "./dto";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 import { UseCaseErrorMessage } from "../../exception";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { AppEvents, OtpPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IKafkaService } from "@/application/shared/ports/IkafkaService";
+import { IAuthService } from "@/application/shared/ports/IAuthService";
 
 @Injectable()
-export class ChangePhoneUseCase
-  implements UseCase<ChangePhoneDto, { message: string }>
+export class ChangePasswordUseCase
+  implements UseCase<ChangePasswordDto, { message: string }>
 {
   constructor(
     private readonly userService: IUserService,
+    private readonly authService: IAuthService,
     private readonly kafkaService: IKafkaService
   ) {}
 
-  public async execute(request: ChangePhoneDto): Promise<{ message: string }> {
+  public async execute(
+    request: ChangePasswordDto
+  ): Promise<{ message: string }> {
     try {
       const existingUser = await this.userService.findOne({
         guid: request.userGuid,
@@ -28,20 +32,31 @@ export class ChangePhoneUseCase
         });
       }
 
+      const isValidPassword = await this.authService.validateUser({
+        password: request.oldPassword,
+        userPassword: existingUser.password,
+      });
+      if (!isValidPassword) {
+        throw new UseCaseError({
+          code: UseCaseErrorCode.VALIDATION_ERROR,
+          message: UseCaseErrorMessage.wrong_password,
+        });
+      }
+
       const otpEvent = new OTPRequestedEvent({
-        phone: request.phone,
-        payload: request.phone,
-        purpose: OtpPurpose.userChangePhone
+        phone: existingUser.phone,
+        payload: request.password,
+        purpose: OtpPurpose.userChangePassword,
       });
       await this.kafkaService.publishEvent<OTPRequestedEvent>(
-        AppEvents.changePhoneOtpRequested,
+        AppEvents.changePasswordOtpRequested,
         otpEvent
       );
-      return { message: "Otp sent to change phone number" };
+      return { message: "Otp sent to change password" };
     } catch (error: any) {
       throw new UseCaseError({
         code: error.code || UseCaseErrorCode.BAD_REQUEST,
-        message: error.message || UseCaseErrorMessage.phone_change_error,
+        message: error.message || UseCaseErrorMessage.password_change_error,
       });
     }
   }

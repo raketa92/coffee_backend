@@ -73,6 +73,23 @@ describe("Login user use case", () => {
     authService = module.get<IAuthService>(IAuthService);
     userService = module.get<IUserService>(IUserService);
     kafkaService = module.get<IKafkaService>(IKafkaService);
+
+    jest
+      .useFakeTimers({
+        doNotFake: [
+          "nextTick",
+          "setImmediate",
+          "setInterval",
+          "setTimeout",
+          "queueMicrotask",
+        ],
+        advanceTimers: true,
+      })
+      .setSystemTime(new Date(2025, 2, 17));
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
   });
 
   beforeEach(() => {
