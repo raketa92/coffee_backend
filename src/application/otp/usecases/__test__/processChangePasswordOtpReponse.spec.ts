@@ -4,7 +4,7 @@ import { Roles } from "@/core/constants/roles";
 import { NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
-import { OtpChangePhoneResponseDto, OtpResponseDto } from "../dto";
+import { OtpChangePasswordResponseDto, OtpChangePhoneResponseDto, OtpResponseDto } from "../dto";
 import { OTP } from "@/domain/otp/otp";
 import { OtpPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
@@ -12,6 +12,7 @@ import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { ProcessChangePasswordOtpResponseUseCase } from "../processChangePasswordOtpResponse";
+import { randomUUID } from "crypto";
 
 describe("Process change phone otp use case", () => {
   let useCase: ProcessChangePasswordOtpResponseUseCase;
@@ -66,7 +67,8 @@ describe("Process change phone otp use case", () => {
 
   it("should throw error if user not found", async () => {
     (userService.findOne as jest.Mock).mockResolvedValue(null);
-    const dto: OtpResponseDto = {
+    const dto: OtpChangePasswordResponseDto = {
+      userGuid: randomUUID(),
       phone: "123111",
       otp: "1122",
     };
@@ -79,7 +81,8 @@ describe("Process change phone otp use case", () => {
 
   it("should process otp", async () => {
     const phone = "+99344333322";
-    const dto: OtpResponseDto = {
+    const dto: OtpChangePasswordResponseDto = {
+      userGuid,
       phone: phone,
       otp: "1122",
     };

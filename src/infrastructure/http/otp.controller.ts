@@ -5,10 +5,12 @@ import {
   otpRequestSchema,
   otpChangePhoneResponseSchema,
   OtpChangePhoneResponseDto,
+  OtpChangePasswordResponseDto,
+  otpChangePasswordResponseSchema,
 } from "@/application/otp/usecases/dto";
 import { ProcessInitialOtpResponseUseCase } from "@/application/otp/usecases/processInitialOtpResponse";
 import { RequestOtpUseCase } from "@/application/otp/usecases/requestOtp";
-import { Body, Controller, HttpCode, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, HttpCode, Param, Post, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ProcessChangePhoneOtpResponseUseCase } from "@/application/otp/usecases/processChangePhoneOtpResponse";
 import { ProcessChangePasswordOtpResponseUseCase } from "@/application/otp/usecases/processChangePasswordOtpResponse";
@@ -28,18 +30,18 @@ export class OtpController {
     return await this.processInitialOtpUseCase.execute(otpResponseSchema.parse(dto));
   }
 
-  @Post("/change-phone")
+  @Post("/change-phone/:userGuid")
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  async handleChangePhoneOtpResponse(@Body() dto: OtpChangePhoneResponseDto) {
-    return await this.processChangePhoneOtpUseCase.execute(otpChangePhoneResponseSchema.parse(dto));
+  async handleChangePhoneOtpResponse(@Param("userGuid") userGuid: string, @Body() dto: OtpChangePhoneResponseDto) {
+    return await this.processChangePhoneOtpUseCase.execute(otpChangePhoneResponseSchema.parse({...dto, userGuid}));
   }
 
-  @Post("/change-password")
+  @Post("/change-password/:userGuid")
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  async handleChangePasswordOtpResponse(@Body() dto: OtpResponseDto) {
-    return await this.processChangePasswordOtpUseCase.execute(otpResponseSchema.parse(dto));
+  async handleChangePasswordOtpResponse(@Param("userGuid") userGuid: string, @Body() dto: OtpChangePasswordResponseDto) {
+    return await this.processChangePasswordOtpUseCase.execute(otpChangePasswordResponseSchema.parse({ ...dto, userGuid }));
   }
 
   @Post("/request")

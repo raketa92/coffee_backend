@@ -25,7 +25,7 @@ export class ProcessChangePhoneOtpResponseUseCase
   public async execute(request: OtpChangePhoneResponseDto): Promise<AuthResponseDto> {
     try {
       const existingUser = await this.userService.findOne({
-        phone: request.oldPhone,
+        guid: request.userGuid,
       });
       if (!existingUser) {
         throw new NotFoundException({

@@ -33,6 +33,7 @@ describe("Change phone use case", () => {
           provide: IAuthService,
           useValue: {
             validateUser: jest.fn(),
+            hashPassword: jest.fn(),
           },
         },
         {
@@ -119,11 +120,12 @@ describe("Change phone use case", () => {
     const user = UserMapper.toDomain(userModel);
     (userService.findOne as jest.Mock).mockResolvedValue(user);
     (authService.validateUser as jest.Mock).mockResolvedValue(true);
+    (authService.hashPassword as jest.Mock).mockResolvedValue(hashedPassword);
 
     const result = await useCase.execute(dto);
     const otpEvent = new OTPRequestedEvent({
       phone: user.phone,
-      payload: dto.password,
+      payload: hashedPassword,
       purpose: OtpPurpose.userChangePassword,
     });
     expect(kafkaService.publishEvent).toHaveBeenCalledWith(

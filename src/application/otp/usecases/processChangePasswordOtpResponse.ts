@@ -5,7 +5,7 @@ import {
   UseCaseError,
   UseCaseErrorCode,
 } from "@/application/shared/exception";
-import { OtpChangePhoneResponseDto, OtpResponseDto } from "./dto";
+import { OtpChangePasswordResponseDto, OtpChangePhoneResponseDto, OtpResponseDto } from "./dto";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { UseCaseErrorMessage } from "../exception";
@@ -14,7 +14,7 @@ import { IAuthService } from "@/application/shared/ports/IAuthService";
 
 @Injectable()
 export class ProcessChangePasswordOtpResponseUseCase
-  implements UseCase<OtpResponseDto, AuthResponseDto>
+  implements UseCase<OtpChangePasswordResponseDto, AuthResponseDto>
 {
   constructor(
     private readonly userService: IUserService,
@@ -22,10 +22,10 @@ export class ProcessChangePasswordOtpResponseUseCase
     private readonly authService: IAuthService
   ) {}
 
-  public async execute(request: OtpResponseDto): Promise<AuthResponseDto> {
+  public async execute(request: OtpChangePasswordResponseDto): Promise<AuthResponseDto> {
     try {
       const existingUser = await this.userService.findOne({
-        phone: request.phone,
+        guid: request.userGuid,
       });
       if (!existingUser) {
         throw new NotFoundException({

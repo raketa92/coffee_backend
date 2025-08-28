@@ -1,21 +1,22 @@
 import { OtpPurpose } from "@/core/constants";
 import { IEvent } from "@/core/events/IEvent";
 
+export interface IOTPRequestedEventProps {
+  purpose: OtpPurpose;
+  phone: string;
+  payload?: string;
+}
+
 export class OTPRequestedEvent implements IEvent {
-  constructor(
-    readonly props: {
-      purpose: OtpPurpose;
-      phone: string;
-      payload?: string;
-    }
-  ) {
-    this.dateTimeOccurred = new Date();
-    this.purpose = props.purpose;
-    this.phone = props.phone;
-    this.payload = props.payload;
-  }
   readonly dateTimeOccurred: Date;
-  public readonly purpose: OtpPurpose;
-  public readonly phone: string;
-  public readonly payload?: string;
+  readonly purpose: OtpPurpose;
+  readonly phone: string;
+  readonly payload?: string;
+
+  constructor({ purpose, phone, payload }: IOTPRequestedEventProps) {
+    this.dateTimeOccurred = new Date();
+    this.purpose = purpose;
+    this.phone = phone;
+    this.payload = payload;
+  }
 }

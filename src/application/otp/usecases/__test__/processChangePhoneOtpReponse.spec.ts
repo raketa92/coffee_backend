@@ -12,6 +12,7 @@ import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { ProcessChangePhoneOtpResponseUseCase } from "../processChangePhoneOtpResponse";
+import { randomUUID } from "crypto";
 
 describe("Process change phone otp use case", () => {
   let useCase: ProcessChangePhoneOtpResponseUseCase;
@@ -68,7 +69,7 @@ describe("Process change phone otp use case", () => {
     (userService.findOne as jest.Mock).mockResolvedValue(null);
     const dto: OtpChangePhoneResponseDto = {
       phone: "123111",
-      oldPhone: "12322",
+      userGuid: randomUUID(),
       otp: "1122",
     };
     await expect(useCase.execute(dto)).rejects.toThrow(
@@ -83,7 +84,7 @@ describe("Process change phone otp use case", () => {
     const newPhone = "+99344333399";
     const dto: OtpChangePhoneResponseDto = {
       phone: newPhone,
-      oldPhone: phone,
+      userGuid,
       otp: "1122",
     };
     const hashedPassword = "mocked_hashed_password";

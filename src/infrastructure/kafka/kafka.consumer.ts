@@ -9,18 +9,8 @@ import { OtpEventHandler } from "@/domain/otp/events/otp.eventHandler";
 @Controller()
 export class KafkaConsumer {
   constructor(private readonly otpEventHandler: OtpEventHandler) {}
-  @MessagePattern(AppEvents.otpRequested)
-  @MessagePattern(AppEvents.changePhoneOtpRequested)
-  @MessagePattern(AppEvents.changePasswordOtpRequested)
+  @MessagePattern([AppEvents.otpRequested, AppEvents.changePhoneOtpRequested, AppEvents.changePasswordOtpRequested])
   async handleOtpRequested(@Payload() event: OTPRequestedEvent): Promise<void> {
     await this.otpEventHandler.handleOtpRequested(event);
   }
-
-  // @MessagePattern(AppEvents.changePhoneOtpRequested)
-  // @MessagePattern(AppEvents.changePasswordOtpRequested)
-  // async handleChangePhoneOtpRequested(
-  //   @Payload() event: OTPRequestedEvent
-  // ): Promise<void> {
-  //   await this.otpEventHandler.handleOtpRequested(event);
-  // }
 }

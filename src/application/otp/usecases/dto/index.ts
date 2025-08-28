@@ -9,11 +9,19 @@ export type OtpResponseDto = z.infer<typeof otpResponseSchema>;
 
 export const otpChangePhoneResponseSchema = z.object({
   phone: z.string(),
-  oldPhone: z.string(),
+  userGuid: z.string().uuid(),
   otp: z.string(),
 });
 
 export type OtpChangePhoneResponseDto = z.infer<typeof otpChangePhoneResponseSchema>;
+
+export const otpChangePasswordResponseSchema = z.object({
+  phone: z.string(),
+  userGuid: z.string().uuid(),
+  otp: z.string(),
+});
+
+export type OtpChangePasswordResponseDto = z.infer<typeof otpChangePasswordResponseSchema>;
 
 export const otpRequestSchema = z.object({
   phone: z.string(),

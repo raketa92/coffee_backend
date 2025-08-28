@@ -1,6 +1,6 @@
 import { UseCase } from "@/core/UseCase";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { ChangePasswordDto, ChangePhoneDto } from "./dto";
+import { ChangePasswordDto } from "./dto";
 import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
 import { UseCaseErrorMessage } from "../../exception";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
@@ -43,9 +43,13 @@ export class ChangePasswordUseCase
         });
       }
 
+      const hashedPassword = await this.authService.hashPassword(
+        request.password
+      );
+
       const otpEvent = new OTPRequestedEvent({
         phone: existingUser.phone,
-        payload: request.password,
+        payload: hashedPassword,
         purpose: OtpPurpose.userChangePassword,
       });
       await this.kafkaService.publishEvent<OTPRequestedEvent>(
