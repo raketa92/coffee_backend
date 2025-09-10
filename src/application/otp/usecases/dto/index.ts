@@ -13,7 +13,9 @@ export const otpChangePhoneResponseSchema = z.object({
   otp: z.string(),
 });
 
-export type OtpChangePhoneResponseDto = z.infer<typeof otpChangePhoneResponseSchema>;
+export type OtpChangePhoneResponseDto = z.infer<
+  typeof otpChangePhoneResponseSchema
+>;
 
 export const otpChangePasswordResponseSchema = z.object({
   phone: z.string(),
@@ -21,7 +23,9 @@ export const otpChangePasswordResponseSchema = z.object({
   otp: z.string(),
 });
 
-export type OtpChangePasswordResponseDto = z.infer<typeof otpChangePasswordResponseSchema>;
+export type OtpChangePasswordResponseDto = z.infer<
+  typeof otpChangePasswordResponseSchema
+>;
 
 export const otpRequestSchema = z.object({
   phone: z.string(),

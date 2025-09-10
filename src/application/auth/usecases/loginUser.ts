@@ -57,8 +57,8 @@ export class LoginUserUseCase
       }
 
       const payload = { sub: user.guid.toValue(), phone: user.phone };
-      const accessToken = this.authService.generateAccessToken(payload);
-      const refreshToken = this.authService.generateRefreshToken(payload);
+      const accessToken = await this.authService.generateAccessToken(payload);
+      const refreshToken = await this.authService.generateRefreshToken(payload);
       user.setRefreshToken(refreshToken);
       user.setLastLogin(new Date());
       await this.userService.save(user);

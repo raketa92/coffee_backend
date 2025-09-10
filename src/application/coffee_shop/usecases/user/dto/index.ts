@@ -24,3 +24,10 @@ export const changePasswordSchema = z.object({
 });
 
 export type ChangePasswordDto = z.infer<typeof changePasswordSchema>;
+
+export const changeEmailSchema = z.object({
+  userGuid: z.string().uuid(),
+  email: z.string().email(),
+});
+
+export type ChangeEmailDto = z.infer<typeof changeEmailSchema>;

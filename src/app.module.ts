@@ -14,6 +14,7 @@ import { AuthConfigModule } from "./infrastructure/auth/authConfig.module";
 import { AuthModule } from "./application/auth/auth.module";
 import { KafkaModule } from "./infrastructure/kafka/kafka.module";
 import { OtpModule } from "./application/otp/otp.module";
+import { EmailVerificationModule } from "./application/email_verification/emailVerification.module";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { OtpModule } from "./application/otp/otp.module";
     KafkaModule,
     CoffeeShopModule,
     OtpModule,
+    EmailVerificationModule,
   ],
   providers: [
     RedisService,

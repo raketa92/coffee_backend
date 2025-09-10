@@ -2,8 +2,12 @@ import * as bcrypt from "bcrypt";
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { EnvService } from "../env";
-import { UserTokenResponseDto } from "../http/dto/user/userTokenResponseDto";
+import {
+  IEmailTokenPayload,
+  UserTokenResponseDto,
+} from "../http/dto/user/userTokenResponseDto";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
+import { EmailVerificationPurpose } from "@/core/constants";
 
 @Injectable()
 export class AuthServiceImpl implements IAuthService {
@@ -19,17 +23,37 @@ export class AuthServiceImpl implements IAuthService {
     return await bcrypt.compare(data.password, data.userPassword);
   }
 
-  generateAccessToken(payload: { sub: string; phone: string }): string {
-    return this.jwtService.sign(payload, {
+  async generateAccessToken(payload: {
+    sub: string;
+    phone: string;
+  }): Promise<string> {
+    return this.jwtService.signAsync(payload, {
       secret: this.configService.get("JWT_SECRET"),
       expiresIn: "5m",
+      audience: "access",
     });
   }
 
-  generateRefreshToken(payload: { sub: string; phone: string }): string {
-    return this.jwtService.sign(payload, {
+  generateRefreshToken(payload: {
+    sub: string;
+    phone: string;
+  }): Promise<string> {
+    return this.jwtService.signAsync(payload, {
       secret: this.configService.get("REFRESH_TOKEN_SECRET"),
       expiresIn: "7d",
+      audience: "refresh",
+    });
+  }
+
+  generateEmailVerificationToken(payload: {
+    sub: string;
+    purpose: EmailVerificationPurpose;
+    newEmail: string;
+  }): Promise<string> {
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get("JWT_SECRET"),
+      expiresIn: "15m",
+      audience: "emailVerification",
     });
   }
 
@@ -39,20 +63,31 @@ export class AuthServiceImpl implements IAuthService {
 
   async refreshToken(refreshToken: string): Promise<UserTokenResponseDto> {
     try {
-      const payload = this.jwtService.verify(refreshToken, {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: this.configService.get("REFRESH_TOKEN_SECRET"),
       });
-      const newAccessToken = this.generateAccessToken({
+      const newAccessToken = await this.generateAccessToken({
         phone: payload.phone,
         sub: payload.sub,
       });
-      const newRefreshToken = this.generateRefreshToken({
+      const newRefreshToken = await this.generateRefreshToken({
         phone: payload.phone,
         sub: payload.sub,
       });
 
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch (error: any) {
+      throw error;
+    }
+  }
+
+  async verifyEmailToken(token: string): Promise<IEmailTokenPayload> {
+    try {
+      return this.jwtService.verifyAsync<IEmailTokenPayload>(token, {
+        secret: this.configService.get("JWT_SECRET"),
+        audience: "emailVerification",
+      });
+    } catch (error) {
       throw error;
     }
   }

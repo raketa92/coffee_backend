@@ -17,6 +17,8 @@ import { IUserRepository } from "@/domain/user/user.repository";
 import { UserRepositoryImpl } from "./repository/userRepositoryImpl";
 import { IOtpRepository } from "@/domain/otp/otp.repository";
 import { OtpRepositoryImpl } from "./repository/otpRepositoryImpl";
+import { IEmailVerificationRepository } from "@/domain/email/email.repository";
+import { EmailVerificationRepositoryImpl } from "./repository/emailRepositoryImpl";
 
 @Module({
   imports: [EnvModule],
@@ -79,6 +81,10 @@ import { OtpRepositoryImpl } from "./repository/otpRepositoryImpl";
       provide: IOtpRepository,
       useClass: OtpRepositoryImpl,
     },
+    {
+      provide: IEmailVerificationRepository,
+      useClass: EmailVerificationRepositoryImpl,
+    },
   ],
   exports: [
     "DB_CONNECTION",
@@ -89,6 +95,7 @@ import { OtpRepositoryImpl } from "./repository/otpRepositoryImpl";
     IShopRepository,
     IUserRepository,
     IOtpRepository,
+    IEmailVerificationRepository,
   ],
 })
 export class DatabaseModule {}

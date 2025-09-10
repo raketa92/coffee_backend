@@ -5,7 +5,7 @@ import {
   UseCaseError,
   UseCaseErrorCode,
 } from "@/application/shared/exception";
-import { OtpChangePasswordResponseDto, OtpChangePhoneResponseDto, OtpResponseDto } from "./dto";
+import { OtpChangePasswordResponseDto } from "./dto";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IOtpService } from "@/application/shared/ports/IOtpService";
 import { UseCaseErrorMessage } from "../exception";
@@ -22,7 +22,9 @@ export class ProcessChangePasswordOtpResponseUseCase
     private readonly authService: IAuthService
   ) {}
 
-  public async execute(request: OtpChangePasswordResponseDto): Promise<AuthResponseDto> {
+  public async execute(
+    request: OtpChangePasswordResponseDto
+  ): Promise<AuthResponseDto> {
     try {
       const existingUser = await this.userService.findOne({
         guid: request.userGuid,
@@ -47,8 +49,8 @@ export class ProcessChangePasswordOtpResponseUseCase
       await this.otpService.delete(otp.guid.toValue());
 
       const payload = { sub: user.guid.toValue(), phone: user.phone };
-      const accessToken = this.authService.generateAccessToken(payload);
-      const refreshToken = this.authService.generateRefreshToken(payload);
+      const accessToken = await this.authService.generateAccessToken(payload);
+      const refreshToken = await this.authService.generateRefreshToken(payload);
       user.setRefreshToken(refreshToken);
       await this.userService.save(user);
 

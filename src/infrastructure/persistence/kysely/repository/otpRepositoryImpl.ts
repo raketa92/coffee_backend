@@ -1,4 +1,3 @@
-import { IOtpFilter } from "@/application/otp/usecases/dto";
 import { OTP } from "@/domain/otp/otp";
 import { IOtpRepository } from "@/domain/otp/otp.repository";
 import { Inject, Injectable } from "@nestjs/common";
@@ -6,6 +5,7 @@ import { Transaction, DeleteResult, Kysely } from "kysely";
 import { DatabaseSchema } from "../database.schema";
 import { OtpCreateModel, OtpModel, OtpUpdateModel } from "../models/otp";
 import { OtpMapper } from "@/infrastructure/dataMappers/otpMapper";
+import { IOtpFilter } from "@/application/otp/usecases/dto";
 
 @Injectable()
 export class OtpRepositoryImpl implements IOtpRepository {

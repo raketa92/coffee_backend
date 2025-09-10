@@ -9,9 +9,14 @@ import { OtpService } from "@/domain/otp/otp.service";
 import { DatabaseModule } from "../persistence/kysely/database.module";
 import { RedisService } from "../persistence/redis/redis.service";
 import { OtpEventHandler } from "@/domain/otp/events/otp.eventHandler";
+import { EmailEventHandler } from "@/domain/email/events/email.eventHandler";
+import { IEmailService } from "@/application/shared/ports/IEmailService";
+import { EmailService } from "@/domain/email/email.service";
+import { MailerModule } from "../mailer/mailer.module";
 
 @Module({
   imports: [
+    MailerModule,
     ClientsModule.registerAsync([
       {
         imports: [EnvModule],
@@ -44,7 +49,12 @@ import { OtpEventHandler } from "@/domain/otp/events/otp.eventHandler";
       provide: IOtpService,
       useClass: OtpService,
     },
+    {
+      provide: IEmailService,
+      useClass: EmailService,
+    },
     OtpEventHandler,
+    EmailEventHandler,
   ],
   controllers: [KafkaConsumer],
   exports: [ClientsModule, IKafkaService],

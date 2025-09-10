@@ -11,6 +11,8 @@ export const UseCaseErrorMessage = {
   profile_update_error: "Profile update error",
   phone_change_error: "Phone change error",
   password_change_error: "Password change error",
+  email_change_error: "Email change error",
   invalid_date: "Invalid date",
   wrong_password: "Password is wrong",
+  email_already_in_use: "Email already in use",
 };

@@ -1,19 +1,19 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
-import { Roles } from "@/core/constants/roles";
 import { NotFoundException } from "@nestjs/common";
-import { UseCaseErrorMessage } from "@/application/auth/exception";
-import { ChangePasswordDto } from "../dto";
-import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
-import { AppEvents, OtpPurpose } from "@/core/constants";
+import { ChangeEmailDto } from "../dto";
+import { AppEvents, EmailVerificationPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IKafkaService } from "@/application/shared/ports/IkafkaService";
-import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
-import { ChangePasswordUseCase } from "../changePassword";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
+import { ChangeEmailUseCase } from "../changeEmail";
+import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
+import { EmailRequestedEvent } from "@/domain/user/events/emailRequest.event";
+import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
+import { Roles } from "@/core/constants/roles";
+import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 
-describe("Change phone use case", () => {
-  let useCase: ChangePasswordUseCase;
+describe("Change email use case", () => {
+  let useCase: ChangeEmailUseCase;
   let userService: IUserService;
   let kafkaService: IKafkaService;
   let authService: IAuthService;
@@ -22,7 +22,7 @@ describe("Change phone use case", () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ChangePasswordUseCase,
+        ChangeEmailUseCase,
         {
           provide: IUserService,
           useValue: {
@@ -32,8 +32,7 @@ describe("Change phone use case", () => {
         {
           provide: IAuthService,
           useValue: {
-            validateUser: jest.fn(),
-            hashPassword: jest.fn(),
+            generateEmailVerificationToken: jest.fn(),
           },
         },
         {
@@ -45,7 +44,7 @@ describe("Change phone use case", () => {
       ],
     }).compile();
 
-    useCase = module.get<ChangePasswordUseCase>(ChangePasswordUseCase);
+    useCase = module.get<ChangeEmailUseCase>(ChangeEmailUseCase);
     userService = module.get<IUserService>(IUserService);
     kafkaService = module.get<IKafkaService>(IKafkaService);
     authService = module.get<IAuthService>(IAuthService);
@@ -78,10 +77,9 @@ describe("Change phone use case", () => {
 
   it("should throw error if user not found", async () => {
     (userService.findOne as jest.Mock).mockResolvedValue(null);
-    const dto: ChangePasswordDto = {
+    const dto: ChangeEmailDto = {
       userGuid,
-      password: "new_password",
-      oldPassword: "old_password",
+      email: "testEmail",
     };
     await expect(useCase.execute(dto)).rejects.toThrow(
       new NotFoundException({
@@ -90,18 +88,34 @@ describe("Change phone use case", () => {
     );
   });
 
-  it("should fire event changePasswordOtpRequested", async () => {
-    const hashedPassword = "mocked_hashed_password";
-    const newHashedPassword = "new_mocked_hashed_password";
-    const dto: ChangePasswordDto = {
+  it("should throw error if email is taken", async () => {
+    (userService.findOne as jest.Mock).mockResolvedValueOnce(true);
+    (userService.findOne as jest.Mock).mockResolvedValueOnce(true);
+    const dto: ChangeEmailDto = {
       userGuid,
-      password: newHashedPassword,
-      oldPassword: hashedPassword,
+      email: "testEmail",
     };
+    await expect(useCase.execute(dto)).rejects.toThrow(
+      new NotFoundException({
+        message: UseCaseErrorMessage.email_already_in_use,
+      })
+    );
+  });
+
+  it("should fire event changeEmailRequested", async () => {
+    const dto: ChangeEmailDto = {
+      userGuid,
+      email: "newEmail",
+    };
+
+    const token = "token";
+    (authService.generateEmailVerificationToken as jest.Mock).mockResolvedValue(
+      token
+    );
 
     const userModel: UserModel = {
       guid: userGuid,
-      password: hashedPassword,
+      password: "hashedPassword",
       phone: "+99344333322",
       email: null,
       userName: "mocked_user_name",
@@ -118,21 +132,22 @@ describe("Change phone use case", () => {
     };
 
     const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
-    (authService.validateUser as jest.Mock).mockResolvedValue(true);
-    (authService.hashPassword as jest.Mock).mockResolvedValue(hashedPassword);
+    (userService.findOne as jest.Mock).mockResolvedValueOnce(user);
+    (userService.findOne as jest.Mock).mockResolvedValueOnce(null);
 
     const result = await useCase.execute(dto);
-    const otpEvent = new OTPRequestedEvent({
-      phone: user.phone,
-      payload: hashedPassword,
-      purpose: OtpPurpose.userChangePassword,
+    const emailEvent = new EmailRequestedEvent({
+      email: dto.email,
+      payload: token,
+      purpose: EmailVerificationPurpose.userChangeEmail,
     });
     expect(kafkaService.publishEvent).toHaveBeenCalledWith(
-      AppEvents.changePasswordOtpRequested,
-      otpEvent
+      AppEvents.changeEmailRequested,
+      emailEvent
     );
 
-    expect(result).toEqual({ message: "Otp sent to change password" });
+    expect(result).toEqual({
+      message: `Verification email sent to ${dto.email}`,
+    });
   });
 });

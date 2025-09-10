@@ -1,8 +1,5 @@
 import { IOtpService } from "@/application/shared/ports/IOtpService";
-import { OtpPurpose } from "@/core/constants";
-import {
-  OTPRequestedEvent,
-} from "@/domain/user/events/otpRequest.event";
+import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { LoggerService } from "@/infrastructure/logger/logger";
 import { RedisService } from "@/infrastructure/persistence/redis/redis.service";
 import { Injectable } from "@nestjs/common";
@@ -25,6 +22,6 @@ export class OtpEventHandler {
       purpose: event.purpose,
       payload: event.payload,
     });
-    // Send SMS logic here
+    // Put send SMS logic here
   }
 }

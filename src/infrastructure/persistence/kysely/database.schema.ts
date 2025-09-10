@@ -1,5 +1,6 @@
 import { BankResponseTable } from "./models/bankResponse";
 import { CategoryTable } from "./models/category";
+import { EmailVerificationTable } from "./models/email";
 import { OrderTable } from "./models/order";
 import { OrderItemTable } from "./models/orderItem";
 import { OtpTable } from "./models/otp";
@@ -18,4 +19,5 @@ export interface DatabaseSchema {
   Shop: ShopTable;
   User: UserTable;
   Otp: OtpTable;
+  EmailVerification: EmailVerificationTable;
 }

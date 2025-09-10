@@ -8,6 +8,8 @@ import {
 } from "@nestjs/common";
 import { UpdateProfileUseCase } from "@/application/coffee_shop/usecases/user/updateProfile";
 import {
+  ChangeEmailDto,
+  changeEmailSchema,
   ChangePasswordDto,
   changePasswordSchema,
   ChangePhoneDto,
@@ -18,6 +20,7 @@ import {
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ChangePhoneUseCase } from "@/application/coffee_shop/usecases/user/changePhone";
 import { ChangePasswordUseCase } from "@/application/coffee_shop/usecases/user/changePassword";
+import { ChangeEmailUseCase } from "@/application/coffee_shop/usecases/user/changeEmail";
 
 @Controller("/user")
 export class UserController {
@@ -25,6 +28,7 @@ export class UserController {
     private readonly updateProfileUseCase: UpdateProfileUseCase,
     private readonly changePhoneUseCase: ChangePhoneUseCase,
     private readonly changePasswordUseCase: ChangePasswordUseCase,
+    private readonly changeEmailUseCase: ChangeEmailUseCase
   ) {}
 
   @Put("/profile/:userGuid")
@@ -60,6 +64,18 @@ export class UserController {
   ) {
     const body = changePasswordSchema.parse({ ...dto, userGuid });
     const response = await this.changePasswordUseCase.execute(body);
+    return response;
+  }
+
+  @Put("/change-email/:userGuid")
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  async changeEmail(
+    @Param("userGuid") userGuid: string,
+    @Body() dto: ChangeEmailDto
+  ) {
+    const body = changeEmailSchema.parse({ ...dto, userGuid });
+    const response = await this.changeEmailUseCase.execute(body);
     return response;
   }
 }

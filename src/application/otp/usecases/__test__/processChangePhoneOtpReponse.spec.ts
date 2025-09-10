@@ -4,7 +4,7 @@ import { Roles } from "@/core/constants/roles";
 import { NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
-import { OtpChangePhoneResponseDto, OtpResponseDto } from "../dto";
+import { OtpChangePhoneResponseDto } from "../dto";
 import { OTP } from "@/domain/otp/otp";
 import { OtpPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
@@ -51,7 +51,9 @@ describe("Process change phone otp use case", () => {
       ],
     }).compile();
 
-    useCase = module.get<ProcessChangePhoneOtpResponseUseCase>(ProcessChangePhoneOtpResponseUseCase);
+    useCase = module.get<ProcessChangePhoneOtpResponseUseCase>(
+      ProcessChangePhoneOtpResponseUseCase
+    );
     userService = module.get<IUserService>(IUserService);
     otpService = module.get<IOtpService>(IOtpService);
     authService = module.get<IAuthService>(IAuthService);
@@ -80,7 +82,6 @@ describe("Process change phone otp use case", () => {
   });
 
   it("should process otp", async () => {
-    const phone = "+99344333322";
     const newPhone = "+99344333399";
     const dto: OtpChangePhoneResponseDto = {
       phone: newPhone,

@@ -47,8 +47,8 @@ export class ProcessInitialOtpResponseUseCase
       await this.otpService.delete(otp.guid.toValue());
 
       const payload = { sub: user.guid.toValue(), phone: user.phone };
-      const accessToken = this.authService.generateAccessToken(payload);
-      const refreshToken = this.authService.generateRefreshToken(payload);
+      const accessToken = await this.authService.generateAccessToken(payload);
+      const refreshToken = await this.authService.generateRefreshToken(payload);
       user.setRefreshToken(refreshToken);
       await this.userService.save(user);
 

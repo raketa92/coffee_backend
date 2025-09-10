@@ -4,7 +4,7 @@ import { Roles } from "@/core/constants/roles";
 import { NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
-import { OtpChangePasswordResponseDto, OtpChangePhoneResponseDto, OtpResponseDto } from "../dto";
+import { OtpChangePasswordResponseDto } from "../dto";
 import { OTP } from "@/domain/otp/otp";
 import { OtpPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
@@ -51,7 +51,9 @@ describe("Process change phone otp use case", () => {
       ],
     }).compile();
 
-    useCase = module.get<ProcessChangePasswordOtpResponseUseCase>(ProcessChangePasswordOtpResponseUseCase);
+    useCase = module.get<ProcessChangePasswordOtpResponseUseCase>(
+      ProcessChangePasswordOtpResponseUseCase
+    );
     userService = module.get<IUserService>(IUserService);
     otpService = module.get<IOtpService>(IOtpService);
     authService = module.get<IAuthService>(IAuthService);

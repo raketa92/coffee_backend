@@ -1,3 +1,5 @@
+import { EmailVerificationPurpose } from "@/core/constants";
+
 export type UserTokenResponseDto = {
   accessToken: string;
   refreshToken: string;
@@ -20,3 +22,9 @@ export type UserDetails = {
 export type AuthResponseDto = UserTokenResponseDto & {
   user: UserDetails;
 };
+
+export interface IEmailTokenPayload {
+  sub: string;
+  purpose: EmailVerificationPurpose;
+  newEmail: string;
+}

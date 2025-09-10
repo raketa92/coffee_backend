@@ -10,7 +10,14 @@ import {
 } from "@/application/otp/usecases/dto";
 import { ProcessInitialOtpResponseUseCase } from "@/application/otp/usecases/processInitialOtpResponse";
 import { RequestOtpUseCase } from "@/application/otp/usecases/requestOtp";
-import { Body, Controller, HttpCode, Param, Post, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Param,
+  Post,
+  UseGuards,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ProcessChangePhoneOtpResponseUseCase } from "@/application/otp/usecases/processChangePhoneOtpResponse";
 import { ProcessChangePasswordOtpResponseUseCase } from "@/application/otp/usecases/processChangePasswordOtpResponse";
@@ -27,21 +34,33 @@ export class OtpController {
   @Post("/initial")
   @HttpCode(200)
   async handleInitialOtpResponse(@Body() dto: OtpResponseDto) {
-    return await this.processInitialOtpUseCase.execute(otpResponseSchema.parse(dto));
+    return await this.processInitialOtpUseCase.execute(
+      otpResponseSchema.parse(dto)
+    );
   }
 
   @Post("/change-phone/:userGuid")
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  async handleChangePhoneOtpResponse(@Param("userGuid") userGuid: string, @Body() dto: OtpChangePhoneResponseDto) {
-    return await this.processChangePhoneOtpUseCase.execute(otpChangePhoneResponseSchema.parse({...dto, userGuid}));
+  async handleChangePhoneOtpResponse(
+    @Param("userGuid") userGuid: string,
+    @Body() dto: OtpChangePhoneResponseDto
+  ) {
+    return await this.processChangePhoneOtpUseCase.execute(
+      otpChangePhoneResponseSchema.parse({ ...dto, userGuid })
+    );
   }
 
   @Post("/change-password/:userGuid")
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  async handleChangePasswordOtpResponse(@Param("userGuid") userGuid: string, @Body() dto: OtpChangePasswordResponseDto) {
-    return await this.processChangePasswordOtpUseCase.execute(otpChangePasswordResponseSchema.parse({ ...dto, userGuid }));
+  async handleChangePasswordOtpResponse(
+    @Param("userGuid") userGuid: string,
+    @Body() dto: OtpChangePasswordResponseDto
+  ) {
+    return await this.processChangePasswordOtpUseCase.execute(
+      otpChangePasswordResponseSchema.parse({ ...dto, userGuid })
+    );
   }
 
   @Post("/request")

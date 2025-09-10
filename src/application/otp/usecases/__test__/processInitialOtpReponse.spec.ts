@@ -50,7 +50,9 @@ describe("Process otp use case", () => {
       ],
     }).compile();
 
-    useCase = module.get<ProcessInitialOtpResponseUseCase>(ProcessInitialOtpResponseUseCase);
+    useCase = module.get<ProcessInitialOtpResponseUseCase>(
+      ProcessInitialOtpResponseUseCase
+    );
     userService = module.get<IUserService>(IUserService);
     otpService = module.get<IOtpService>(IOtpService);
     authService = module.get<IAuthService>(IAuthService);

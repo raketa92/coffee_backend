@@ -28,7 +28,7 @@ export class User extends AggregateRoot<IUserProps> {
   private _isActive: boolean;
   private _lastLogin: Date;
   private _refreshToken?: string | null;
-  private _changedFields: Set<keyof User> = new Set();
+  private _changedFields: Set<keyof IUserProps> = new Set();
 
   constructor(props: IUserProps, guid?: UniqueEntityID) {
     super(guid);
@@ -67,6 +67,11 @@ export class User extends AggregateRoot<IUserProps> {
     this.addChangedFields("phone");
   }
 
+  changeEmail(email: string) {
+    this._email = email;
+    this.addChangedFields("email");
+  }
+
   verify() {
     this._isVerified = true;
     this.addChangedFields("isVerified");
@@ -74,22 +79,27 @@ export class User extends AggregateRoot<IUserProps> {
 
   setLastLogin(payload: Date): void {
     this._lastLogin = payload;
+    this.addChangedFields("lastLogin");
   }
 
   setUserName(payload: string): void {
     this._userName = payload;
+    this.addChangedFields("userName");
   }
 
   setFirstName(payload: string): void {
     this._firstName = payload;
+    this.addChangedFields("firstName");
   }
 
   setLastName(payload: string): void {
     this._lastName = payload;
+    this.addChangedFields("lastName");
   }
 
   setGender(payload: string): void {
     this._gender = payload;
+    this.addChangedFields("gender");
   }
 
   removeRefreshToken() {

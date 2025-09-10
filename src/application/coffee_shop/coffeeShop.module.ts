@@ -25,6 +25,7 @@ import { ChangePasswordUseCase } from "./usecases/user/changePassword";
 import { IAuthService } from "../shared/ports/IAuthService";
 import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
 import { JwtService } from "@nestjs/jwt";
+import { ChangeEmailUseCase } from "./usecases/user/changeEmail";
 
 @Module({
   imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, KafkaModule],
@@ -42,6 +43,7 @@ import { JwtService } from "@nestjs/jwt";
     UpdateProfileUseCase,
     ChangePhoneUseCase,
     ChangePasswordUseCase,
+    ChangeEmailUseCase,
     {
       provide: IUserService,
       useClass: UserService,
@@ -71,6 +73,7 @@ import { JwtService } from "@nestjs/jwt";
     UpdateProfileUseCase,
     ChangePhoneUseCase,
     ChangePasswordUseCase,
+    ChangeEmailUseCase,
   ],
 })
 export class CoffeeShopModule {}

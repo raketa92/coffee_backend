@@ -29,6 +29,11 @@ export const evnSchema = z.object({
   JWT_SECRET: z.coerce.string(),
   REFRESH_TOKEN_SECRET: z.coerce.string(),
   KAFKA_BROKER: z.coerce.string(),
+  SMTP_HOST: z.coerce.string(),
+  SMTP_PORT: z.coerce.number(),
+  SMTP_SECURE: z.coerce.boolean(),
+  SMTP_USER: z.coerce.string(),
+  SMTP_PASS: z.coerce.string(),
 });
 
 export type Env = z.infer<typeof evnSchema>;
