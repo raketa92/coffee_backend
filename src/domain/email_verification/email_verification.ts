@@ -3,22 +3,22 @@ import { Entity } from "@/core/Entity";
 import { UniqueEntityID } from "@/core/UniqueEntityID";
 
 export interface IEmailProps {
+  otp: string;
   email: string;
-  payload?: string | null;
   purpose: EmailVerificationPurpose;
   expiresAt?: Date;
 }
 export class EmailVerification extends Entity<IEmailProps> {
+  private readonly _otp: string;
   private readonly _email: string;
-  private readonly _payload?: string | null;
   private readonly _purpose: EmailVerificationPurpose;
   private _expiresAt: Date;
   private _changedFields: Set<keyof IEmailProps> = new Set();
 
   private constructor(props: IEmailProps, guid?: UniqueEntityID) {
     super(guid);
+    this._otp = props.otp;
     this._email = props.email;
-    this._payload = props.payload;
     this._purpose = props.purpose;
     this._expiresAt = this.setExpireDate(props.expiresAt);
   }
@@ -37,16 +37,16 @@ export class EmailVerification extends Entity<IEmailProps> {
     return this._guid;
   }
 
+  get otp(): string {
+    return this._otp;
+  }
+
   get email(): string {
     return this._email;
   }
 
   get purpose(): EmailVerificationPurpose {
     return this._purpose;
-  }
-
-  get payload(): string | undefined | null {
-    return this._payload;
   }
 
   get expiresAt(): Date {
@@ -68,8 +68,8 @@ export class EmailVerification extends Entity<IEmailProps> {
   toJSON() {
     return {
       guid: this._guid.toString(),
+      otp: this._otp,
       email: this._email,
-      payload: this._payload,
       expiresAt: this._expiresAt,
     };
   }

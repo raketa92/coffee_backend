@@ -10,13 +10,11 @@ import { LogoutUserUseCase } from "../auth/usecases/logoutUser";
 import { RefreshTokenUseCase } from "../auth/usecases/refreshToken";
 import { IAuthService } from "../shared/ports/IAuthService";
 import { DeleteUserUseCase } from "./usecases/deleteUser";
-import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
-import { KafkaService } from "@/infrastructure/kafka/kafka.service";
 import { IUserService } from "../shared/ports/IUserService";
-import { IKafkaService } from "../shared/ports/IkafkaService";
+import { KafkaProducerModule } from "@/infrastructure/kafka/kafka_producer.module";
 
 @Module({
-  imports: [EnvModule, DatabaseModule, KafkaModule],
+  imports: [EnvModule, DatabaseModule, KafkaProducerModule],
   providers: [
     JwtService,
     LoginUserUseCase,
@@ -31,10 +29,6 @@ import { IKafkaService } from "../shared/ports/IkafkaService";
     {
       provide: IAuthService,
       useClass: AuthServiceImpl,
-    },
-    {
-      provide: IKafkaService,
-      useClass: KafkaService,
     },
   ],
   exports: [

@@ -1,15 +1,15 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
 import { Transaction } from "kysely";
-import { IEmailVerificationRepository } from "./email.repository";
-import { EmailVerification, IEmailProps } from "./email";
+import { IEmailVerificationRepository } from "./email_verification.repository";
+import { EmailVerification, IEmailProps } from "./email_verification";
 import { EmailVerificationMapper } from "@/infrastructure/dataMappers/emailVerificationMapper";
-import { IEmailService } from "@/application/shared/ports/IEmailService";
+import { IEmailVerificationService } from "@/application/shared/ports/IEmailService";
 import { IEmailFilter } from "@/application/email_verification/usecases/dto";
 import { addMinutes } from "date-fns";
 
 @Injectable()
-export class EmailService implements IEmailService {
+export class EmailVerificationService implements IEmailVerificationService {
   constructor(
     @Inject(IEmailVerificationRepository)
     private readonly emailRepository: IEmailVerificationRepository
@@ -20,8 +20,8 @@ export class EmailService implements IEmailService {
   ): Promise<EmailVerification> {
     const today = new Date();
     const email = EmailVerification.create({
+      otp: data.otp,
       email: data.email,
-      payload: data.payload,
       purpose: data.purpose,
       expiresAt: addMinutes(today, 15),
     });
@@ -29,7 +29,8 @@ export class EmailService implements IEmailService {
     return email;
   }
   async findOne(filter: IEmailFilter): Promise<EmailVerification | null> {
-    const emailModel = await this.emailRepository.getEmailByFilter(filter);
+    const emailModel =
+      await this.emailRepository.getEmailVerificationByFilter(filter);
     if (!emailModel) {
       return null;
     }

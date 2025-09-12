@@ -1,14 +1,14 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Transaction, DeleteResult, Kysely } from "kysely";
 import { DatabaseSchema } from "../database.schema";
-import { IEmailVerificationRepository } from "@/domain/email/email.repository";
+import { IEmailVerificationRepository } from "@/domain/email_verification/email_verification.repository";
 import {
   EmailVerificationCreateModel,
   EmailVerificationModel,
   EmailVerificationUpdateModel,
 } from "../models/email";
 import { IEmailFilter } from "@/application/email_verification/usecases/dto";
-import { EmailVerification } from "@/domain/email/email";
+import { EmailVerification } from "@/domain/email_verification/email_verification";
 import { EmailVerificationMapper } from "@/infrastructure/dataMappers/emailVerificationMapper";
 
 @Injectable()
@@ -20,12 +20,13 @@ export class EmailVerificationRepositoryImpl
     private readonly kysely: Kysely<DatabaseSchema>
   ) {}
 
-  async getEmailByFilter(
+  async getEmailVerificationByFilter(
     filter: IEmailFilter
   ): Promise<EmailVerificationModel | null> {
     const query = this.kysely
       .selectFrom("EmailVerification")
       .selectAll()
+      .where("EmailVerification.otp", "=", filter.otp)
       .where("EmailVerification.email", "=", filter.email);
 
     const emailModel = await query.executeTakeFirst();

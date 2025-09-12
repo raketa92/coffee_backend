@@ -17,8 +17,8 @@ import { IUserRepository } from "@/domain/user/user.repository";
 import { UserRepositoryImpl } from "./repository/userRepositoryImpl";
 import { IOtpRepository } from "@/domain/otp/otp.repository";
 import { OtpRepositoryImpl } from "./repository/otpRepositoryImpl";
-import { IEmailVerificationRepository } from "@/domain/email/email.repository";
-import { EmailVerificationRepositoryImpl } from "./repository/emailRepositoryImpl";
+import { IEmailVerificationRepository } from "@/domain/email_verification/email_verification.repository";
+import { EmailVerificationRepositoryImpl } from "./repository/emailVerificationRepositoryImpl";
 
 @Module({
   imports: [EnvModule],

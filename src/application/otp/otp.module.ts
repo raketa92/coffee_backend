@@ -12,11 +12,11 @@ import { EnvModule } from "@/infrastructure/env";
 import { RequestOtpUseCase } from "./usecases/requestOtp";
 import { OtpEventHandler } from "@/domain/otp/events/otp.eventHandler";
 import { RedisService } from "@/infrastructure/persistence/redis/redis.service";
-import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
+// import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
 import { ProcessChangePasswordOtpResponseUseCase } from "./usecases/processChangePasswordOtpResponse";
 import { ProcessChangePhoneOtpResponseUseCase } from "./usecases/processChangePhoneOtpResponse";
 @Module({
-  imports: [DatabaseModule, EnvModule, KafkaModule],
+  imports: [DatabaseModule, EnvModule],
   providers: [
     JwtService,
     RedisService,

@@ -31,7 +31,7 @@ export class ChangePhoneUseCase
       const otpEvent = new OTPRequestedEvent({
         phone: request.phone,
         payload: request.phone,
-        purpose: OtpPurpose.userChangePhone
+        purpose: OtpPurpose.userChangePhone,
       });
       await this.kafkaService.publishEvent<OTPRequestedEvent>(
         AppEvents.changePhoneOtpRequested,

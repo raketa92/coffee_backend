@@ -6,16 +6,16 @@ import { KafkaConsumer } from "../kafka.consumer";
 import { EmailVerificationPurpose, OtpPurpose } from "@/core/constants";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { OtpEventHandler } from "@/domain/otp/events/otp.eventHandler";
-import { EmailEventHandler } from "@/domain/email/events/email.eventHandler";
-import { IEmailService } from "@/application/shared/ports/IEmailService";
-import { EmailRequestedEvent } from "@/domain/user/events/emailRequest.event";
+import { EmailVerificationEventHandler } from "@/domain/email_verification/events/email_verification.eventHandler";
+import { IEmailVerificationService } from "@/application/shared/ports/IEmailService";
+import { EmailVerificationRequestedEvent } from "@/domain/user/events/emailRequest.event";
 import { IEmailSender } from "@/application/shared/ports/IEmailSender";
 
 describe("Kafka consumer tests", () => {
   let kafkaConsumer: KafkaConsumer;
   let redisService: RedisService;
   let otpService: IOtpService;
-  let emailService: IEmailService;
+  let emailService: IEmailVerificationService;
   let emailSender: IEmailSender;
 
   beforeEach(async () => {
@@ -31,13 +31,14 @@ describe("Kafka consumer tests", () => {
           useValue: { create: jest.fn() },
         },
         {
-          provide: IEmailService,
+          provide: IEmailVerificationService,
           useValue: { create: jest.fn() },
         },
         {
           provide: RedisService,
           useValue: {
             generateShortSmsCode: jest.fn().mockResolvedValue("12345"),
+            generateEmailCode: jest.fn().mockResolvedValue("112233"),
           },
         },
         {
@@ -45,14 +46,14 @@ describe("Kafka consumer tests", () => {
           useValue: { send: jest.fn() },
         },
         OtpEventHandler,
-        EmailEventHandler,
+        EmailVerificationEventHandler,
       ],
     }).compile();
 
     kafkaConsumer = module.get<KafkaConsumer>(KafkaConsumer);
     redisService = module.get(RedisService);
     otpService = module.get(IOtpService);
-    emailService = module.get(IEmailService);
+    emailService = module.get(IEmailVerificationService);
     emailSender = module.get(IEmailSender);
   });
 
@@ -94,33 +95,31 @@ describe("Kafka consumer tests", () => {
 
   it("should handle change email requested event", async () => {
     const email = "testemail";
-    const event = new EmailRequestedEvent({
+    const event = new EmailVerificationRequestedEvent({
       email,
-      payload: "token",
       purpose: EmailVerificationPurpose.userChangeEmail,
     });
 
     await kafkaConsumer.handleEmailRequested(event);
-
-    const verifyUrl = `${process.env.PUBLIC_BASE_URL}/email/verify?token=${encodeURIComponent(event.payload)}`;
+    const code = "112233";
     expect(emailSender.send).toHaveBeenCalledWith({
       to: event.email,
       content: {
         subject: "Confirm your new email",
         html: `
           <p>We received a request to change your email.</p>
-          <p>Please confirm by clicking the link below:</p>
-          <p><a href="${verifyUrl}">Verify Email</a></p>
+          <p>Please confirm by entering code below:</p>
+          <p>Code: ${code}</p>
           <p>If you didn’t request this, you can ignore this email.</p>
         `,
-        text: `Confirm your new email: ${verifyUrl}`,
+        text: `Confirm your new email`,
       },
     });
 
     expect(emailService.create).toHaveBeenCalledWith({
       email,
       purpose: EmailVerificationPurpose.userChangeEmail,
-      payload: "token",
+      otp: code,
     });
   });
 });

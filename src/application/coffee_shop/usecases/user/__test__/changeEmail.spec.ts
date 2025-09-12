@@ -7,7 +7,7 @@ import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
 import { ChangeEmailUseCase } from "../changeEmail";
 import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
-import { EmailRequestedEvent } from "@/domain/user/events/emailRequest.event";
+import { EmailVerificationRequestedEvent } from "@/domain/user/events/emailRequest.event";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
@@ -136,9 +136,8 @@ describe("Change email use case", () => {
     (userService.findOne as jest.Mock).mockResolvedValueOnce(null);
 
     const result = await useCase.execute(dto);
-    const emailEvent = new EmailRequestedEvent({
+    const emailEvent = new EmailVerificationRequestedEvent({
       email: dto.email,
-      payload: token,
       purpose: EmailVerificationPurpose.userChangeEmail,
     });
     expect(kafkaService.publishEvent).toHaveBeenCalledWith(

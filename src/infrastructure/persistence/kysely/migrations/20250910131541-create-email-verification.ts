@@ -9,8 +9,8 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable(tableName)
     .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
+    .addColumn("otp", "varchar(10)", (col) => col.notNull())
     .addColumn("email", "varchar(60)", (col) => col.notNull())
-    .addColumn("payload", "varchar")
     .addColumn("purpose", sql`email_verification_purpose_enum`, (col) =>
       col.notNull()
     )

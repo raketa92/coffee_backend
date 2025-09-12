@@ -1,11 +1,11 @@
 import { DeleteResult, Transaction } from "kysely";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
-import { EmailVerification } from "./email";
+import { EmailVerification } from "./email_verification";
 import { EmailVerificationModel } from "@/infrastructure/persistence/kysely/models/email";
 import { IEmailFilter } from "@/application/email_verification/usecases/dto";
 
 export interface IEmailVerificationRepository {
-  getEmailByFilter(
+  getEmailVerificationByFilter(
     filter: IEmailFilter
   ): Promise<EmailVerificationModel | null>;
   save(

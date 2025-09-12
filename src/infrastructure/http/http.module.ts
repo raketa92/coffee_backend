@@ -11,9 +11,17 @@ import { AuthModule } from "@/application/auth/auth.module";
 import { UserController } from "./user.controller";
 import { OtpController } from "./otp.controller";
 import { OtpModule } from "@/application/otp/otp.module";
+import { EmailVerificationController } from "./email_verification.controller";
+import { EmailVerificationModule } from "@/application/email_verification/emailVerification.module";
 
 @Module({
-  imports: [CoffeeShopModule, AuthConfigModule, AuthModule, OtpModule],
+  imports: [
+    CoffeeShopModule,
+    AuthConfigModule,
+    AuthModule,
+    OtpModule,
+    EmailVerificationModule,
+  ],
   controllers: [
     OrderController,
     CategoryController,
@@ -22,6 +30,7 @@ import { OtpModule } from "@/application/otp/otp.module";
     AuthController,
     UserController,
     OtpController,
+    EmailVerificationController,
   ],
   providers: [
     RedisService,
@@ -32,6 +41,7 @@ import { OtpModule } from "@/application/otp/otp.module";
     AuthController,
     UserController,
     OtpController,
+    EmailVerificationController,
   ],
 })
 export class HttpModule {}

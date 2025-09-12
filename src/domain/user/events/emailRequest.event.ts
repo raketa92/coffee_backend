@@ -4,19 +4,16 @@ import { IEvent } from "@/core/events/IEvent";
 export interface IEmailRequestedEventProps {
   purpose: EmailVerificationPurpose;
   email: string;
-  payload: string;
 }
 
-export class EmailRequestedEvent implements IEvent {
+export class EmailVerificationRequestedEvent implements IEvent {
   readonly dateTimeOccurred: Date;
   readonly purpose: EmailVerificationPurpose;
   readonly email: string;
-  readonly payload: string;
 
-  constructor({ purpose, email: phone, payload }: IEmailRequestedEventProps) {
+  constructor({ purpose, email: phone }: IEmailRequestedEventProps) {
     this.dateTimeOccurred = new Date();
     this.purpose = purpose;
     this.email = phone;
-    this.payload = payload;
   }
 }

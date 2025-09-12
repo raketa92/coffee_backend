@@ -18,9 +18,6 @@ import { UserService } from "@/domain/user/user.service";
 import { UpdateProfileUseCase } from "./usecases/user/updateProfile";
 import { IUserService } from "../shared/ports/IUserService";
 import { ChangePhoneUseCase } from "./usecases/user/changePhone";
-import { IKafkaService } from "../shared/ports/IkafkaService";
-import { KafkaService } from "@/infrastructure/kafka/kafka.service";
-import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
 import { ChangePasswordUseCase } from "./usecases/user/changePassword";
 import { IAuthService } from "../shared/ports/IAuthService";
 import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
@@ -28,7 +25,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ChangeEmailUseCase } from "./usecases/user/changeEmail";
 
 @Module({
-  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule, KafkaModule],
+  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule],
   providers: [
     RedisService,
     JwtService,
@@ -55,10 +52,6 @@ import { ChangeEmailUseCase } from "./usecases/user/changeEmail";
     {
       provide: IBankService,
       useClass: BankServiceImpl,
-    },
-    {
-      provide: IKafkaService,
-      useClass: KafkaService,
     },
   ],
   exports: [

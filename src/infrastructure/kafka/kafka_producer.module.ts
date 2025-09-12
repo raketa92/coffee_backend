@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Global, Module } from "@nestjs/common";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { EnvModule, EnvService } from "../env";
 import { KafkaConsumer } from "./kafka.consumer";
@@ -9,18 +9,19 @@ import { OtpService } from "@/domain/otp/otp.service";
 import { DatabaseModule } from "../persistence/kysely/database.module";
 import { RedisService } from "../persistence/redis/redis.service";
 import { OtpEventHandler } from "@/domain/otp/events/otp.eventHandler";
-import { EmailEventHandler } from "@/domain/email/events/email.eventHandler";
-import { IEmailService } from "@/application/shared/ports/IEmailService";
-import { EmailService } from "@/domain/email/email.service";
+import { EmailVerificationEventHandler } from "@/domain/email_verification/events/email_verification.eventHandler";
+import { IEmailVerificationService } from "@/application/shared/ports/IEmailService";
+import { EmailVerificationService } from "@/domain/email_verification/email_verification.service";
 import { MailerModule } from "../mailer/mailer.module";
 
+@Global()
 @Module({
   imports: [
     MailerModule,
     ClientsModule.registerAsync([
       {
         imports: [EnvModule],
-        name: "KAFKA_SERVICE",
+        name: "KAFKA_PRODUCER",
         useFactory: async (configService: EnvService) => ({
           transport: Transport.KAFKA,
           options: {
@@ -50,13 +51,13 @@ import { MailerModule } from "../mailer/mailer.module";
       useClass: OtpService,
     },
     {
-      provide: IEmailService,
-      useClass: EmailService,
+      provide: IEmailVerificationService,
+      useClass: EmailVerificationService,
     },
     OtpEventHandler,
-    EmailEventHandler,
+    EmailVerificationEventHandler,
   ],
   controllers: [KafkaConsumer],
-  exports: [ClientsModule, IKafkaService],
+  exports: [IKafkaService],
 })
-export class KafkaModule {}
+export class KafkaProducerModule {}

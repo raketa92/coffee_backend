@@ -3,8 +3,8 @@ import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 export interface EmailVerificationTable {
   guid: string;
+  otp: string;
   email: string;
-  payload?: string | null;
   purpose: EmailVerificationPurpose;
   expiresAt: Date;
   createdAt: Generated<Date>;

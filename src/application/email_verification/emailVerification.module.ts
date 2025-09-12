@@ -2,40 +2,36 @@ import { DatabaseModule } from "@/infrastructure/persistence/kysely/database.mod
 import { Module } from "@nestjs/common";
 import { IUserService } from "../shared/ports/IUserService";
 import { UserService } from "@/domain/user/user.service";
-import { IAuthService } from "../shared/ports/IAuthService";
-import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
 import { JwtService } from "@nestjs/jwt";
 import { EnvModule } from "@/infrastructure/env";
-import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
+// import { KafkaModule } from "@/infrastructure/kafka/kafka.module";
 import { ProcessChangeEmailResponseUseCase } from "./usecases/processChangeEmailResponse";
-import { EmailEventHandler } from "@/domain/email/events/email.eventHandler";
-import { IEmailService } from "../shared/ports/IEmailService";
-import { EmailService } from "@/domain/email/email.service";
+import { EmailVerificationEventHandler } from "@/domain/email_verification/events/email_verification.eventHandler";
+import { IEmailVerificationService } from "../shared/ports/IEmailService";
+import { EmailVerificationService } from "@/domain/email_verification/email_verification.service";
 import { IEmailSender } from "../shared/ports/IEmailSender";
 import { NodemailerEmailSender } from "@/infrastructure/mailer/mailer.service";
+import { RedisService } from "@/infrastructure/persistence/redis/redis.service";
 @Module({
-  imports: [DatabaseModule, EnvModule, KafkaModule],
+  imports: [DatabaseModule, EnvModule],
   providers: [
     JwtService,
+    RedisService,
     ProcessChangeEmailResponseUseCase,
-    EmailEventHandler,
+    EmailVerificationEventHandler,
     {
       provide: IUserService,
       useClass: UserService,
     },
     {
-      provide: IAuthService,
-      useClass: AuthServiceImpl,
-    },
-    {
-      provide: IEmailService,
-      useClass: EmailService,
+      provide: IEmailVerificationService,
+      useClass: EmailVerificationService,
     },
     {
       provide: IEmailSender,
       useClass: NodemailerEmailSender,
     },
   ],
-  exports: [ProcessChangeEmailResponseUseCase, EmailEventHandler],
+  exports: [ProcessChangeEmailResponseUseCase, EmailVerificationEventHandler],
 })
 export class EmailVerificationModule {}

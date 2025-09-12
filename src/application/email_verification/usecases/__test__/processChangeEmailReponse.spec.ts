@@ -1,15 +1,13 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
-import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { NotFoundException } from "@nestjs/common";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { EmailVerificationPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
-import { IAuthService } from "@/application/shared/ports/IAuthService";
-import { IEmailTokenPayload } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { ProcessChangeEmailResponseUseCase } from "../processChangeEmailResponse";
-import { IEmailService } from "@/application/shared/ports/IEmailService";
-import { EmailVerification } from "@/domain/email/email";
+import { IEmailVerificationService } from "@/application/shared/ports/IEmailService";
+import { EmailVerification } from "@/domain/email_verification/email_verification";
 import { addMinutes, subMinutes } from "date-fns";
 import {
   UseCaseCommonErrorMessage,
@@ -17,12 +15,12 @@ import {
   UseCaseErrorCode,
 } from "@/application/shared/exception";
 import { UseCaseErrorMessage } from "../exception";
+import { OtpChangeEmailResponseDto } from "../dto";
 
 describe("Process change email response use case", () => {
   let useCase: ProcessChangeEmailResponseUseCase;
   let userService: IUserService;
-  let emailService: IEmailService;
-  let authService: IAuthService;
+  let emailService: IEmailVerificationService;
   const userGuid = "8524994a-58c6-4b12-a965-80693a7b9803";
 
   beforeAll(async () => {
@@ -37,16 +35,10 @@ describe("Process change email response use case", () => {
           },
         },
         {
-          provide: IEmailService,
+          provide: IEmailVerificationService,
           useValue: {
             findOne: jest.fn(),
             delete: jest.fn(),
-          },
-        },
-        {
-          provide: IAuthService,
-          useValue: {
-            verifyEmailToken: jest.fn(),
           },
         },
       ],
@@ -56,8 +48,9 @@ describe("Process change email response use case", () => {
       ProcessChangeEmailResponseUseCase
     );
     userService = module.get<IUserService>(IUserService);
-    emailService = module.get<IEmailService>(IEmailService);
-    authService = module.get<IAuthService>(IAuthService);
+    emailService = module.get<IEmailVerificationService>(
+      IEmailVerificationService
+    );
   });
 
   beforeEach(() => {
@@ -69,45 +62,31 @@ describe("Process change email response use case", () => {
   });
 
   it("should throw error if user not found", async () => {
-    const payload: IEmailTokenPayload = {
-      sub: userGuid,
-      purpose: EmailVerificationPurpose.userChangeEmail,
-      newEmail: "testEmail",
-    };
-    (authService.verifyEmailToken as jest.Mock).mockReturnValue(payload);
+    const email = "testEmail";
     (userService.findOne as jest.Mock).mockResolvedValue(null);
-    const token = "token";
-    await expect(useCase.execute(token)).rejects.toThrow(
+    const dto: OtpChangeEmailResponseDto = {
+      email,
+      otp: "121212",
+      userGuid,
+    };
+    await expect(useCase.execute(dto)).rejects.toThrow(
       new NotFoundException({
         message: UseCaseCommonErrorMessage.user_not_found,
       })
     );
   });
 
-  it("should throw error if email purporse is wrong", async () => {
-    const token = "token";
-    const payload: IEmailTokenPayload = {
-      sub: userGuid,
-      purpose: "random" as EmailVerificationPurpose,
-      newEmail: "testEmail",
-    };
-    (authService.verifyEmailToken as jest.Mock).mockReturnValue(payload);
-    await expect(useCase.execute(token)).rejects.toThrow(
-      new BadRequestException("Invalid purpose")
-    );
-  });
-
   it("should throw error if record expired", async () => {
     const newEmail = "newEmail";
-    const token = "token";
-    const payload: IEmailTokenPayload = {
-      sub: userGuid,
-      purpose: EmailVerificationPurpose.userChangeEmail,
-      newEmail,
+    const otp = "112233";
+    const dto: OtpChangeEmailResponseDto = {
+      email: newEmail,
+      otp,
+      userGuid,
     };
     const email = EmailVerification.create({
       email: newEmail,
-      payload: token,
+      otp,
       purpose: EmailVerificationPurpose.userChangeEmail,
       expiresAt: subMinutes(new Date(), 10),
     });
@@ -130,9 +109,8 @@ describe("Process change email response use case", () => {
     };
     const user = UserMapper.toDomain(userModel);
     (userService.findOne as jest.Mock).mockResolvedValue(user);
-    (authService.verifyEmailToken as jest.Mock).mockReturnValue(payload);
     (emailService.findOne as jest.Mock).mockResolvedValue(email);
-    await expect(useCase.execute(token)).rejects.toThrow(
+    await expect(useCase.execute(dto)).rejects.toThrow(
       new UseCaseError({
         code: UseCaseErrorCode.VALIDATION_ERROR,
         message: UseCaseErrorMessage.expired_link,
@@ -142,15 +120,15 @@ describe("Process change email response use case", () => {
 
   it("should throw error if email exists", async () => {
     const newEmail = "newEmail";
-    const token = "token";
-    const payload: IEmailTokenPayload = {
-      sub: userGuid,
-      purpose: EmailVerificationPurpose.userChangeEmail,
-      newEmail,
+    const otp = "112233";
+    const dto: OtpChangeEmailResponseDto = {
+      email: newEmail,
+      otp,
+      userGuid,
     };
     const email = EmailVerification.create({
       email: newEmail,
-      payload: token,
+      otp,
       purpose: EmailVerificationPurpose.userChangeEmail,
       expiresAt: addMinutes(new Date(), 10),
     });
@@ -175,9 +153,8 @@ describe("Process change email response use case", () => {
 
     const user = UserMapper.toDomain(userModel);
     (userService.findOne as jest.Mock).mockResolvedValue(user);
-    (authService.verifyEmailToken as jest.Mock).mockReturnValue(payload);
     (emailService.findOne as jest.Mock).mockResolvedValue(email);
-    await expect(useCase.execute(token)).rejects.toThrow(
+    await expect(useCase.execute(dto)).rejects.toThrow(
       new UseCaseError({
         code: UseCaseErrorCode.VALIDATION_ERROR,
         message: UseCaseErrorMessage.email_already_in_use,
@@ -187,9 +164,14 @@ describe("Process change email response use case", () => {
 
   it("should process email change", async () => {
     const phone = "+99344333322";
-    const token = "token";
     const newEmail = "userMail";
     const hashedPassword = "mocked_hashed_password";
+    const otp = "112233";
+    const dto: OtpChangeEmailResponseDto = {
+      email: newEmail,
+      otp,
+      userGuid,
+    };
 
     const userModel: UserModel = {
       guid: userGuid,
@@ -214,21 +196,14 @@ describe("Process change email response use case", () => {
 
     const email = EmailVerification.create({
       email: newEmail,
-      payload: token,
+      otp,
       purpose: EmailVerificationPurpose.userChangeEmail,
       expiresAt: addMinutes(new Date(), 15),
     });
 
-    const payload: IEmailTokenPayload = {
-      sub: userGuid,
-      purpose: EmailVerificationPurpose.userChangeEmail,
-      newEmail,
-    };
-
     (emailService.findOne as jest.Mock).mockResolvedValue(email);
-    (authService.verifyEmailToken as jest.Mock).mockReturnValue(payload);
 
-    const result = await useCase.execute(token);
+    const result = await useCase.execute(dto);
     expect(userService.save).toHaveBeenCalledWith(user);
     expect(emailService.delete).toHaveBeenCalledWith(email.guid.toValue());
     expect(user.email).toEqual(newEmail);

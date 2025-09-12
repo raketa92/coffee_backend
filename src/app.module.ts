@@ -12,9 +12,10 @@ import { join } from "path";
 import { HttpModule } from "./infrastructure/http/http.module";
 import { AuthConfigModule } from "./infrastructure/auth/authConfig.module";
 import { AuthModule } from "./application/auth/auth.module";
-import { KafkaModule } from "./infrastructure/kafka/kafka.module";
 import { OtpModule } from "./application/otp/otp.module";
 import { EmailVerificationModule } from "./application/email_verification/emailVerification.module";
+import { KafkaConsumerModule } from "./infrastructure/kafka/kafka_consumer.module";
+import { KafkaProducerModule } from "./infrastructure/kafka/kafka_producer.module";
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { EmailVerificationModule } from "./application/email_verification/emailV
     LoggerModule,
     HttpModule,
     AuthConfigModule,
-    KafkaModule,
+    KafkaConsumerModule,
+    KafkaProducerModule,
     CoffeeShopModule,
     OtpModule,
     EmailVerificationModule,

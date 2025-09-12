@@ -6,8 +6,7 @@ import { UseCaseErrorMessage } from "../../exception";
 import { AppEvents, EmailVerificationPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IKafkaService } from "@/application/shared/ports/IkafkaService";
-import { IAuthService } from "@/application/shared/ports/IAuthService";
-import { EmailRequestedEvent } from "@/domain/user/events/emailRequest.event";
+import { EmailVerificationRequestedEvent } from "@/domain/user/events/emailRequest.event";
 
 @Injectable()
 export class ChangeEmailUseCase
@@ -15,7 +14,6 @@ export class ChangeEmailUseCase
 {
   constructor(
     private readonly userService: IUserService,
-    private readonly authService: IAuthService,
     private readonly kafkaService: IKafkaService
   ) {}
 
@@ -40,18 +38,11 @@ export class ChangeEmailUseCase
         });
       }
 
-      const token = await this.authService.generateEmailVerificationToken({
-        newEmail: request.email,
-        purpose: EmailVerificationPurpose.userChangeEmail,
-        sub: request.userGuid,
-      });
-
-      const emailEvent = new EmailRequestedEvent({
+      const emailEvent = new EmailVerificationRequestedEvent({
         email: request.email,
-        payload: token,
         purpose: EmailVerificationPurpose.userChangeEmail,
       });
-      await this.kafkaService.publishEvent<EmailRequestedEvent>(
+      await this.kafkaService.publishEvent<EmailVerificationRequestedEvent>(
         AppEvents.changeEmailRequested,
         emailEvent
       );

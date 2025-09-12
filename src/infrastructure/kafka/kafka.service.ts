@@ -7,8 +7,10 @@ import { lastValueFrom } from "rxjs";
 @Injectable()
 export class KafkaService implements OnModuleInit, IKafkaService {
   constructor(
-    @Inject("KAFKA_SERVICE") private readonly kafkaClient: ClientKafka
-  ) {}
+    @Inject("KAFKA_PRODUCER") private readonly kafkaClient: ClientKafka
+  ) {
+    console.log("KafkaService ctor");
+  }
   async onModuleInit() {
     try {
       await this.kafkaClient.connect();

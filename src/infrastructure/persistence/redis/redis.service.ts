@@ -53,4 +53,19 @@ export class RedisService {
 
     return smsCode;
   }
+
+  async generateEmailCode(): Promise<string> {
+    const client = this.redisClient;
+
+    let randomPart: string;
+    let code: string;
+    do {
+      randomPart = Math.floor(100000 + Math.random() * 9000).toString();
+      code = randomPart;
+    } while (await client.exists(code));
+
+    await client.set(code, "1", "EX", 5 * 60);
+
+    return code;
+  }
 }
