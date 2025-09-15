@@ -8,6 +8,8 @@ import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { OTP } from "../otp/otp";
 import { OtpPurpose } from "@/core/constants";
+import { UseCaseError } from "@/application/shared/exception";
+import { Either, left, right } from "@/core/Either";
 
 @Injectable()
 export class UserService implements IUserService {
@@ -16,13 +18,12 @@ export class UserService implements IUserService {
     private readonly userRepository: IUserRepository
   ) {}
 
-  async findOne(filter: UserFiltersDto): Promise<User | null> {
+  async findOne(filter: UserFiltersDto): Promise<Either<UseCaseError, User>> {
     const userModel = await this.userRepository.getUserByFilter(filter);
-    if (!userModel) {
-      return null;
-    }
-    const user = UserMapper.toDomain(userModel);
-    return user;
+    return userModel.fold(
+      (err) => left(err),
+      (r) => right(UserMapper.toDomain(r))
+    );
   }
 
   async findUserByRefreshToken(refreshToken: string): Promise<User | null> {

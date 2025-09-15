@@ -6,6 +6,9 @@ import { UserFiltersDto } from "@/infrastructure/http/dto/user/filters";
 import { UserCreateModel, UserModel, UserUpdateModel } from "../models/user";
 import { User } from "@/domain/user/user.entity";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { Either, left, right } from "@/core/Either";
+import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
 
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
@@ -86,35 +89,51 @@ export class UserRepositoryImpl implements IUserRepository {
     }
   }
 
-  async getUserByFilter(filter: UserFiltersDto): Promise<UserModel | null> {
-    let query = this.kysely.selectFrom("User").selectAll("User");
+  async getUserByFilter(
+    filter: UserFiltersDto
+  ): Promise<Either<UseCaseError, UserModel>> {
+    try {
+      let query = this.kysely.selectFrom("User").selectAll("User");
 
-    if (filter.email) {
-      query = query.where("User.email", "=", filter.email);
-    }
-    if (filter.firstName) {
-      query = query.where("User.firstName", "=", filter.firstName);
-    }
-    if (filter.lastName) {
-      query = query.where("User.lastName", "=", filter.lastName);
-    }
-    if (filter.phone) {
-      query = query.where("User.phone", "=", filter.phone);
-    }
-    if (filter.userName) {
-      query = query.where("User.userName", "=", filter.userName);
-    }
-    if (filter.guid) {
-      query = query.where("User.guid", "=", filter.guid);
-    }
+      if (filter.email) {
+        query = query.where("User.email", "=", filter.email);
+      }
+      if (filter.firstName) {
+        query = query.where("User.firstName", "=", filter.firstName);
+      }
+      if (filter.lastName) {
+        query = query.where("User.lastName", "=", filter.lastName);
+      }
+      if (filter.phone) {
+        query = query.where("User.phone", "=", filter.phone);
+      }
+      if (filter.userName) {
+        query = query.where("User.userName", "=", filter.userName);
+      }
+      if (filter.guid) {
+        query = query.where("User.guid", "=", filter.guid);
+      }
 
-    const userModel = await query.executeTakeFirst();
+      const userModel = await query.executeTakeFirst();
 
-    if (!userModel) {
-      return null;
+      if (!userModel) {
+        throw new UseCaseError({
+          code: UseCaseErrorCode.NOT_FOUND,
+          message: UseCaseErrorMessage.user_not_found,
+        });
+      }
+
+      return right(userModel);
+    } catch (error) {
+      return left(
+        error instanceof UseCaseError
+          ? error
+          : new UseCaseError({
+              code: UseCaseErrorCode.BAD_REQUEST,
+              message: UseCaseErrorMessage.fetch_error,
+            })
+      );
     }
-
-    return userModel;
   }
 
   async getUserByRefreshToken(refreshToken: string): Promise<UserModel | null> {

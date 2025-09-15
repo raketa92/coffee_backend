@@ -15,4 +15,5 @@ export const UseCaseErrorMessage = {
   invalid_date: "Invalid date",
   wrong_password: "Password is wrong",
   email_already_in_use: "Email already in use",
+  fetch_error: "Fetch failed",
 };

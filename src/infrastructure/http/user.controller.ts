@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   HttpCode,
+  HttpException,
   Param,
   Put,
   UseGuards,
@@ -21,6 +22,7 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ChangePhoneUseCase } from "@/application/coffee_shop/usecases/user/changePhone";
 import { ChangePasswordUseCase } from "@/application/coffee_shop/usecases/user/changePassword";
 import { ChangeEmailUseCase } from "@/application/coffee_shop/usecases/user/changeEmail";
+import { UseCaseErrorCode } from "@/application/shared/exception";
 
 @Controller("/user")
 export class UserController {
@@ -40,7 +42,13 @@ export class UserController {
   ) {
     const body = updateProfileSchema.parse({ ...updateProfileDto, userGuid });
     const response = await this.updateProfileUseCase.execute(body);
-    return response;
+    return response.fold(
+      (err) => {
+        const status = mapUseCaseCodeToHttp(err.code);
+        throw new HttpException(err.message, status);
+      },
+      (ok) => ok
+    );
   }
 
   @Put("/change-phone/:userGuid")
@@ -77,5 +85,20 @@ export class UserController {
     const body = changeEmailSchema.parse({ ...dto, userGuid });
     const response = await this.changeEmailUseCase.execute(body);
     return response;
+  }
+}
+
+function mapUseCaseCodeToHttp(code: UseCaseErrorCode): number {
+  switch (code) {
+    case UseCaseErrorCode.NOT_FOUND:
+      return 404;
+    case UseCaseErrorCode.BAD_REQUEST:
+      return 400;
+    case UseCaseErrorCode.UNAUTHORIZED:
+      return 401;
+    case UseCaseErrorCode.FORBIDDEN:
+      return 403;
+    default:
+      return 500;
   }
 }

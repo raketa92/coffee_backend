@@ -1,11 +1,13 @@
+import { Either } from "@/core/Either";
 import { OTP } from "@/domain/otp/otp";
 import { User } from "@/domain/user/user.entity";
 import { UserFiltersDto } from "@/infrastructure/http/dto/user/filters";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
 import { Transaction } from "kysely";
+import { UseCaseError } from "../exception";
 
 export abstract class IUserService {
-  abstract findOne(filter: UserFiltersDto): Promise<User | null>;
+  abstract findOne(filter: UserFiltersDto): Promise<Either<UseCaseError, User>>;
   abstract findUserByRefreshToken(refreshToken: string): Promise<User | null>;
   abstract save(
     user: User,

@@ -1,7 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
-import { NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { ChangePasswordDto } from "../dto";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
@@ -11,6 +10,8 @@ import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { ChangePasswordUseCase } from "../changePassword";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { isLeft, isRight, left, right } from "@/core/Either";
 
 describe("Change phone use case", () => {
   let useCase: ChangePasswordUseCase;
@@ -76,21 +77,31 @@ describe("Change phone use case", () => {
     expect(useCase).toBeDefined();
   });
 
-  it("should throw error if user not found", async () => {
-    (userService.findOne as jest.Mock).mockResolvedValue(null);
+  it("returns Left if user not found", async () => {
+    const notFound = new UseCaseError({
+      code: UseCaseErrorCode.NOT_FOUND,
+      message: UseCaseErrorMessage.user_not_found,
+    });
+    (userService.findOne as jest.Mock).mockResolvedValue(left(notFound));
+
     const dto: ChangePasswordDto = {
       userGuid,
       password: "new_password",
       oldPassword: "old_password",
     };
-    await expect(useCase.execute(dto)).rejects.toThrow(
-      new NotFoundException({
-        message: UseCaseErrorMessage.user_not_found,
-      })
+    const res = await useCase.execute(dto);
+    expect(isLeft(res)).toBe(true);
+    res.fold(
+      (err) => {
+        expect(err).toBeInstanceOf(UseCaseError);
+        expect(err.code).toBe(UseCaseErrorCode.NOT_FOUND);
+        expect(err.message).toBe(UseCaseErrorMessage.user_not_found);
+      },
+      () => fail("Expected Left, got Right")
     );
   });
 
-  it("should fire event changePasswordOtpRequested", async () => {
+  it("Changes password and fire event changePasswordOtpRequested", async () => {
     const hashedPassword = "mocked_hashed_password";
     const newHashedPassword = "new_mocked_hashed_password";
     const dto: ChangePasswordDto = {
@@ -118,7 +129,7 @@ describe("Change phone use case", () => {
     };
 
     const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(user));
     (authService.validateUser as jest.Mock).mockResolvedValue(true);
     (authService.hashPassword as jest.Mock).mockResolvedValue(hashedPassword);
 
@@ -132,7 +143,10 @@ describe("Change phone use case", () => {
       AppEvents.changePasswordOtpRequested,
       otpEvent
     );
-
-    expect(result).toEqual({ message: "Otp sent to change password" });
+    expect(isRight(result)).toBe(true);
+    result.fold(
+      (err) => fail(`Expected Right, got Left: ${err.message}`),
+      (r) => expect(r).toEqual({ message: "Otp sent to change password" })
+    );
   });
 });

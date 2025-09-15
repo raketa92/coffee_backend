@@ -4,6 +4,8 @@ export const UseCaseErrorCode = {
   NOT_FOUND: 404,
   CONFLICT: 409,
   VALIDATION_ERROR: 422,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
 } as const;
 
 export type UseCaseErrorCode =

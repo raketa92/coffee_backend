@@ -2,12 +2,13 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
 import { UserDetails } from "@/infrastructure/http/dto/user/userTokenResponseDto";
-import { NotFoundException } from "@nestjs/common";
 import { UpdateProfileUseCase } from "../updateProfile";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { UpdateProfileDto } from "../dto";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { IUserService } from "@/application/shared/ports/IUserService";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { fold, isLeft, isRight, left, right } from "@/core/Either";
 
 describe("Update profile user use case", () => {
   let useCase: UpdateProfileUseCase;
@@ -40,31 +41,42 @@ describe("Update profile user use case", () => {
     expect(useCase).toBeDefined();
   });
 
-  it("should throw error if user not found", async () => {
-    (userService.findOne as jest.Mock).mockResolvedValue(null);
-    const updateProfileDto: UpdateProfileDto = {
-      userGuid,
-    };
-    await expect(useCase.execute(updateProfileDto)).rejects.toThrow(
-      new NotFoundException({
-        message: UseCaseErrorMessage.user_not_found,
-      })
+  it("returns Left if user not found", async () => {
+    const notFound = new UseCaseError({
+      code: UseCaseErrorCode.NOT_FOUND,
+      message: UseCaseErrorMessage.user_not_found,
+    });
+
+    (userService.findOne as jest.Mock).mockResolvedValue(left(notFound));
+
+    const dto: UpdateProfileDto = { userGuid };
+
+    const res = await useCase.execute(dto);
+
+    expect(isLeft(res)).toBe(true);
+    fold(
+      res,
+      (err) => {
+        expect(err).toBeInstanceOf(UseCaseError);
+        expect(err.code).toBe(UseCaseErrorCode.NOT_FOUND);
+        expect(err.message).toBe(UseCaseErrorMessage.user_not_found);
+      },
+      () => fail("Expected Left, got Right")
     );
   });
 
-  it("should update profile", async () => {
-    const updateProfileDto: UpdateProfileDto = {
+  it("updates profile and returns Right(UserDetails)", async () => {
+    const dto: UpdateProfileDto = {
       userGuid,
       userName: "usname",
       firstName: "fsname",
       lastName: "lsname",
       gender: "female",
     };
-    const hashedPassword = "mocked_hashed_password";
 
     const userModel: UserModel = {
       guid: userGuid,
-      password: hashedPassword,
+      password: "mocked_hashed_password",
       phone: "+99344333322",
       email: null,
       userName: "mocked_user_name",
@@ -80,27 +92,42 @@ describe("Update profile user use case", () => {
       lastLogin: new Date(),
     };
 
-    const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
-    const udpatedUser = UserMapper.toDomainFromDto(updateProfileDto, user);
-    (userService.save as jest.Mock).mockResolvedValue(udpatedUser);
+    const existingUser = UserMapper.toDomain(userModel);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(existingUser));
 
-    const result = await useCase.execute(updateProfileDto);
+    const updatedUser = UserMapper.toDomainFromDto(dto, existingUser);
 
-    expect(userService.save).toHaveBeenCalledWith(udpatedUser);
-    const userDetails: UserDetails = {
-      guid: udpatedUser.guid.toValue(),
-      email: udpatedUser.email,
-      phone: udpatedUser.phone,
-      gender: udpatedUser.gender,
-      role: udpatedUser.roles[0],
-      isVerified: udpatedUser.isVerified,
-      isActive: udpatedUser.isActive,
-      userName: udpatedUser.userName,
-      firstName: udpatedUser.firstName,
-      lastName: udpatedUser.lastName,
-      lastLogin: udpatedUser.lastLogin,
-    };
-    expect(result).toEqual(userDetails);
+    (userService.save as jest.Mock).mockResolvedValue(right(undefined));
+
+    const res = await useCase.execute(dto);
+
+    expect(userService.save).toHaveBeenCalledTimes(1);
+    const savedArg = (userService.save as jest.Mock).mock.calls[0][0];
+    expect(savedArg.userName).toBe(updatedUser.userName);
+    expect(savedArg.firstName).toBe(updatedUser.firstName);
+    expect(savedArg.lastName).toBe(updatedUser.lastName);
+    expect(savedArg.gender).toBe(updatedUser.gender);
+
+    expect(isRight(res)).toBe(true);
+    fold(
+      res,
+      (err) => fail(`Expected Right, got Left: ${err.message}`),
+      (userDetails) => {
+        const expected: UserDetails = {
+          guid: updatedUser.guid.toValue(),
+          email: updatedUser.email,
+          phone: updatedUser.phone,
+          gender: updatedUser.gender,
+          role: updatedUser.roles[0],
+          isVerified: updatedUser.isVerified,
+          isActive: updatedUser.isActive,
+          userName: updatedUser.userName,
+          firstName: updatedUser.firstName,
+          lastName: updatedUser.lastName,
+          lastLogin: updatedUser.lastLogin,
+        };
+        expect(userDetails).toEqual(expected);
+      }
+    );
   });
 });

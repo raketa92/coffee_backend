@@ -3,9 +3,13 @@ import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { User } from "./user.entity";
 import { DeleteResult, Transaction } from "kysely";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
+import { Either } from "@/core/Either";
+import { UseCaseError } from "@/application/shared/exception";
 
 export interface IUserRepository {
-  getUserByFilter(filter: UserFiltersDto): Promise<UserModel | null>;
+  getUserByFilter(
+    filter: UserFiltersDto
+  ): Promise<Either<UseCaseError, UserModel>>;
   getUserByRefreshToken(refreshToken: string): Promise<UserModel | null>;
   updateRefreshToken(userGuid: string, refreshToken: string): Promise<void>;
   save(user: User, transaction?: Transaction<DatabaseSchema>): Promise<void>;
