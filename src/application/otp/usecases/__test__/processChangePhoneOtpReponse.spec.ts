@@ -13,6 +13,7 @@ import { IAuthService } from "@/application/shared/ports/IAuthService";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { ProcessChangePhoneOtpResponseUseCase } from "../processChangePhoneOtpResponse";
 import { randomUUID } from "crypto";
+import { right } from "@/core/Either";
 
 describe("Process change phone otp use case", () => {
   let useCase: ProcessChangePhoneOtpResponseUseCase;
@@ -68,7 +69,7 @@ describe("Process change phone otp use case", () => {
   });
 
   it("should throw error if user not found", async () => {
-    (userService.findOne as jest.Mock).mockResolvedValue(null);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(null));
     const dto: OtpChangePhoneResponseDto = {
       phone: "123111",
       userGuid: randomUUID(),
@@ -109,7 +110,7 @@ describe("Process change phone otp use case", () => {
     };
 
     const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(user));
 
     const otp = OTP.create({
       otp: dto.otp,
@@ -159,6 +160,6 @@ describe("Process change phone otp use case", () => {
         lastLogin: user.lastLogin,
       },
     };
-    expect(result).toEqual(userDetails);
+    expect(result).toEqual(right(userDetails));
   });
 });

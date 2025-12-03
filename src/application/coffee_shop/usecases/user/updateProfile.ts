@@ -2,10 +2,14 @@ import { Injectable } from "@nestjs/common";
 import { UpdateProfileDto } from "./dto";
 import { UserDetails } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { UseCaseEither } from "@/core/UseCase";
-import { UseCaseError } from "@/application/shared/exception";
+import {
+  UseCaseError,
+  UseCaseErrorCode,
+} from "@/application/shared/exception/useCaseError";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { Either, left, right } from "@/core/Either";
+import { UseCaseErrorMessage } from "../../exception";
 
 type UpdateProfileError = UseCaseError;
 
@@ -23,8 +27,14 @@ export class UpdateProfileUseCase
     });
     return existingUser.fold<Promise<Either<UseCaseError, UserDetails>>>(
       (err) => Promise.resolve(left(err)),
-      async (r) => {
-        const user = UserMapper.toDomainFromDto(request, r);
+      async (userOrNull) => {
+        if (!userOrNull) {
+          throw new UseCaseError({
+            code: UseCaseErrorCode.NOT_FOUND,
+            message: UseCaseErrorMessage.user_not_found,
+          });
+        }
+        const user = UserMapper.toDomainFromDto(request, userOrNull);
         await this.userService.save(user);
 
         const userDetails: UserDetails = {

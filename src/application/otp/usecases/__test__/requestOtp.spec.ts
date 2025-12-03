@@ -9,6 +9,7 @@ import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 import { AppEvents, OtpPurpose } from "@/core/constants";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { RequestOtpUseCase } from "../../../otp/usecases/requestOtp";
+import { right } from "@/core/Either";
 
 jest.mock("bcrypt", () => ({
   compare: jest.fn(),
@@ -69,7 +70,7 @@ describe("Request otp use case", () => {
   });
 
   it("should throw error if user not found", async () => {
-    (userService.findOne as jest.Mock).mockResolvedValue(null);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(null));
     const otpRequestDto: { phone: string } = {
       phone: "+99364123123",
     };
@@ -105,7 +106,7 @@ describe("Request otp use case", () => {
     };
 
     const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(user));
     const result = await useCase.execute(otpRequestDto);
 
     const otpEvent = new OTPRequestedEvent({
@@ -116,8 +117,8 @@ describe("Request otp use case", () => {
       AppEvents.otpRequested,
       otpEvent
     );
-    expect(result).toEqual({
+    expect(result).toEqual(right({
       message: "OTP sent to your phone. Please verify your account.",
-    });
+    }));
   });
 });

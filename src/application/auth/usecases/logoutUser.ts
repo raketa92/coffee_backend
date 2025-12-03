@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "../../auth/exception";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
 import { ResponseMessages } from "@/core/constants";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 import { IUserService } from "@/application/shared/ports/IUserService";
 
 @Injectable()

@@ -23,7 +23,7 @@ import { CreateOrderResponseDto } from "@/infrastructure/http/dto/order/orderRes
 import { UseCaseErrorMessage } from "@application/coffee_shop/exception";
 import { IProductRepository } from "@domain/product/repository/IProductRepository";
 import { IPaymentData } from "@/infrastructure/payment/bankService/dto/paymentDto";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 
 @Injectable()
 export class CreateOrderUseCase

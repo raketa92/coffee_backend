@@ -10,7 +10,7 @@ import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { ChangePasswordUseCase } from "../changePassword";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 import { isLeft, isRight, left, right } from "@/core/Either";
 
 describe("Change phone use case", () => {

@@ -1,5 +1,7 @@
+import { InfraError } from "@/application/shared/exception/infraError";
 import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 import { AppEvents } from "@/core/constants";
+import { left, right } from "@/core/Either";
 import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { ClientKafka } from "@nestjs/microservices";
 import { lastValueFrom } from "rxjs";
@@ -22,6 +24,11 @@ export class KafkaService implements OnModuleInit, IKafkaService {
   }
 
   async publishEvent<T>(topic: AppEvents, event: T) {
-    await lastValueFrom(this.kafkaClient.emit<T>(topic, JSON.stringify(event)));
+    try {
+      await lastValueFrom(this.kafkaClient.emit<T>(topic, JSON.stringify(event)));
+      return right(undefined);
+    } catch (error: any) {
+      return left(new InfraError(error.message));
+    }
   }
 }

@@ -22,7 +22,8 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ChangePhoneUseCase } from "@/application/coffee_shop/usecases/user/changePhone";
 import { ChangePasswordUseCase } from "@/application/coffee_shop/usecases/user/changePassword";
 import { ChangeEmailUseCase } from "@/application/coffee_shop/usecases/user/changeEmail";
-import { UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
+import { mapUseCaseCodeToHttp } from "@/core/ErrorMappers";
 
 @Controller("/user")
 export class UserController {
@@ -85,20 +86,5 @@ export class UserController {
     const body = changeEmailSchema.parse({ ...dto, userGuid });
     const response = await this.changeEmailUseCase.execute(body);
     return response;
-  }
-}
-
-function mapUseCaseCodeToHttp(code: UseCaseErrorCode): number {
-  switch (code) {
-    case UseCaseErrorCode.NOT_FOUND:
-      return 404;
-    case UseCaseErrorCode.BAD_REQUEST:
-      return 400;
-    case UseCaseErrorCode.UNAUTHORIZED:
-      return 401;
-    case UseCaseErrorCode.FORBIDDEN:
-      return 403;
-    default:
-      return 500;
   }
 }

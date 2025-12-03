@@ -13,7 +13,7 @@ import {
   UseCaseCommonErrorMessage,
   UseCaseError,
   UseCaseErrorCode,
-} from "@/application/shared/exception";
+} from "@/application/shared/exception/useCaseError";
 import { UseCaseErrorMessage } from "../exception";
 import { OtpChangeEmailResponseDto } from "../dto";
 

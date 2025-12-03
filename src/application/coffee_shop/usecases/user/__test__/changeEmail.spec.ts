@@ -11,6 +11,7 @@ import { EmailVerificationRequestedEvent } from "@/domain/user/events/emailReque
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
+import { right } from "@/core/Either";
 
 describe("Change email use case", () => {
   let useCase: ChangeEmailUseCase;
@@ -76,7 +77,7 @@ describe("Change email use case", () => {
   });
 
   it("should throw error if user not found", async () => {
-    (userService.findOne as jest.Mock).mockResolvedValue(null);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(null));
     const dto: ChangeEmailDto = {
       userGuid,
       email: "testEmail",
@@ -89,8 +90,8 @@ describe("Change email use case", () => {
   });
 
   it("should throw error if email is taken", async () => {
-    (userService.findOne as jest.Mock).mockResolvedValueOnce(true);
-    (userService.findOne as jest.Mock).mockResolvedValueOnce(true);
+    (userService.findOne as jest.Mock).mockResolvedValueOnce(right(true));
+    (userService.findOne as jest.Mock).mockResolvedValueOnce(right(true));
     const dto: ChangeEmailDto = {
       userGuid,
       email: "testEmail",
@@ -132,8 +133,8 @@ describe("Change email use case", () => {
     };
 
     const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValueOnce(user);
-    (userService.findOne as jest.Mock).mockResolvedValueOnce(null);
+    (userService.findOne as jest.Mock).mockResolvedValueOnce(right(user));
+    (userService.findOne as jest.Mock).mockResolvedValueOnce(right(null));
 
     const result = await useCase.execute(dto);
     const emailEvent = new EmailVerificationRequestedEvent({
@@ -145,8 +146,8 @@ describe("Change email use case", () => {
       emailEvent
     );
 
-    expect(result).toEqual({
+    expect(result).toEqual(right({
       message: `Verification email sent to ${dto.email}`,
-    });
+    }));
   });
 });

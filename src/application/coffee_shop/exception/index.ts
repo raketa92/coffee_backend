@@ -8,6 +8,7 @@ export const UseCaseErrorMessage = {
   shop_not_found: "Shop not found",
   payment_not_found: "Payment not found",
   user_not_found: "User not found",
+  user_already_exists: "User already exists",
   profile_update_error: "Profile update error",
   phone_change_error: "Phone change error",
   password_change_error: "Password change error",

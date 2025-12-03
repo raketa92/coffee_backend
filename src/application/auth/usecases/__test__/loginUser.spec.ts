@@ -5,15 +5,15 @@ import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
 import { AuthResponseDto } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
-import { NotFoundException } from "@nestjs/common";
 import { LoginUserUseCase } from "../loginUser";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 import { AppEvents, OtpPurpose } from "@/core/constants";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
+import { left, right } from "@/core/Either";
 
 jest.mock("bcrypt", () => ({
   compare: jest.fn(),
@@ -100,35 +100,60 @@ describe("Login user use case", () => {
     expect(useCase).toBeDefined();
   });
 
-  it("should throw error if user not found", async () => {
-    (userService.findOne as jest.Mock).mockResolvedValue(null);
+  it("should return Left(NOT_FOUND) if user not found", async () => {
+    (userService.findOne as jest.Mock).mockResolvedValue(right(null));
     const loginUserDto: LoginUserDto = {
       password: "qwerty",
       phone: "+99364123123",
     };
-    await expect(useCase.execute(loginUserDto)).rejects.toThrow(
-      new NotFoundException({
-        message: UseCaseErrorMessage.user_not_found,
-      })
+    const res = await useCase.execute(loginUserDto);
+    expect(res._tag).toBe("Left");
+    res.fold(
+      (err) => {
+        expect(err.code).toBe(UseCaseErrorCode.NOT_FOUND);
+        expect(err.message).toBe(UseCaseErrorMessage.user_not_found);
+      },
+      () => fail("Expected Left(NOT_FOUND) but got Right")
     );
   });
 
-  it("should throw error if password is wrong", async () => {
-    (userService.findOne as jest.Mock).mockResolvedValue(true);
+  it("should return Left(VALIDATION_ERROR) if password is wrong", async () => {
+    const userModel: UserModel = {
+      guid: "8524994a-58c6-4b12-a965-80693a7b9803",
+      password: "hashed",
+      phone: "+99364123123",
+      email: null,
+      userName: "mocked_user_name",
+      firstName: "some_first_name",
+      lastName: "some_last_name",
+      gender: "male",
+      roles: [Roles.user],
+      refreshToken: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isVerified: true,
+      isActive: true,
+      lastLogin: new Date(),
+    };
+    const user = UserMapper.toDomain(userModel);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(user));
     (authService.validateUser as jest.Mock).mockResolvedValue(false);
     const loginUserDto: LoginUserDto = {
       password: "qwerty",
       phone: "+99364123123",
     };
-    await expect(useCase.execute(loginUserDto)).rejects.toThrow(
-      new UseCaseError({
-        code: UseCaseErrorCode.BAD_REQUEST,
-        message: UseCaseErrorMessage.wrong_password,
-      })
+    const res = await useCase.execute(loginUserDto);
+    expect(res._tag).toBe("Left");
+    res.fold(
+      (err) => {
+        expect(err.code).toBe(UseCaseErrorCode.VALIDATION_ERROR);
+        expect(err.message).toBe(UseCaseErrorMessage.wrong_password);
+      },
+      () => fail("Expected Left(VALIDATION_ERROR) but got Right")
     );
   });
 
-  it("should throw error if user not verified", async () => {
+  it("should return Left(VALIDATION_ERROR) if user not verified", async () => {
     (userService.findOne as jest.Mock).mockResolvedValue(true);
     (authService.validateUser as jest.Mock).mockResolvedValue(true);
     const loginUserDto: LoginUserDto = {
@@ -154,12 +179,16 @@ describe("Login user use case", () => {
     };
 
     const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
-    await expect(useCase.execute(loginUserDto)).rejects.toThrow(
-      new UseCaseError({
-        code: UseCaseErrorCode.BAD_REQUEST,
-        message: UseCaseErrorMessage.user_not_verified,
-      })
+    (userService.findOne as jest.Mock).mockResolvedValue(right(user));
+    (kafkaService.publishEvent as jest.Mock).mockResolvedValue(right(null));
+    const res = await useCase.execute(loginUserDto);
+    expect(res._tag).toBe("Left");
+    res.fold(
+      (err) => {
+        expect(err.code).toBe(UseCaseErrorCode.VALIDATION_ERROR);
+        expect(err.message).toBe(UseCaseErrorMessage.user_not_verified);
+      },
+      () => fail("Expected Left(VALIDATION_ERROR) but got Right")
     );
     const otpEvent = new OTPRequestedEvent({
       phone: user.phone,
@@ -199,7 +228,8 @@ describe("Login user use case", () => {
     };
 
     const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(user));
+    (userService.save as jest.Mock).mockResolvedValue(right(null));
     (authService.validateUser as jest.Mock).mockResolvedValue(true);
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
     (authService.generateAccessToken as jest.Mock).mockReturnValue(accessToken);
@@ -212,10 +242,9 @@ describe("Login user use case", () => {
       phone: user.phone,
     };
     const result = await useCase.execute(loginUserDto);
-
+    
     expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
     expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
-    user.setRefreshToken(refreshToken);
     expect(userService.save).toHaveBeenCalledWith(
       expect.objectContaining({
         password: hashedPassword,
@@ -245,6 +274,6 @@ describe("Login user use case", () => {
         lastLogin: user.lastLogin,
       },
     };
-    expect(result).toEqual(userDetails);
+    expect(result).toEqual(right(userDetails));
   });
 });

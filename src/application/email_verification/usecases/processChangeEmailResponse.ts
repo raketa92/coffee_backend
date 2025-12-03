@@ -1,18 +1,20 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { UseCase } from "@/core/UseCase";
+import { UseCase, UseCaseEither } from "@/core/UseCase";
 import {
   UseCaseCommonErrorMessage,
   UseCaseError,
   UseCaseErrorCode,
-} from "@/application/shared/exception";
+} from "@/application/shared/exception/useCaseError";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { IEmailVerificationService } from "@/application/shared/ports/IEmailService";
 import { UseCaseErrorMessage } from "./exception";
 import { OtpChangeEmailResponseDto } from "./dto";
+import { Either, left, right } from "@/core/Either";
 
 @Injectable()
 export class ProcessChangeEmailResponseUseCase
-  implements UseCase<OtpChangeEmailResponseDto, { message: string }>
+  implements
+    UseCaseEither<OtpChangeEmailResponseDto, { message: string }, UseCaseError>
 {
   constructor(
     private readonly userService: IUserService,
@@ -21,54 +23,54 @@ export class ProcessChangeEmailResponseUseCase
 
   public async execute(
     request: OtpChangeEmailResponseDto
-  ): Promise<{ message: string }> {
-    try {
-      const { email, otp, userGuid } = request;
-      const user = await this.userService.findOne({
-        guid: userGuid,
-      });
-      if (!user) {
-        throw new NotFoundException({
-          message: UseCaseCommonErrorMessage.user_not_found,
+  ): Promise<Either<UseCaseError, { message: string }>> {
+    const { email, otp, userGuid } = request;
+    const user = await this.userService.findOne({
+      guid: userGuid,
+    });
+    return user.fold(
+      (err) => Promise.resolve(left(err)),
+      async (userOrNull) => {
+        if (!userOrNull) {
+          throw new UseCaseError({
+            code: UseCaseErrorCode.NOT_FOUND,
+            message: UseCaseErrorMessage.user_not_found,
+          })
+        }
+        const record = await this.emailVerificationService.findOne({
+          email,
+          otp,
         });
-      }
+        if (!record) {
+          throw new NotFoundException({
+            message: UseCaseErrorMessage.wrong_email,
+          });
+        }
+        if (record.expiresAt && record.expiresAt < new Date()) {
+          await this.emailVerificationService.delete(record.guid.toValue());
+          throw new UseCaseError({
+            code: UseCaseErrorCode.VALIDATION_ERROR,
+            message: UseCaseErrorMessage.expired_link,
+          });
+        }
 
-      const record = await this.emailVerificationService.findOne({
-        email,
-        otp,
-      });
-      if (!record) {
-        throw new NotFoundException({
-          message: UseCaseErrorMessage.wrong_email,
-        });
-      }
-      if (record.expiresAt && record.expiresAt < new Date()) {
-        await this.emailVerificationService.delete(record.guid.toValue());
-        throw new UseCaseError({
-          code: UseCaseErrorCode.VALIDATION_ERROR,
-          message: UseCaseErrorMessage.expired_link,
-        });
-      }
+        const collision = await this.userService.findOne({ email });
+        return collision.fold((err) => Promise.resolve(left(err)), async (collisionUser) => {
+          if (collisionUser && collisionUser.guid.toString() !== userGuid) {
+            await this.emailVerificationService.delete(record.guid.toValue());
+            throw new UseCaseError({
+              code: UseCaseErrorCode.VALIDATION_ERROR,
+              message: UseCaseErrorMessage.email_already_in_use,
+            });
+          }
 
-      const collision = await this.userService.findOne({ email });
-      if (collision && collision.guid.toString() !== userGuid) {
-        await this.emailVerificationService.delete(record.guid.toValue());
-        throw new UseCaseError({
-          code: UseCaseErrorCode.VALIDATION_ERROR,
-          message: UseCaseErrorMessage.email_already_in_use,
-        });
+          userOrNull.changeEmail(email);
+          await this.userService.save(userOrNull);
+          await this.emailVerificationService.delete(record.guid.toValue());
+
+          return right({ message: "Email verified successfully" });
+        });        
       }
-
-      user.changeEmail(email);
-      await this.userService.save(user);
-      await this.emailVerificationService.delete(record.guid.toValue());
-
-      return { message: "Email verified successfully" };
-    } catch (error: any) {
-      throw new UseCaseError({
-        code: error.code || UseCaseErrorCode.BAD_REQUEST,
-        message: error.message || UseCaseErrorMessage.process_email_failed,
-      });
-    }
+    );
   }
 }

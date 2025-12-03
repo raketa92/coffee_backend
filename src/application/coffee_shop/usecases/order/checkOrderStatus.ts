@@ -10,7 +10,7 @@ import { OrderStatus, PaymentMethods } from "@/core/constants";
 import { DatabaseSchema } from "@/infrastructure/persistence/kysely/database.schema";
 import { Kysely } from "kysely";
 import { OrderDomainService } from "@/domain/order/service/OrderDomainService";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 import { OrderMapper } from "@/infrastructure/dataMappers/orderMapper";
 import { PaymentMapper } from "@/infrastructure/dataMappers/paymentMapper";
 

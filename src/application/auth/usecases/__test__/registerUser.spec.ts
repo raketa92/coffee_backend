@@ -6,11 +6,15 @@ import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { Roles } from "@/core/constants/roles";
 import { UserDetails } from "@/infrastructure/http/dto/user/userTokenResponseDto";
 import { IAuthService } from "@/application/shared/ports/IAuthService";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import {
+  UseCaseError,
+  UseCaseErrorCode,
+} from "@/application/shared/exception/useCaseError";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { AppEvents, OtpPurpose } from "@/core/constants";
 import { IKafkaService } from "../../../shared/ports/IkafkaService";
 import { IUserService } from "@/application/shared/ports/IUserService";
+import { right } from "@/core/Either";
 
 jest.mock("bcrypt", () => ({
   hash: jest.fn(),
@@ -116,15 +120,20 @@ describe("Register user use case", () => {
       isVerified: false,
       lastLogin: new Date(),
     });
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(user));
 
-    await expect(useCase.execute(createUserDto)).rejects.toThrow(
-      new UseCaseError({
-        code: UseCaseErrorCode.BAD_REQUEST,
-        message: UseCaseErrorMessage.user_already_exists,
-      })
+    const res = await useCase.execute(createUserDto);
+    expect(res._tag).toBe("Left");
+    res.fold(
+      (err) => {
+        expect(err.code).toBe(UseCaseErrorCode.CONFLICT);
+        expect(err.message).toBe(UseCaseErrorMessage.user_already_exists);
+      },
+      () => fail("Expected Left(CONFLICT) but got Right")
     );
-    expect(userService.findOne).toHaveBeenCalled();
+    expect(userService.findOne).toHaveBeenCalledWith({
+      phone: createUserDto.phone,
+    });
   });
 
   it("should create user", async () => {
@@ -137,9 +146,11 @@ describe("Register user use case", () => {
       lastName: "Petzold",
       email: "cp@kkk.com",
     };
-    (userService.findOne as jest.Mock).mockResolvedValue(null);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(null));
+    (userService.save as jest.Mock).mockResolvedValue(right(null));
     const hashedPassword = "mocked_hashed_password";
     (authService.hashPassword as jest.Mock).mockResolvedValue(hashedPassword);
+    (kafkaService.publishEvent as jest.Mock).mockResolvedValue(right(null));
 
     const accessToken = "mock_access_token";
     const refreshToken = "mock_refresh_token";
@@ -194,6 +205,9 @@ describe("Register user use case", () => {
       lastName: user.lastName,
       lastLogin: user.lastLogin,
     };
-    expect(result).toEqual(userDetails);
+    expect(result).toEqual(right(userDetails));
+    expect(userService.findOne).toHaveBeenCalledWith({
+      phone: createUserDto.phone,
+    });
   });
 });

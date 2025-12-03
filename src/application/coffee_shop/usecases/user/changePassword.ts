@@ -1,7 +1,7 @@
 import { UseCaseEither } from "@/core/UseCase";
 import { Injectable } from "@nestjs/common";
 import { ChangePasswordDto } from "./dto";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 import { UseCaseErrorMessage } from "../../exception";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { AppEvents, OtpPurpose } from "@/core/constants";
@@ -32,10 +32,16 @@ export class ChangePasswordUseCase
       Promise<Either<UseCaseError, { message: string }>>
     >(
       (err) => Promise.resolve(left(err)),
-      async (r) => {
+      async (userOrNull) => {
+        if (!userOrNull) {
+          throw new UseCaseError({
+            code: UseCaseErrorCode.NOT_FOUND,
+            message: UseCaseErrorMessage.user_not_found,
+          })
+        }
         const isPasswordValid = await this.authService.validateUser({
           password: request.oldPassword,
-          userPassword: r.password,
+          userPassword: userOrNull.password,
         });
 
         if (!isPasswordValid) {
@@ -50,7 +56,7 @@ export class ChangePasswordUseCase
         );
 
         const otpEvent = new OTPRequestedEvent({
-          phone: r.phone,
+          phone: userOrNull.phone,
           payload: hashedPassword,
           purpose: OtpPurpose.userChangePassword,
         });

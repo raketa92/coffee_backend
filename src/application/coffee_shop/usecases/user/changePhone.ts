@@ -1,7 +1,7 @@
 import { UseCase } from "@/core/UseCase";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ChangePhoneDto } from "./dto";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 import { UseCaseErrorMessage } from "../../exception";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { AppEvents, OtpPurpose } from "@/core/constants";

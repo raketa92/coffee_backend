@@ -1,7 +1,7 @@
 import { UseCase } from "@/core/UseCase";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "../exception";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 import { ResponseMessages } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
 

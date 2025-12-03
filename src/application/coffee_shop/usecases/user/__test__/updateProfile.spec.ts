@@ -7,7 +7,7 @@ import { UseCaseErrorMessage } from "@/application/auth/exception";
 import { UpdateProfileDto } from "../dto";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { IUserService } from "@/application/shared/ports/IUserService";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 import { fold, isLeft, isRight, left, right } from "@/core/Either";
 
 describe("Update profile user use case", () => {

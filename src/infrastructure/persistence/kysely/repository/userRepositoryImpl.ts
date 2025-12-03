@@ -6,7 +6,7 @@ import { UserFiltersDto } from "@/infrastructure/http/dto/user/filters";
 import { UserCreateModel, UserModel, UserUpdateModel } from "../models/user";
 import { User } from "@/domain/user/user.entity";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception";
+import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 import { Either, left, right } from "@/core/Either";
 import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
 
@@ -81,17 +81,33 @@ export class UserRepositoryImpl implements IUserRepository {
   async save(
     user: User,
     transaction?: Transaction<DatabaseSchema>
-  ): Promise<void> {
-    if (transaction) {
+  ): Promise<Either<UseCaseError, void>> {
+    try {
+      if (transaction) {
       await this.saveUser(user, transaction);
     } else {
       await this.saveUser(user);
     }
+    return right(undefined);
+    } catch (err: any) {
+      if (err?.code === "23505") {
+      return left(new UseCaseError({
+        code: UseCaseErrorCode.CONFLICT,
+        message: UseCaseErrorMessage.user_already_exists,
+      }));
+    }
+    return left(new UseCaseError({
+      code: UseCaseErrorCode.INTERNAL,
+      message: UseCaseErrorMessage.fetch_error,
+      info: { cause: err?.message },
+    }));
+    }
+    
   }
 
   async getUserByFilter(
     filter: UserFiltersDto
-  ): Promise<Either<UseCaseError, UserModel>> {
+  ): Promise<Either<UseCaseError, UserModel |  null>> {
     try {
       let query = this.kysely.selectFrom("User").selectAll("User");
 
@@ -116,20 +132,13 @@ export class UserRepositoryImpl implements IUserRepository {
 
       const userModel = await query.executeTakeFirst();
 
-      if (!userModel) {
-        throw new UseCaseError({
-          code: UseCaseErrorCode.NOT_FOUND,
-          message: UseCaseErrorMessage.user_not_found,
-        });
-      }
-
-      return right(userModel);
+      return right(userModel ?? null);
     } catch (error) {
       return left(
         error instanceof UseCaseError
           ? error
           : new UseCaseError({
-              code: UseCaseErrorCode.BAD_REQUEST,
+              code: UseCaseErrorCode.INTERNAL,
               message: UseCaseErrorMessage.fetch_error,
             })
       );

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   HttpCode,
+  HttpException,
   Param,
   Post,
   Req,
@@ -19,6 +20,7 @@ import { Request } from "express";
 import { JwtRefreshAuthGuard } from "../auth/guards/jwt-refresh-auth.guard";
 import { DeleteUserUseCase } from "@/application/auth/usecases/deleteUser";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { mapUseCaseCodeToHttp } from "@/core/ErrorMappers";
 
 @Controller("/auth")
 export class AuthController {
@@ -34,7 +36,13 @@ export class AuthController {
   async register(@Body() createUserDto: CreateUserDto) {
     const body = createUserSchema.parse(createUserDto);
     const response = await this.registerUserUseCase.execute(body);
-    return response;
+    return response.fold(
+      (err) => {
+        const status = mapUseCaseCodeToHttp(err.code);
+        throw new HttpException(err.message, status);
+      },
+      (ok) => ok
+    );
   }
 
   @Post("/login")
@@ -42,7 +50,13 @@ export class AuthController {
   async login(@Body() loginUserDto: LoginUserDto) {
     const body = loginUserSchema.parse(loginUserDto);
     const response = await this.loginUserUseCase.execute(body);
-    return response;
+    return response.fold(
+      (err) => {
+        const status = mapUseCaseCodeToHttp(err.code);
+        throw new HttpException(err.message, status);
+      },
+      (ok) => ok
+    );
   }
 
   @Post("/logout")
