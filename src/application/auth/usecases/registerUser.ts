@@ -37,7 +37,7 @@ export class RegisterUserUseCase
 
     const maybeUser = fold(
       userE,
-      (_) => null,
+      () => null,
       (u) => u
     );
 

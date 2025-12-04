@@ -13,7 +13,7 @@ import { IUserService } from "@/application/shared/ports/IUserService";
 import { IKafkaService } from "@/application/shared/ports/IkafkaService";
 import { AppEvents, OtpPurpose } from "@/core/constants";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
-import { left, right } from "@/core/Either";
+import { right } from "@/core/Either";
 
 jest.mock("bcrypt", () => ({
   compare: jest.fn(),
@@ -242,7 +242,7 @@ describe("Login user use case", () => {
       phone: user.phone,
     };
     const result = await useCase.execute(loginUserDto);
-    
+
     expect(authService.generateAccessToken).toHaveBeenCalledWith(payload);
     expect(authService.generateRefreshToken).toHaveBeenCalledWith(payload);
     expect(userService.save).toHaveBeenCalledWith(

@@ -4,7 +4,10 @@ import { Inject, Injectable } from "@nestjs/common";
 import { UseCaseErrorMessage } from "../../auth/exception";
 import { LoginUserDto } from "@/infrastructure/http/dto/user/loginUserDto";
 import { IAuthService } from "../../shared/ports/IAuthService";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
+import {
+  UseCaseError,
+  UseCaseErrorCode,
+} from "@/application/shared/exception/useCaseError";
 import { IUserService } from "@/application/shared/ports/IUserService";
 import { OTPRequestedEvent } from "@/domain/user/events/otpRequest.event";
 import { AppEvents, OtpPurpose } from "@/core/constants";
@@ -23,7 +26,9 @@ export class LoginUserUseCase
     private readonly kafkaService: IKafkaService
   ) {}
 
-  public async execute(request: LoginUserDto): Promise<Either<UseCaseError, AuthResponseDto>> {
+  public async execute(
+    request: LoginUserDto
+  ): Promise<Either<UseCaseError, AuthResponseDto>> {
     const user = await this.userService.findOne({ phone: request.phone });
     return user.fold(
       async (err) => left(err),
@@ -53,10 +58,11 @@ export class LoginUserUseCase
             phone: userOrNull.phone,
             purpose: OtpPurpose.userRegister,
           });
-          const publishedE = await this.kafkaService.publishEvent<OTPRequestedEvent>(
-            AppEvents.otpRequested,
-            otpEvent
-          );
+          const publishedE =
+            await this.kafkaService.publishEvent<OTPRequestedEvent>(
+              AppEvents.otpRequested,
+              otpEvent
+            );
           const published = mapLeft(publishedE, mapInfraToUseCase);
           if (isLeft(published)) return published;
           return left(
@@ -67,7 +73,10 @@ export class LoginUserUseCase
           );
         }
 
-        const payload = { sub: userOrNull.guid.toValue(), phone: userOrNull.phone };
+        const payload = {
+          sub: userOrNull.guid.toValue(),
+          phone: userOrNull.phone,
+        };
         const accessToken = await this.authService.generateAccessToken(payload);
         const refreshToken =
           await this.authService.generateRefreshToken(payload);

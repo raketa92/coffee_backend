@@ -1,7 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserModel } from "@/infrastructure/persistence/kysely/models/user";
 import { Roles } from "@/core/constants/roles";
-import { NotFoundException } from "@nestjs/common";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
 import { EmailVerificationPurpose } from "@/core/constants";
 import { IUserService } from "@/application/shared/ports/IUserService";
@@ -10,12 +9,12 @@ import { IEmailVerificationService } from "@/application/shared/ports/IEmailServ
 import { EmailVerification } from "@/domain/email_verification/email_verification";
 import { addMinutes, subMinutes } from "date-fns";
 import {
-  UseCaseCommonErrorMessage,
   UseCaseError,
   UseCaseErrorCode,
 } from "@/application/shared/exception/useCaseError";
 import { UseCaseErrorMessage } from "../exception";
 import { OtpChangeEmailResponseDto } from "../dto";
+import { right } from "@/core/Either";
 
 describe("Process change email response use case", () => {
   let useCase: ProcessChangeEmailResponseUseCase;
@@ -61,18 +60,22 @@ describe("Process change email response use case", () => {
     expect(useCase).toBeDefined();
   });
 
-  it("should throw error if user not found", async () => {
+  it("should return Left(NOT_FOUND) if user not found", async () => {
     const email = "testEmail";
-    (userService.findOne as jest.Mock).mockResolvedValue(null);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(null));
     const dto: OtpChangeEmailResponseDto = {
       email,
       otp: "121212",
       userGuid,
     };
-    await expect(useCase.execute(dto)).rejects.toThrow(
-      new NotFoundException({
-        message: UseCaseCommonErrorMessage.user_not_found,
-      })
+    const res = await useCase.execute(dto);
+    expect(res._tag).toBe("Left");
+    res.fold(
+      (err) => {
+        expect(err.code).toBe(UseCaseErrorCode.NOT_FOUND);
+        expect(err.message).toBe(UseCaseErrorMessage.user_not_found);
+      },
+      () => fail("Expected Left(NOT_FOUND) but got right")
     );
   });
 
@@ -108,7 +111,7 @@ describe("Process change email response use case", () => {
       lastLogin: new Date(),
     };
     const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(user));
     (emailService.findOne as jest.Mock).mockResolvedValue(email);
     await expect(useCase.execute(dto)).rejects.toThrow(
       new UseCaseError({
@@ -152,7 +155,7 @@ describe("Process change email response use case", () => {
     };
 
     const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(user));
     (emailService.findOne as jest.Mock).mockResolvedValue(email);
     await expect(useCase.execute(dto)).rejects.toThrow(
       new UseCaseError({
@@ -192,7 +195,7 @@ describe("Process change email response use case", () => {
     };
 
     const user = UserMapper.toDomain(userModel);
-    (userService.findOne as jest.Mock).mockResolvedValue(user);
+    (userService.findOne as jest.Mock).mockResolvedValue(right(user));
 
     const email = EmailVerification.create({
       email: newEmail,
@@ -207,6 +210,6 @@ describe("Process change email response use case", () => {
     expect(userService.save).toHaveBeenCalledWith(user);
     expect(emailService.delete).toHaveBeenCalledWith(email.guid.toValue());
     expect(user.email).toEqual(newEmail);
-    expect(result).toEqual({ message: "Email verified successfully" });
+    expect(result).toEqual(right({ message: "Email verified successfully" }));
   });
 });
