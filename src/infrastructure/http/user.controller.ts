@@ -22,7 +22,6 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ChangePhoneUseCase } from "@/application/coffee_shop/usecases/user/changePhone";
 import { ChangePasswordUseCase } from "@/application/coffee_shop/usecases/user/changePassword";
 import { ChangeEmailUseCase } from "@/application/coffee_shop/usecases/user/changeEmail";
-import { UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
 import { mapUseCaseCodeToHttp } from "@/core/ErrorMappers";
 
 @Controller("/user")

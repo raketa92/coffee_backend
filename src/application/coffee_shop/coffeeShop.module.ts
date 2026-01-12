@@ -23,6 +23,7 @@ import { IAuthService } from "../shared/ports/IAuthService";
 import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
 import { JwtService } from "@nestjs/jwt";
 import { ChangeEmailUseCase } from "./usecases/user/changeEmail";
+import { OrdersGateway } from "@/infrastructure/websocket/orders.gateway";
 
 @Module({
   imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule],
@@ -52,6 +53,10 @@ import { ChangeEmailUseCase } from "./usecases/user/changeEmail";
     {
       provide: IBankService,
       useClass: BankServiceImpl,
+    },
+    {
+      provide: "IOrderStatusBroadcaster",
+      useClass: OrdersGateway,
     },
   ],
   exports: [

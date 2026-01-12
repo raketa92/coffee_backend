@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:17
+    image: postgres
     container_name: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -14,7 +14,7 @@ services:
       - dev-network
 
   redis:
-    image: redis:alpine
+    image: redis
     container_name: redis
     ports:
       - "6379:6379"
@@ -46,21 +46,21 @@ services:
     depends_on:
       - zookeeper
     volumes:
-      - kafka-data:/var/lib/kafka/data 
+      - kafka-data:/var/lib/kafka/data
     networks:
       - dev-network
 
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    container_name: kafdrop
-    depends_on:
-      - kafka
-    ports:
-      - "9000:9000"
-    environment:
-      KAFKA_BROKERCONNECT: "kafka:9093"
-    networks:
-      - dev-network
+  # kafdrop:
+  #   image: obsidiandynamics/kafdrop
+  #   container_name: kafdrop
+  #   depends_on:
+  #     - kafka
+  #   ports:
+  #     - "9000:9000"
+  #   environment:
+  #     KAFKA_BROKERCONNECT: "kafka:9093"
+  #   networks:
+  #     - dev-network
 
 volumes:
   postgres-data:

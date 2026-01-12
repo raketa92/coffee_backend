@@ -24,6 +24,11 @@ export type OrderResponseDto = {
   OrderItems: OrderItem[];
 };
 
+export type UpdateOrder = {
+  orderGuid: string;
+  status: OrderStatus;
+};
+
 export type CreateOrderResponseDto = Omit<
   OrderResponseDto,
   "OrderItems" | "shopName" | "shopRating" | "date"

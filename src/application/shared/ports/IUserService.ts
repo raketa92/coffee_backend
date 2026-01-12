@@ -7,7 +7,9 @@ import { Transaction } from "kysely";
 import { UseCaseError } from "../exception/useCaseError";
 
 export abstract class IUserService {
-  abstract findOne(filter: UserFiltersDto): Promise<Either<UseCaseError, User | null>>;
+  abstract findOne(
+    filter: UserFiltersDto
+  ): Promise<Either<UseCaseError, User | null>>;
   abstract findUserByRefreshToken(refreshToken: string): Promise<User | null>;
   abstract save(
     user: User,

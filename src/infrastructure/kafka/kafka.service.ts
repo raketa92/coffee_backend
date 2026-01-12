@@ -25,7 +25,9 @@ export class KafkaService implements OnModuleInit, IKafkaService {
 
   async publishEvent<T>(topic: AppEvents, event: T) {
     try {
-      await lastValueFrom(this.kafkaClient.emit<T>(topic, JSON.stringify(event)));
+      await lastValueFrom(
+        this.kafkaClient.emit<T>(topic, JSON.stringify(event))
+      );
       return right(undefined);
     } catch (error: any) {
       return left(new InfraError(error.message));
