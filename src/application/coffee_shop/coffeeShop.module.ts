@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { RedisModule } from "@infrastructure/persistence/redis/redis.module";
 import { RedisService } from "@infrastructure/persistence/redis/redis.service";
 import { EnvModule } from "@infrastructure/env";
@@ -23,10 +23,17 @@ import { IAuthService } from "../shared/ports/IAuthService";
 import { AuthServiceImpl } from "@/infrastructure/auth/auth.service";
 import { JwtService } from "@nestjs/jwt";
 import { ChangeEmailUseCase } from "./usecases/user/changeEmail";
-import { OrdersGateway } from "@/infrastructure/websocket/orders.gateway";
+import { UpdateOrderStatusUseCase } from "./usecases/order/updateOrderStatus";
+import { WebsocketModule } from "@/infrastructure/websocket/websocket.module";
 
 @Module({
-  imports: [RedisModule, EnvModule, DatabaseModule, PaymentModule],
+  imports: [
+    RedisModule,
+    EnvModule,
+    DatabaseModule,
+    PaymentModule,
+    forwardRef(() => WebsocketModule),
+  ],
   providers: [
     RedisService,
     JwtService,
@@ -42,6 +49,7 @@ import { OrdersGateway } from "@/infrastructure/websocket/orders.gateway";
     ChangePhoneUseCase,
     ChangePasswordUseCase,
     ChangeEmailUseCase,
+    UpdateOrderStatusUseCase,
     {
       provide: IUserService,
       useClass: UserService,
@@ -53,10 +61,6 @@ import { OrdersGateway } from "@/infrastructure/websocket/orders.gateway";
     {
       provide: IBankService,
       useClass: BankServiceImpl,
-    },
-    {
-      provide: "IOrderStatusBroadcaster",
-      useClass: OrdersGateway,
     },
   ],
   exports: [
@@ -72,6 +76,7 @@ import { OrdersGateway } from "@/infrastructure/websocket/orders.gateway";
     ChangePhoneUseCase,
     ChangePasswordUseCase,
     ChangeEmailUseCase,
+    UpdateOrderStatusUseCase,
   ],
 })
 export class CoffeeShopModule {}

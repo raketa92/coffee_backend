@@ -40,10 +40,6 @@ export class UpdateOrderStatusUseCase
       );
     }
 
-    if (orderModel.paymentMethod !== PaymentMethods.card) {
-      return right({ status: orderModel.status });
-    }
-
     if (
       [OrderStatus.completed, OrderStatus.canceled].includes(orderModel.status)
     ) {

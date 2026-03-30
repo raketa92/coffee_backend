@@ -101,7 +101,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
     } else {
       await this.kysely.transaction().execute(async (trx) => {
         await this.saveOrder(order, trx);
-        await this.saveOrderItems(order.orderItems, orderModelData.guid, trx);
+        // await this.saveOrderItems(order.orderItems, orderModelData.guid, trx);
       });
     }
     return order;

@@ -1,11 +1,11 @@
-import { Kysely } from "kysely";
+import { Kysely, sql } from "kysely";
 
 const tableName = "OrderItem";
 
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable(tableName)
-    .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
+    .addColumn("guid", "uuid", (col) => col.unique().primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn("orderGuid", "uuid", (col) =>
       col.references("Order.guid").onDelete("cascade")
     )

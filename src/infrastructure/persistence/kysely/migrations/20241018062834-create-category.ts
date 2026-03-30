@@ -1,11 +1,11 @@
-import { Kysely } from "kysely";
+import { Kysely, sql } from "kysely";
 import { withTimestamps } from "../helpers/dateColumns";
 
 const tableName = "Category";
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable(tableName)
-    .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
+    .addColumn("guid", "uuid", (col) => col.unique().primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn("name", "text", (col) => col.notNull().unique())
     .addColumn("iconUrl", "text", (col) => col.notNull())
     .$call(withTimestamps)

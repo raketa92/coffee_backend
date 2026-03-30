@@ -39,7 +39,7 @@ export class OrdersGateway implements IOrderStatusBroadcaster {
     const userId = client.user?.id;
 
     if (!userId) {
-      client.emit("order_status_live_error", { reason: "UNAUTHORIZED" });
+      client.emit("order_status_live_error", { reason: "UNAUTHORIZED from handleSubscribe" });
       return;
     }
 

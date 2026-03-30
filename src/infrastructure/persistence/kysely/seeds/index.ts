@@ -72,7 +72,7 @@ const products = [
     price: 30,
     categoryGuid: categories[1].guid,
     shopGuid: shops[0].guid,
-    ingredients: ["shocolate"],
+    ingredients: ["chocolate"],
     rating: 4,
   },
   {
@@ -111,6 +111,16 @@ const products = [
     categoryGuid: categories[2].guid,
     shopGuid: shops[2].guid,
     rating: 4,
+  },
+  {
+    guid: "f7cd3818-8696-4f00-866a-34e202025a1b",
+    name: "Cappucino",
+    image: "cappucino.jpg",
+    price: 35,
+    categoryGuid: categories[0].guid,
+    shopGuid: shops[2].guid,
+    ingredients: ["caramel syrup", "fruit syrup"],
+    rating: 5,
   },
 ];
 

@@ -14,6 +14,7 @@ import {
   Body,
   Controller,
   HttpCode,
+  HttpException,
   Param,
   Post,
   UseGuards,
@@ -21,6 +22,7 @@ import {
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ProcessChangePhoneOtpResponseUseCase } from "@/application/otp/usecases/processChangePhoneOtpResponse";
 import { ProcessChangePasswordOtpResponseUseCase } from "@/application/otp/usecases/processChangePasswordOtpResponse";
+import { mapUseCaseCodeToHttp } from "@/core/ErrorMappers";
 
 @Controller("otp")
 export class OtpController {
@@ -34,9 +36,16 @@ export class OtpController {
   @Post("/initial")
   @HttpCode(200)
   async handleInitialOtpResponse(@Body() dto: OtpResponseDto) {
-    return await this.processInitialOtpUseCase.execute(
+    const response = await this.processInitialOtpUseCase.execute(
       otpResponseSchema.parse(dto)
     );
+    return response.fold(
+          (err) => {
+            const status = mapUseCaseCodeToHttp(err.code);
+            throw new HttpException(err.message, status);
+          },
+          (ok) => ok
+        );
   }
 
   @Post("/change-phone/:userGuid")

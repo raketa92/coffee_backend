@@ -6,7 +6,7 @@ const tableName = "User";
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable(tableName)
-    .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
+    .addColumn("guid", "uuid", (col) => col.unique().primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn("password", "text", (col) => col.notNull())
     .addColumn("email", "varchar(60)")
     .addColumn("phone", "varchar(20)", (col) => col.notNull())

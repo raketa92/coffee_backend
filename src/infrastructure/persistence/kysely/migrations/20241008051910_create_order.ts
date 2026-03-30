@@ -1,4 +1,4 @@
-import { Kysely } from "kysely";
+import { Kysely, sql } from "kysely";
 import { withTimestamps } from "../helpers/dateColumns";
 
 const tableName = "Order";
@@ -6,7 +6,7 @@ const tableName = "Order";
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable(tableName)
-    .addColumn("guid", "uuid", (col) => col.unique().primaryKey())
+    .addColumn("guid", "uuid", (col) => col.unique().primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn("orderNumber", "varchar(50)", (col) => col.notNull().unique())
     .addColumn("userGuid", "uuid")
     .addColumn("shopGuid", "uuid", (col) => col.notNull())

@@ -16,6 +16,7 @@ import { OtpModule } from "./application/otp/otp.module";
 import { EmailVerificationModule } from "./application/email_verification/emailVerification.module";
 import { KafkaConsumerModule } from "./infrastructure/kafka/kafka_consumer.module";
 import { KafkaProducerModule } from "./infrastructure/kafka/kafka_producer.module";
+import { WebsocketModule } from "./infrastructure/websocket/websocket.module";
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { KafkaProducerModule } from "./infrastructure/kafka/kafka_producer.modul
     AuthConfigModule,
     KafkaConsumerModule,
     KafkaProducerModule,
+    WebsocketModule,
     CoffeeShopModule,
     OtpModule,
     EmailVerificationModule,

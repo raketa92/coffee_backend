@@ -8,20 +8,20 @@ export class RedisService {
   async generateOrderNumber(): Promise<string> {
     const client = this.redisClient;
 
-    const now = new Date();
-    const datePart = this.formatDate(now);
+    // const now = new Date();
+    // const datePart = this.formatDate(now);
 
     let randomPart: string;
 
-    let orderNumber: string;
+    // let orderNumber: string;
     do {
-      randomPart = Math.floor(100000 + Math.random() * 900000).toString();
-      orderNumber = `${datePart}${randomPart}`;
-    } while (await client.exists(orderNumber));
+      randomPart = Math.floor(1000 + Math.random() * 9000).toString();
+      // orderNumber = `${datePart}${randomPart}`;
+    } while (await client.exists(randomPart));
 
-    await client.set(orderNumber, "1", "EX", 24 * 60 * 60);
+    await client.set(randomPart, "1", "EX", 24 * 60 * 60);
 
-    return orderNumber;
+    return randomPart;
   }
 
   private formatDate(date: Date): string {
