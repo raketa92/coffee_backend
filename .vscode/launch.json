@@ -8,7 +8,7 @@
       "type": "node",
         "request": "launch",
         "name": "Debug Nest",
-        "runtimeExecutable": "npm",
+        "runtimeExecutable": "/Users/raketa/.nvm/versions/node/v20.11.1/bin/npm",
         "runtimeArgs": [
           "run",
           "start:debug",

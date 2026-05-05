@@ -31,14 +31,6 @@ const deliveryTimeSchema = z.string().superRefine((val, ctx) => {
     });
     return;
   }
-
-  const now = new Date();
-  if (now > end) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Current time is not within deliveryTime range",
-    });
-  }
 });
 
 function parseTimeToToday(timeStr: string): Date {

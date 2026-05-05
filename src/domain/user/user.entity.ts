@@ -13,6 +13,7 @@ export interface IUserProps {
   isVerified: boolean;
   isActive: boolean;
   lastLogin?: Date;
+  refreshToken?: string;
 }
 
 export class User extends AggregateRoot<IUserProps> {
@@ -55,6 +56,7 @@ export class User extends AggregateRoot<IUserProps> {
 
   setRefreshToken(token: string) {
     this._refreshToken = token;
+    this.addChangedFields("refreshToken");
   }
 
   changePassword(password: string) {
@@ -104,6 +106,7 @@ export class User extends AggregateRoot<IUserProps> {
 
   removeRefreshToken() {
     this._refreshToken = null;
+    this.addChangedFields("refreshToken");
   }
 
   static create(props: IUserProps, guid?: UniqueEntityID): User {

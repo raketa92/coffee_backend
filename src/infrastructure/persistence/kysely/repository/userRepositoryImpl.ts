@@ -6,7 +6,10 @@ import { UserFiltersDto } from "@/infrastructure/http/dto/user/filters";
 import { UserCreateModel, UserModel, UserUpdateModel } from "../models/user";
 import { User } from "@/domain/user/user.entity";
 import { UserMapper } from "@/infrastructure/dataMappers/userMapper";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
+import {
+  UseCaseError,
+  UseCaseErrorCode,
+} from "@/application/shared/exception/useCaseError";
 import { Either, left, right } from "@/core/Either";
 import { UseCaseErrorMessage } from "@/application/coffee_shop/exception";
 
@@ -84,30 +87,33 @@ export class UserRepositoryImpl implements IUserRepository {
   ): Promise<Either<UseCaseError, void>> {
     try {
       if (transaction) {
-      await this.saveUser(user, transaction);
-    } else {
-      await this.saveUser(user);
-    }
-    return right(undefined);
+        await this.saveUser(user, transaction);
+      } else {
+        await this.saveUser(user);
+      }
+      return right(undefined);
     } catch (err: any) {
       if (err?.code === "23505") {
-      return left(new UseCaseError({
-        code: UseCaseErrorCode.CONFLICT,
-        message: UseCaseErrorMessage.user_already_exists,
-      }));
+        return left(
+          new UseCaseError({
+            code: UseCaseErrorCode.CONFLICT,
+            message: UseCaseErrorMessage.user_already_exists,
+          })
+        );
+      }
+      return left(
+        new UseCaseError({
+          code: UseCaseErrorCode.INTERNAL,
+          message: UseCaseErrorMessage.fetch_error,
+          info: { cause: err?.message },
+        })
+      );
     }
-    return left(new UseCaseError({
-      code: UseCaseErrorCode.INTERNAL,
-      message: UseCaseErrorMessage.fetch_error,
-      info: { cause: err?.message },
-    }));
-    }
-    
   }
 
   async getUserByFilter(
     filter: UserFiltersDto
-  ): Promise<Either<UseCaseError, UserModel |  null>> {
+  ): Promise<Either<UseCaseError, UserModel | null>> {
     try {
       let query = this.kysely.selectFrom("User").selectAll("User");
 

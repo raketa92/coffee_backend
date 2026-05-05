@@ -4,7 +4,10 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { UseCaseErrorMessage } from "../../auth/exception";
 import { UserTokenDto } from "@/infrastructure/http/dto/user/logoutUserDto";
 import { IAuthService } from "../../shared/ports/IAuthService";
-import { UseCaseError, UseCaseErrorCode } from "@/application/shared/exception/useCaseError";
+import {
+  UseCaseError,
+  UseCaseErrorCode,
+} from "@/application/shared/exception/useCaseError";
 import { IUserService } from "@/application/shared/ports/IUserService";
 
 @Injectable()
@@ -32,7 +35,7 @@ export class RefreshTokenUseCase
         request.refreshToken
       );
       user.setRefreshToken(newTokens.refreshToken);
-      this.userservice.save(user);
+      await this.userservice.save(user);
 
       return newTokens;
     } catch (error: any) {

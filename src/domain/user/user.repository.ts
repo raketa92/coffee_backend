@@ -12,7 +12,10 @@ export interface IUserRepository {
   ): Promise<Either<UseCaseError, UserModel | null>>;
   getUserByRefreshToken(refreshToken: string): Promise<UserModel | null>;
   updateRefreshToken(userGuid: string, refreshToken: string): Promise<void>;
-  save(user: User, transaction?: Transaction<DatabaseSchema>): Promise<Either<UseCaseError, void>>;
+  save(
+    user: User,
+    transaction?: Transaction<DatabaseSchema>
+  ): Promise<Either<UseCaseError, void>>;
   delete(
     userGuid: string,
     transaction?: Transaction<DatabaseSchema>

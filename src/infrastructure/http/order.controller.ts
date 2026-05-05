@@ -1,11 +1,18 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from "@nestjs/common";
 import { CreateOrderUseCase } from "@application/coffee_shop/usecases/order/createOrder";
 import { CreateOrderDto, createOrderSchema } from "./dto/order/createOrderDto";
 import { OrderFilterDto } from "./dto/order/filters";
 import { GetOrdersUseCase } from "@/application/coffee_shop/usecases/order/getOrders";
 import { CheckOrderUseCase } from "@/application/coffee_shop/usecases/order/checkOrderStatus";
 import { UpdateOrderStatusUseCase } from "@/application/coffee_shop/usecases/order/updateOrderStatus";
-import { OrderStatus } from "@/core/constants";
 import { UpdateOrderStatusDto } from "./dto/order/updateOrderDto";
 
 @Controller("/order")
@@ -43,7 +50,10 @@ export class OrderController {
   }
 
   @Patch("/status/:orderGuid")
-  async updateOrderStatus(@Param("orderGuid") orderGuid: any, @Body("status") status: UpdateOrderStatusDto['status']) {
+  async updateOrderStatus(
+    @Param("orderGuid") orderGuid: any,
+    @Body("status") status: UpdateOrderStatusDto["status"]
+  ) {
     await this.updateOrderStatusUseCase.execute({ orderGuid, status });
     return { message: "Update order status endpoint" };
   }
